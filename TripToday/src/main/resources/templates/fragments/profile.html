@@ -1,10 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>Title</title>
 </head>
 <body>
-$END$
+<div th:fragment="profile">
+    <img width="200" height="200" th:src="${profile.get('picture')}"/>
+    <p th:text="'Your email: ' + ${profile.get('email')}"></p>
+    <p th:text="'Account role: ' + ${profile.get('role')}"></p>
+    <p id="user-id" th:text="${profile.get('user_id')}" style="display: none"></p>
+
+    <div th:if="${#strings.startsWith(profile.get('user_id'), 'auth0')}">
+        <input id="image-url-input" type="text" placeholder="Enter URL of picture here">
+        <button type="button" th:onclick="updatePicture(document.getElementById('user-id').innerText, document.getElementById('image-url-input').value)">Update picture</button>
+    </div>
+</div>
 </body>
 </html>
