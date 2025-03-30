@@ -1,25 +1,10 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
-    <link rel="stylesheet" href="/index.css">
 </head>
 <body>
 
-<div sec:authorize="!isAuthenticated()">
-    <a th:href="@{/oauth2/authorization/okta}">Log In</a>
-</div>
-<div class="navbar" sec:authorize="isAuthenticated()">
-    <div class="navbar__menu">
-        <a href="">Home</a>
-        <a href="">Meet the guides</a>
-        <a href="">Upcoming trips</a>
-        <a href="">Profile</a>
-    </div>
-    <div class="navbar__profile">
-        <img th:src="${profile.get('picture')}" th:attr="alt=${profile.get('name')}"/>
-        <p th:text="${profile.get('email')}"></p>
-        <a th:href="@{/logout}">Log Out</a>
-    </div>
-</div>
+    <div th:replace="~{/fragments/header :: header}"></div>
+
 
 </body>
 </html>
