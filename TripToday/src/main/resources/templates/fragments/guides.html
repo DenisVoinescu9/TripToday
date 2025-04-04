@@ -1,0 +1,19 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="guides">
+    <h2>Our guides</h2>
+    <div class="guides-list">
+        <div class="guide-card" th:each="user : ${users}">
+            <img width="200" height="200" th:src="${user['picture']}" alt="User Avatar" class="user-avatar">
+            <div class="guide-info">
+                <p><strong>Email:</strong> <span th:text="${user['email']}"></span></p>
+
+                <!-- Afișează descrierea doar dacă există -->
+
+                    <strong>Description:</strong> <span th:text="${user['description']}"></span>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

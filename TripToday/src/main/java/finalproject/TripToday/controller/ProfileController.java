@@ -13,7 +13,7 @@ public class ProfileController {
 
 
     @GetMapping("/profile")
-    public String home(Model model, @AuthenticationPrincipal OidcUser principal) {
+    public String profile(Model model, @AuthenticationPrincipal OidcUser principal) {
         if (principal != null) {
             model.addAttribute("profile", principal.getClaims());
         }

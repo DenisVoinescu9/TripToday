@@ -27,14 +27,14 @@ async function getApi2Token() {
         }
 
         const data = await response.json();
-        return data.access_token; // Returnăm token-ul corect
+        return data.access_token;
     } catch (error) {
         console.error("Error getting token:", error);
     }
 }
 
 async function updatePicture(userId, imageUrl) {
-    const token = await getApi2Token(); // Așteptăm token-ul înainte de a-l folosi
+    const token = await getApi2Token();
 
     if (!token) {
         console.error("Failed to retrieve token!");
@@ -48,16 +48,14 @@ async function updatePicture(userId, imageUrl) {
         const response = await fetch(url, {
             method: "PATCH",
             headers: {
-                "Authorization": `Bearer ${token}`, // Folosim token-ul corect
+                "Authorization": `Bearer ${token}`,
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(body)
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
 
+        alert("Profile picture updated successfully!")
         console.log("Profile picture updated successfully!");
 
     } catch (error) {
@@ -65,27 +63,25 @@ async function updatePicture(userId, imageUrl) {
     }
 }
 
-// function silentAuthentication() {
-//     const clientId = "F5gDUwTRwbqS1lJPLr0Dts4oRBrr1G8D";
-//     const domain = "https://dev-an6hxzzvf6uoryjw.us.auth0.com";
-//     const redirectUri = window.location.origin + "/profile"; //
-//     const audience = "https://dev-an6hxzzvf6uoryjw.us.auth0.com/api/v2/";
-//     const scope = "openid profile email";
-//     const state = btoa(Math.random().toString(36).substring(2));
-//     const nonce = btoa(Math.random().toString(36).substring(2));
-//
-//     const authUrl = `${domain}/authorize?` + new URLSearchParams({
-//         response_type: "id_token token",
-//         client_id: clientId,
-//         redirect_uri: redirectUri,
-//         state: state,
-//         scope: scope,
-//         nonce: nonce,
-//         audience: audience,
-//         response_mode: "fragment",
-//         prompt: "none", // Silent authentication
-//     });
-//
-//     window.location.href = authUrl; // Redirecționăm userul pentru autentificare
-// }
+async function updateGuideDescription(userId, description) {
+    const token = await getApi2Token();
+    if (!token) return console.error("Failed to retrieve token!");
+
+    const url = `https://dev-an6hxzzvf6uoryjw.us.auth0.com/api/v2/users/${userId}`;
+    const body = { "user_metadata": { "description": description } };
+
+    try {
+        await fetch(url, {
+            method: "PATCH",
+            headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+        });
+
+        alert("Guide description updated successfully!");
+    } catch (error) {
+        console.error("Error updating description:", error);
+    }
+}
+
+
 
