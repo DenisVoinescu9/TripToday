@@ -15,7 +15,7 @@ public class ProfileController {
     @GetMapping("/profile")
     public String profile(Model model, @AuthenticationPrincipal OidcUser principal) {
         if (principal != null) {
-            model.addAttribute("profile", principal.getClaims());
+            model.addAttribute("user", principal.getClaims());
         }
         return "profile";
     }

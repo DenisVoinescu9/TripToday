@@ -3,14 +3,15 @@
 <div th:fragment="guides">
     <h2>Our guides</h2>
     <div class="guides-list">
-        <div class="guide-card" th:each="user : ${users}">
-            <img width="200" height="200" th:src="${user['picture']}" alt="User Avatar" class="user-avatar">
+        <div class="guide-card" th:each="guide : ${guides}">
+            <img width="200" height="200" th:src="${guide['picture']}" alt="User Avatar" class="user-avatar">
             <div class="guide-info">
-                <p><strong>Email:</strong> <span th:text="${user['email']}"></span></p>
+                <p><strong>Email:</strong> <span th:text="${guide['email']}"></span></p>
 
                 <!-- Afișează descrierea doar dacă există -->
 
-                    <strong>Description:</strong> <span th:text="${user['description']}"></span>
+                <td th:text="'Description: ' + ${guide['description']}"></td>
+
             </div>
         </div>
     </div>
