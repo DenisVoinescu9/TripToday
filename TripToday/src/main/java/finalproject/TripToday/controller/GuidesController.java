@@ -1,5 +1,8 @@
 package finalproject.TripToday.controller;
+
 import org.springframework.http.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.ui.Model;
 
 import org.springframework.stereotype.Controller;
@@ -25,12 +28,7 @@ public class GuidesController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        Map<String, String> requestBody = Map.of(
-                "grant_type", "client_credentials",
-                "client_id", CLIENT_ID,
-                "client_secret", CLIENT_SECRET,
-                "audience", AUDIENCE
-        );
+        Map<String, String> requestBody = Map.of("grant_type", "client_credentials", "client_id", CLIENT_ID, "client_secret", CLIENT_SECRET, "audience", AUDIENCE);
 
         HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
 
@@ -44,30 +42,64 @@ public class GuidesController {
     }
 
     @GetMapping("/guides")
-    public String guides(Model model) {
-
-        String url = "https://dev-an6hxzzvf6uoryjw.us.auth0.com/api/v2/roles/rol_y9CbKaiBPr8RoikW/users";
+    public String guides(Model model, @AuthenticationPrincipal OidcUser principal) {
         String accessToken = "Bearer " + getApi2Token();
 
+        String getARolesUsersAPI = "https://dev-an6hxzzvf6uoryjw.us.auth0.com/api/v2/roles/rol_y9CbKaiBPr8RoikW/users";
+        String getUserByIdAPI = "https://dev-an6hxzzvf6uoryjw.us.auth0.com/api/v2/users/";
 
         // Configurare headers
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", accessToken);
 
-        // Configurare request
+        // Configurare request pentru obținerea ghidurilor
         HttpEntity<String> entity = new HttpEntity<>(headers);
         RestTemplate restTemplate = new RestTemplate();
 
-        // Efectuare cerere GET
-        ResponseEntity<List> response = restTemplate.exchange(url, HttpMethod.GET, entity, List.class);
-        List<Map<String, Object>> users = response.getBody();
+        // Efectuare cerere GET pentru ghiduri
+        ResponseEntity<List> response = restTemplate.exchange(getARolesUsersAPI, HttpMethod.GET, entity, List.class);
+        List<Map<String, Object>> guides = response.getBody();
+
+        // Iterăm prin lista de ghiduri și facem un request pentru fiecare pentru a obține "user_metadata.description"
+        if (guides != null && !guides.isEmpty()) {
+            for (Map<String, Object> guide : guides) {
+                String userId = (String) guide.get("user_id");  // presupunem că există un câmp user_id în fiecare guide
+
+                String userApiUrl = getUserByIdAPI + "/" + userId;
+
+                HttpEntity<String> userEntity = new HttpEntity<>(headers);
+
+                ResponseEntity<Map> userResponse = restTemplate.exchange(userApiUrl, HttpMethod.GET, userEntity, Map.class);
+                Map<String, Object> userDetails = userResponse.getBody();
+
+                System.out.println(userDetails);
+                assert userDetails != null;
+                if (userDetails.containsKey("user_metadata")) {
+                    Map<String, Object> userMetadata = (Map<String, Object>) userDetails.get("user_metadata");
+
+                    if (userMetadata.containsKey("description")) {
+
+                        if (userMetadata.get("description").toString().trim().isEmpty())
+                            guide.put("description", "The guide has no description...");
+                        else guide.put("description", userMetadata.get("description").toString());
+                    } else {
+                        guide.put("description", "The guide has no description. The user_metadata doesn't have key 'description'");
+                    }
+                } else {
+                    guide.put("description", "The guide has no description. There is no user_metadata");
+                }
+
+
+            }
+
+
+        }
+
 
         // Adăugare date în model pentru Thymeleaf
-        model.addAttribute("users", users);
+        model.addAttribute("guides", guides);
 
         return "guides";
-
-
     }
 
 
