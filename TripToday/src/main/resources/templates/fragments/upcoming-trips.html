@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="trips">
+    <h1>Available Trips</h1>
+
+    <!-- If trips are available, display them in a table -->
+    <div th:if="${trips != null}">
+        <table border="1">
+            <thead>
+            <p  th:text="${user.get('user_id')}"></p>
+
+            <tr>
+                <th>Trip ID</th>
+                <th>Destination</th>
+                <th>Departure Location</th>
+                <th>Departure Date</th>
+                <th>Departure Hour</th>
+                <th>Return Date</th>
+                <th>Duration (days)</th>
+                <th>Available Spots</th>
+                <th>Registration Fee</th>
+                <th>Guide</th>
+                <th>Description</th>
+                <th>Hotel</th>
+                <th>Picture</th>
+                <th>Enroll</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="trip : ${trips}">
+                <td th:text="${trip.id}">Trip ID</td>
+                <td th:text="${trip.destination}">Destination</td>
+                <td th:text="${trip.departureLocation}">Departure Location</td>
+                <td th:text="${trip.departureDate}">Departure Date</td>
+                <td th:text="${trip.departureHour}">Departure Hour</td>
+                <td th:text="${trip.returnDate}">Return Date</td>
+                <td th:text="${trip.durationDays}">Duration (days)</td>
+                <td th:text="${trip.availableSpots}">Available Spots</td>
+                <td th:text="${trip.registrationFee}">Registration Fee</td>
+                <td th:text="${trip.guideId}">Guide</td>
+                <td th:text="${trip.description}">Description</td>
+                <td th:text="${trip.hotelName}">Hotel</td>
+                <td>
+                    <img th:src="@{${trip.picture}}" width="150" height="150" alt="Trip Image"/>
+                </td>
+                <td>
+                    <!-- Create a form for each trip -->
+                    <form th:action="@{/enroll}" method="post">
+                        <input type="hidden" th:value="${trip.id}" name="tripId" />
+                        <button type="submit">Enroll in trip</button>
+                    </form>
+                </td>
+
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- If there are no trips, show a message -->
+    <div th:if="${trips == null or #lists.isEmpty(trips)}">
+        <p>No trips available at the moment.</p>
+    </div>
+</div>
+</html>

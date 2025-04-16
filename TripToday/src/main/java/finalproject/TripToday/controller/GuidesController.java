@@ -80,13 +80,19 @@ public class GuidesController {
                     if (userMetadata.containsKey("description")) {
 
                         if (userMetadata.get("description").toString().trim().isEmpty())
+
+                            // user.user_metadata has key description but it's empty
                             guide.put("description", "The guide has no description...");
                         else guide.put("description", userMetadata.get("description").toString());
                     } else {
-                        guide.put("description", "The guide has no description. The user_metadata doesn't have key 'description'");
+
+                        // user.user_metadata doesn't have key 'description'
+                        guide.put("description", "The guide has no description.");
                     }
                 } else {
-                    guide.put("description", "The guide has no description. There is no user_metadata");
+
+                    // user.user_metadata is null
+                    guide.put("description", "The guide has no description.");
                 }
 
 
