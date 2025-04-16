@@ -10,12 +10,13 @@
     <img width="200" height="200" th:src="${user.get('picture')}"/>
     <p th:text="'Your email: ' + ${user.get('email')}"></p>
     <p th:text="'Account role: ' + ${user.get('role')}"></p>
-    <p id="user-id" th:text="${user.get('user_id')}" style="display: none"></p>
+    <p id="user-id" th:text="${user.get('user_id')}"></p>
 
     <!-- Câmp vizibil doar pentru utilizatori cu rol "Guide" -->
     <div th:if="${user.get('role') == 'Guide'}" class="description-container">
-        <label for="description"><strong>Your description:</strong></label>
-        <textarea id="description" placeholder="Enter your description..."></textarea>
+        <label><strong>Your description:</strong></label>
+        <!-- Populează textarea cu descrierea din model -->
+        <textarea id="description" th:text="${description}" placeholder="Enter your description..."></textarea>
         <button type="button" th:onclick="updateGuideDescription(document.getElementById('user-id').innerText, document.getElementById('description').value)">Save Description</button>
     </div>
 
@@ -23,6 +24,11 @@
     <div th:if="${#strings.startsWith(user.get('user_id'), 'auth0')}">
         <input id="image-url-input" type="text" placeholder="Enter URL of picture here">
         <button type="button" th:onclick="updatePicture(document.getElementById('user-id').innerText, document.getElementById('image-url-input').value)">Update picture</button>
+    </div>
+
+    <div>
+        <div>My past trips</div>
+        <div>My upcoming trips</div>
     </div>
 </div>
 
