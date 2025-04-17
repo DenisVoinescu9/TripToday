@@ -1,10 +1,13 @@
 package finalproject.TripToday.controller;
 
+import finalproject.TripToday.entity.Trip;
 import finalproject.TripToday.entity.UserTrip;
+import finalproject.TripToday.service.TripService;
 import finalproject.TripToday.service.UserTripService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,9 +16,11 @@ import java.util.Optional;
 public class UserTripController {
 
     private final UserTripService userTripService;
+    private final TripService tripService;
 
-    public UserTripController(UserTripService userTripService) {
+    public UserTripController(UserTripService userTripService, TripService tripService) {
         this.userTripService = userTripService;
+        this.tripService = tripService;
     }
 
     @PostMapping
@@ -29,6 +34,8 @@ public class UserTripController {
         List<UserTrip> userTrips = userTripService.getAllUserTrips();
         return ResponseEntity.ok(userTrips);
     }
+
+
 
     @GetMapping("/{id}")
     public ResponseEntity<UserTrip> getUserTripById(@PathVariable Integer id) {

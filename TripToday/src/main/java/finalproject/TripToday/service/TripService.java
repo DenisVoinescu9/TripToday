@@ -1,22 +1,25 @@
 package finalproject.TripToday.service;
 
 import finalproject.TripToday.entity.Trip;
+import finalproject.TripToday.entity.UserTrip;
 import finalproject.TripToday.repository.TripRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class TripService {
 
     private final TripRepository tripRepository;
 
+    private final UserTripService userTripService;
 
-    public TripService(TripRepository tripRepository) {
+
+    public TripService(TripRepository tripRepository, UserTripService userTripService) {
         this.tripRepository = tripRepository;
+        this.userTripService = userTripService;
     }
 
 
@@ -28,6 +31,47 @@ public class TripService {
     public Optional<Trip> getTripById(Integer id) {
         return tripRepository.findById(id);
     }
+
+    public List<Optional<Trip>> getUserTripsByUserId(String userId) {
+        List<UserTrip> userTrips = userTripService.getAllUserTripsByUserId(userId);
+
+        List<Optional<Trip>> trips = new ArrayList<>();
+
+        for (UserTrip userTrip : userTrips) {
+            int currentUserTripId = userTrip.getTripId();
+            Optional<Trip> trip = getTripById(currentUserTripId);
+            trips.add(trip);
+        }
+        return trips;
+    }
+
+// Existing TripService...
+
+    public Map<String, List<Trip>> splitUserTripsByDate(String userId) {
+        List<UserTrip> userTrips = userTripService.getAllUserTripsByUserId(userId);
+
+        List<Trip> pastTrips = new ArrayList<>();
+        List<Trip> upcomingTrips = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+
+        for (UserTrip userTrip : userTrips) {
+            Optional<Trip> tripOptional = getTripById(userTrip.getTripId());
+            tripOptional.ifPresent(trip -> {
+                if (trip.getDepartureDate().isBefore(today) || trip.getDepartureDate().isEqual(today)) {
+                    pastTrips.add(trip);
+                } else {
+                    upcomingTrips.add(trip);
+                }
+            });
+        }
+
+        Map<String, List<Trip>> result = new HashMap<>();
+        result.put("pastTrips", pastTrips);
+        result.put("upcomingTrips", upcomingTrips);
+
+        return result;
+    }
+
 
     @Transactional
     public boolean decrementAvailableSpots(Integer tripId) {

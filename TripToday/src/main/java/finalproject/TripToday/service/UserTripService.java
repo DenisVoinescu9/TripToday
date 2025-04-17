@@ -2,6 +2,7 @@ package finalproject.TripToday.service;
 
 import finalproject.TripToday.entity.UserTrip;
 import finalproject.TripToday.repository.UserTripRepository;
+import org.apache.catalina.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,6 +27,10 @@ public class UserTripService {
 
     public List<UserTrip> getAllUserTrips() {
         return userTripRepository.findAll();
+    }
+
+    public List<UserTrip> getAllUserTripsByUserId(String userId) {
+        return userTripRepository.findAllByUserId(userId);
     }
 
     public UserTrip updateUserTrip(Integer id, UserTrip userTripDetails) {
