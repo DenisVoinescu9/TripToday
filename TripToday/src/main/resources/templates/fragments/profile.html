@@ -26,10 +26,48 @@
         <button type="button" th:onclick="updatePicture(document.getElementById('user-id').innerText, document.getElementById('image-url-input').value)">Update picture</button>
     </div>
 
-    <div>
-        <div>My past trips</div>
-        <div>My upcoming trips</div>
+    <div th:each="trip : ${upcomingTrips}">
+        <div>
+            <p>
+                <span th:if="${trip.guideId == user.get('user_id')}"><strong>You are the guide for this trip</strong></span>
+                <span th:unless="${trip.guideId == user.get('user_id')}">Guide: <span th:text="${trip.guideId}"></span></span>
+            </p>
+
+            <p>Destination: <span th:text="${trip.destination}"></span></p>
+            <p>Departure: <span th:text="${trip.departureLocation}"></span></p>
+            <p>Departure Date: <span th:text="${trip.departureDate}"></span></p>
+            <p>Return Date: <span th:text="${trip.returnDate}"></span></p>
+            <p>Duration: <span th:text="${trip.durationDays}"></span> days</p>
+            <p>Available Spots: <span th:text="${trip.availableSpots}"></span></p>
+            <p>Fee: <span th:text="${trip.registrationFee}"></span> USD</p>
+            <p>Hotel: <span th:text="${trip.hotelName}"></span></p>
+            <img th:src="${trip.picture}" width="200" height="150" />
+            <hr/>
+        </div>
     </div>
+
+    <div th:each="trip : ${pastTrips}">
+        <div>
+            <p>
+                <span th:if="${trip.guideId == user.get('user_id')}"><strong>You were the guide for this trip</strong></span>
+<!--                <span th:unless="${trip.guideId == user.get('user_id')}">Guide: <span th:text="${trip.guideId}"></span></span>-->
+            </p>
+
+            <p>Destination: <span th:text="${trip.destination}"></span></p>
+            <p>Departure: <span th:text="${trip.departureLocation}"></span></p>
+            <p>Departure Date: <span th:text="${trip.departureDate}"></span></p>
+            <p>Return Date: <span th:text="${trip.returnDate}"></span></p>
+            <p>Duration: <span th:text="${trip.durationDays}"></span> days</p>
+            <p>Available Spots: <span th:text="${trip.availableSpots}"></span></p>
+            <p>Fee: <span th:text="${trip.registrationFee}"></span> USD</p>
+            <p>Hotel: <span th:text="${trip.hotelName}"></span></p>
+            <img th:src="${trip.picture}" width="200" height="150" />
+            <hr/>
+        </div>
+    </div>
+
+
+
 </div>
 
 </body>
