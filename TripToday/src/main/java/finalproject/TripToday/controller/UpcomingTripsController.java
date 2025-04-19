@@ -61,6 +61,19 @@ public class UpcomingTripsController {
         return "redirect:/trips";
     }
 
+    @PostMapping("/update-trip")
+    public String updateTrip(@ModelAttribute Trip trip) {
+        tripService.updateTrip(trip.getId(), trip);
+        return "redirect:/trips";
+    }
+
+    @PostMapping("/delete-trip")
+    public String deleteTrip(@RequestParam("id") Integer tripId) {
+        tripService.deleteTrip(tripId);
+        return "redirect:/trips";
+    }
+
+
 
     @PostMapping("/enroll")
     public String enrollInTrip(@RequestParam("tripId") Integer tripId,

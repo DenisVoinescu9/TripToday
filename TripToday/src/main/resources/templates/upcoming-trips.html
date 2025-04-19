@@ -3,24 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>Trips</title>
-
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
 </head>
 <body>
 <div th:replace="~{/fragments/header :: header}"></div>
-<div>
+
+<div class="container-fluid mt-4">
     <h1>Available Trips</h1>
 
-    <!-- Manager can add trips -->
-    <div th:if="${user.get('role') == 'Manager' or user.get('role') == 'Manager and guide'}" >
+    <!-- Add Trip Button -->
+    <div th:if="${user.get('role') == 'Manager' or user.get('role') == 'Manager and guide'}">
         <button class="btn btn-success mb-3" onclick="openAddTripModal()">Add New Trip</button>
     </div>
 
+    <!-- Trips Table -->
     <div th:if="${trips != null}">
-        <table class="table table-bordered">
+        <table class="table table-bordered table-striped">
             <thead>
-            <p th:text="${user.get('role')}"></p>
             <tr>
                 <th>Trip ID</th>
                 <th>Destination</th>
@@ -36,25 +35,26 @@
                 <th>Hotel</th>
                 <th>Picture</th>
                 <th>Enroll</th>
+                <th th:if="${user.get('role') == 'Manager' or user.get('role') == 'Manager and guide'}">Actions</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="trip : ${trips}">
-                <td th:text="${trip.id}">Trip ID</td>
-                <td th:text="${trip.destination}">Destination</td>
-                <td th:text="${trip.departureLocation}">Departure Location</td>
-                <td th:text="${trip.departureDate}">Departure Date</td>
-                <td th:text="${trip.departureHour}">Departure Hour</td>
-                <td th:text="${trip.returnDate}">Return Date</td>
-                <td th:text="${trip.durationDays}">Duration (days)</td>
-                <td th:text="${trip.availableSpots}">Available Spots</td>
-                <td th:text="${trip.registrationFee}">Registration Fee</td>
+                <td th:text="${trip.id}"></td>
+                <td th:text="${trip.destination}"></td>
+                <td th:text="${trip.departureLocation}"></td>
+                <td th:text="${trip.departureDate}"></td>
+                <td th:text="${trip.departureHour}"></td>
+                <td th:text="${trip.returnDate}"></td>
+                <td th:text="${trip.durationDays}"></td>
+                <td th:text="${trip.availableSpots}"></td>
+                <td th:text="${trip.registrationFee}"></td>
                 <td>
-                    <span th:each="guide : ${guides}" th:if="${guide['id'] == trip.guideId}" th:text="${guide['email']}">Guide</span>
-                    <span th:if="${trip.guideId == null}" th:text="'No guide assigned'">Guide</span>
+                    <span th:each="guide : ${guides}" th:if="${guide['id'] == trip.guideId}" th:text="${guide['email']}"></span>
+                    <span th:if="${trip.guideId == null}">No guide assigned</span>
                 </td>
-                <td th:text="${trip.description}">Description</td>
-                <td th:text="${trip.hotelName}">Hotel</td>
+                <td th:text="${trip.description}"></td>
+                <td th:text="${trip.hotelName}"></td>
                 <td><img th:src="@{${trip.picture}}" width="150" height="150" alt="Trip Image"/></td>
                 <td>
                     <button type="button" class="btn btn-primary"
@@ -63,6 +63,10 @@
                             th:attr="data-tripid=${trip.id}, data-destination=${trip.destination}">
                         Enroll
                     </button>
+                </td>
+                <td th:if="${user.get('role') == 'Manager' or user.get('role') == 'Manager and guide'}">
+                    <button class="btn btn-warning btn-sm" th:attr="data-tripid=${trip.id}" onclick="openEditTripModal(this)">Edit</button>
+                    <button class="btn btn-danger btn-sm" th:attr="data-tripid=${trip.id}" onclick="openDeleteModal(this)">Delete</button>
                 </td>
             </tr>
             </tbody>
@@ -74,67 +78,57 @@
     </div>
 </div>
 
+
 <!-- Enroll Modal -->
-<div class="modal fade" id="enrollModal" tabindex="-1" role="dialog" aria-labelledby="enrollModalLabel"
-     aria-hidden="true">
+<div class="modal fade" id="enrollModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <form th:action="@{/enroll}" method="post" id="enrollForm">
             <input type="hidden" name="tripId" id="modalTripId"/>
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="enrollModalLabel">Confirm Enrollment</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <h5 class="modal-title">Confirm Enrollment</h5>
+                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to enroll in <strong id="modalDestination">this trip</strong>?
-
-                    <!-- Card Information -->
-                    <div class="form-group">
-                        <label for="cardNumber">Card Number</label>
-                        <input type="text" class="form-control" id="cardNumber" name="cardNumber" required
-                               pattern="\d{16}" maxlength="16" placeholder="Enter 16 digit card number">
+                    Are you sure you want to enroll in <strong id="modalDestination"></strong>?
+                    <div class="form-group mt-3">
+                        <label>Card Number</label>
+                        <input type="text" class="form-control" name="cardNumber" required pattern="\d{16}"
+                               maxlength="16">
                     </div>
-
                     <div class="form-group">
-                        <label for="cvv">CVV</label>
-                        <input type="text" class="form-control" id="cvv" name="cvv" required pattern="\d{3}"
-                               maxlength="3" placeholder="Enter 3 digit CVV">
+                        <label>CVV</label>
+                        <input type="text" class="form-control" name="cvv" required pattern="\d{3}" maxlength="3">
                     </div>
-
                     <div class="form-group">
-                        <label for="expirationDate">Expiration Date (MM/YY)</label>
-                        <input type="text" class="form-control" id="expirationDate" name="expirationDate" required
-                               pattern="(0[1-9]|1[0-2])\/\d{2}" placeholder="MM/YY">
+                        <label>Expiration Date (MM/YY)</label>
+                        <input type="text" class="form-control" name="expirationDate" required
+                               pattern="(0[1-9]|1[0-2])\/\d{2}">
                     </div>
-
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-success" id="submitBtn">Yes, Enroll</button>
+                    <button type="submit" class="btn btn-success">Yes, Enroll</button>
                 </div>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Add Trip Modal -->
-<div class="modal fade" id="addTripModal" tabindex="-1" role="dialog" aria-labelledby="addTripModalLabel"
-     aria-hidden="true">
+<!-- Edit Trip Modal -->
+<div class="modal fade" id="editTripModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
-        <form id="addTripForm" th:action="@{/create-trip}" method="post">
+        <form id="editTripForm" method="post" th:action="@{/update-trip}">
+            <input type="hidden" name="id" id="editTripId">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add New Trip</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <h5 class="modal-title">Edit Trip</h5>
+                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="guideSelect">Select Guide</label>
-                        <select class="form-control" name="guideId" id="guideSelect" required>
+                        <label for="editGuideSelect">Select Guide</label>
+                        <select class="form-control" name="guideId" id="editGuideSelect" required>
                             <option value="" disabled selected>Select Guide</option>
                             <option th:each="guide : ${guides}"
                                     th:value="${guide.id}"
@@ -142,137 +136,124 @@
                             </option>
                         </select>
                     </div>
-
-
-                    <!-- Add Trip Form Inputs -->
                     <div class="form-group">
                         <label>Destination</label>
-                        <input type="text" class="form-control" name="destination" required pattern="^(?!\\d+$).+"
-                               title="Cannot be only numbers.">
+                        <input type="text" class="form-control" name="destination" id="editDestination" required>
                     </div>
                     <div class="form-group">
                         <label>Departure Location</label>
-                        <input type="text" class="form-control" name="departureLocation" required pattern="^(?!\\d+$).+"
-                               title="Cannot be only numbers.">
+                        <input type="text" class="form-control" name="departureLocation" id="editDepartureLocation" required>
                     </div>
                     <div class="form-group">
                         <label>Departure Date</label>
-                        <input type="date" class="form-control" name="departureDate" required>
+                        <input type="date" class="form-control" name="departureDate" id="editDepartureDate" required>
                     </div>
-
                     <div class="form-group">
                         <label>Return Date</label>
-                        <input type="date" class="form-control" name="returnDate" required>
+                        <input type="date" class="form-control" name="returnDate" id="editReturnDate" required>
                     </div>
                     <div class="form-group">
                         <label>Departure Hour</label>
-                        <input type="time" class="form-control" name="departureHour" required>
+                        <input type="time" class="form-control" name="departureHour" id="editDepartureHour" required>
                     </div>
-
                     <div class="form-group">
                         <label>Duration (days)</label>
-                        <input type="number" class="form-control" name="durationDays" required readonly>
+                        <input type="number" class="form-control" name="durationDays" id="editDurationDays" required>
                     </div>
                     <div class="form-group">
                         <label>Available Spots</label>
-                        <input type="number" class="form-control" name="availableSpots" min="1" required>
+                        <input type="number" class="form-control" name="availableSpots" id="editAvailableSpots" required>
                     </div>
                     <div class="form-group">
                         <label>Registration Fee</label>
-                        <input type="number" class="form-control" name="registrationFee" min="1" required>
+                        <input type="number" class="form-control" name="registrationFee" id="editRegistrationFee" required>
                     </div>
                     <div class="form-group">
                         <label>Hotel Name</label>
-                        <input type="text" class="form-control" name="hotelName" required pattern="^(?!\\d+$).+"
-                               title="Cannot be only numbers.">
+                        <input type="text" class="form-control" name="hotelName" id="editHotelName" required>
                     </div>
                     <div class="form-group">
                         <label>Description</label>
-                        <textarea class="form-control" name="description" required pattern="^(?!\\d+$).+"
-                                  title="Cannot be only numbers."></textarea>
+                        <textarea class="form-control" name="description" id="editDescription" required></textarea>
                     </div>
                     <div class="form-group">
                         <label>Picture URL</label>
-                        <input type="url" class="form-control" name="picture" required>
+                        <input type="url" class="form-control" name="picture" id="editPicture" required>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-success">Save Trip</button>
+                    <button type="submit" class="btn btn-primary">Update Trip</button>
                 </div>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Scripts -->
+<!-- Delete Trip Modal -->
+<div class="modal fade" id="deleteTripModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <form id="deleteTripForm" method="post" th:action="@{/delete-trip}">
+            <input type="hidden" name="id" id="deleteTripId">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Delete</h5>
+                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this trip?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    function openAddTripModal() {
-        $('#addTripModal').modal('show');
+    function openEditTripModal(button) {
+        const row = $(button).closest('tr');
+        $('#editTripId').val(row.find('td:eq(0)').text());
+        $('#editDestination').val(row.find('td:eq(1)').text());
+        $('#editDepartureLocation').val(row.find('td:eq(2)').text());
+        $('#editDepartureDate').val(row.find('td:eq(3)').text());
+        $('#editDepartureHour').val(row.find('td:eq(4)').text());
+        $('#editReturnDate').val(row.find('td:eq(5)').text());
+        $('#editDurationDays').val(row.find('td:eq(6)').text());
+        $('#editAvailableSpots').val(row.find('td:eq(7)').text());
+        $('#editRegistrationFee').val(row.find('td:eq(8)').text());
+        $('#editDescription').val(row.find('td:eq(10)').text());
+        $('#editHotelName').val(row.find('td:eq(11)').text());
+        $('#editPicture').val(row.find('td:eq(12)').find('img').attr('src'));
+
+        // Match guide email and select it
+        const guideEmail = row.find('td:eq(9)').text().trim();
+        $('#editGuideSelect option').each(function () {
+            if ($(this).text().trim() === guideEmail) {
+                $(this).prop('selected', true);
+            }
+        });
+
+        $('#editTripModal').modal('show');
+    }
+
+    function openDeleteModal(button) {
+        const tripId = $(button).data('tripid');
+        $('#deleteTripId').val(tripId);
+        $('#deleteTripModal').modal('show');
     }
 
     $('#enrollModal').on('show.bs.modal', function (event) {
-        const button = $(event.relatedTarget)
-        const tripId = button.data('tripid')
-        const destination = button.data('destination')
-
-        const modal = $(this)
-        modal.find('#modalTripId').val(tripId)
-        modal.find('#modalDestination').text(destination)
-    });
-
-    $('#cardNumber, #cvv').on('input', function () {
-        this.value = this.value.replace(/\D/g, '');
-    });
-
-    $(document).ready(function () {
-        let today = new Date().toISOString().split('T')[0];
-        $('input[name="departureDate"]').attr('min', today);
-    });
-
-    $('input[name="departureDate"], input[name="returnDate"]').on('change', function () {
-        let departure = new Date($('input[name="departureDate"]').val());
-        let ret = new Date($('input[name="returnDate"]').val());
-
-        if (departure && ret) {
-            if (ret < departure) {
-                $('input[name="returnDate"]')[0].setCustomValidity('Return date must be after departure date.');
-            } else {
-                $('input[name="returnDate"]')[0].setCustomValidity('');
-                let duration = Math.ceil((ret - departure) / (1000 * 60 * 60 * 24));
-                $('input[name="durationDays"]').val(duration);
-            }
-        }
-    });
-
-    // VALIDATION COLOR
-    $(document).ready(function () {
-        $('#addTripForm input, #addTripForm textarea').on('input change', function () {
-            if (this.checkValidity()) {
-                $(this).removeClass('is-invalid').addClass('is-valid');
-            } else {
-                $(this).removeClass('is-valid').addClass('is-invalid');
-            }
-        });
-
-        $('#addTripForm').on('submit', function (event) {
-            let isValid = true;
-            $(this).find('input, textarea').each(function () {
-                if (!this.checkValidity()) {
-                    $(this).addClass('is-invalid');
-                    isValid = false;
-                } else {
-                    $(this).removeClass('is-invalid').addClass('is-valid');
-                }
-            });
-
-            if (!isValid) {
-                event.preventDefault();
-            }
-        });
+        const button = $(event.relatedTarget);
+        const tripId = button.data('tripid');
+        const destination = button.data('destination');
+        $('#modalTripId').val(tripId);
+        $('#modalDestination').text(destination);
     });
 </script>
 </body>
