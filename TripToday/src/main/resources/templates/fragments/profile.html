@@ -9,12 +9,12 @@
 <div th:fragment="profile" class="profile-card">
     <img width="200" height="200" th:src="${user.get('picture')}"/>
     <p th:text="'Your email: ' + ${user.get('email')}"></p>
-    <p th:text="'Account role: ' + ${user.get('role')}"></p>
+    <p th:text="'Account ' + ${user.get('role').contains(' and ') ? 'roles:' : 'role:'} + ' ' + ${user.get('role')}"></p>
     <p id="user-id" th:text="${user.get('user_id')}"></p>
 
     <!-- Câmp vizibil doar pentru utilizatori cu rol "Guide" -->
-    <div th:if="${user.get('role') == 'Guide'}" class="description-container">
-        <label><strong>Your description:</strong></label>
+    <div th:if="${user.get('role') == 'Guide' or user.get('role') == 'Manager and guide'}" class="description-container">
+        <label><strong>Your description (as a guide):</strong></label>
         <!-- Populează textarea cu descrierea din model -->
         <textarea id="description" th:text="${description}" placeholder="Enter your description..."></textarea>
         <button type="button" th:onclick="updateGuideDescription(document.getElementById('user-id').innerText, document.getElementById('description').value)">Save Description</button>
