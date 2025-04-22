@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <title>Trips</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
+    <style>
+        input[readonly] {
+            background-color: #e9ecef; /* Culoare standard Bootstrap pentru readonly */
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 <body>
 <div th:replace="~{/fragments/header :: header}"></div>
@@ -11,13 +17,11 @@
 <div class="container-fluid mt-4">
     <h1>Available Trips</h1>
 
-    <!-- Add Trip Button -->
-    <div th:if="${user.get('role') == 'Manager' or user.get('role') == 'Manager and guide'}">
+    <div th:if="${user != null and (user.get('role') == 'Manager' or user.get('role') == 'Manager and guide')}">
         <button class="btn btn-success mb-3" onclick="openAddTripModal()">Add New Trip</button>
     </div>
 
-    <!-- Trips Table -->
-    <div th:if="${trips != null}">
+    <div th:if="${trips != null and not #lists.isEmpty(trips)}">
         <table class="table table-bordered table-striped">
             <thead>
             <tr>
@@ -35,7 +39,7 @@
                 <th>Hotel</th>
                 <th>Picture</th>
                 <th>Enroll</th>
-                <th th:if="${user.get('role') == 'Manager' or user.get('role') == 'Manager and guide'}">Actions</th>
+                <th th:if="${user != null and (user.get('role') == 'Manager' or user.get('role') == 'Manager and guide')}">Actions</th>
             </tr>
             </thead>
             <tbody>
@@ -50,7 +54,7 @@
                 <td th:text="${trip.availableSpots}"></td>
                 <td th:text="${trip.registrationFee}"></td>
                 <td>
-                    <span th:each="guide : ${guides}" th:if="${guide['id'] == trip.guideId}" th:text="${guide['email']}"></span>
+                    <span th:each="guide : ${guides}" th:if="${guide != null and guide['id'] == trip.guideId}" th:text="${guide['email']}"></span>
                     <span th:if="${trip.guideId == null}">No guide assigned</span>
                 </td>
                 <td th:text="${trip.description}"></td>
@@ -64,7 +68,7 @@
                         Enroll
                     </button>
                 </td>
-                <td th:if="${user.get('role') == 'Manager' or user.get('role') == 'Manager and guide'}">
+                <td th:if="${user != null and (user.get('role') == 'Manager' or user.get('role') == 'Manager and guide')}">
                     <button class="btn btn-warning btn-sm" th:attr="data-tripid=${trip.id}" onclick="openEditTripModal(this)">Edit</button>
                     <button class="btn btn-danger btn-sm" th:attr="data-tripid=${trip.id}" onclick="openDeleteModal(this)">Delete</button>
                 </td>
@@ -78,11 +82,85 @@
     </div>
 </div>
 
+<div class="modal fade" id="addTripModal" tabindex="-1" role="dialog" aria-labelledby="addTripModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="addTripForm" method="post" th:action="@{/create-trip}" class="needs-validation" novalidate>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addTripModalLabel">Add New Trip</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="addGuideSelect">Select Guide</label>
+                        <select class="form-control" name="guideId" id="addGuideSelect" required>
+                            <option value="" disabled selected>Select Guide</option>
+                            <option th:each="guide : ${guides}"
+                                    th:if="${guide != null}"
+                                    th:value="${guide.id}"
+                                    th:text="${guide.email}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="addDestination">Destination</label>
+                        <input type="text" class="form-control" name="destination" id="addDestination" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="addDepartureLocation">Departure Location</label>
+                        <input type="text" class="form-control" name="departureLocation" id="addDepartureLocation" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="addDepartureDate">Departure Date</label>
+                        <input type="date" class="form-control" name="departureDate" id="addDepartureDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="addReturnDate">Return Date</label>
+                        <input type="date" class="form-control" name="returnDate" id="addReturnDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="addDepartureHour">Departure Hour</label>
+                        <input type="time" class="form-control" name="departureHour" id="addDepartureHour" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="addDurationDays">Duration (days)</label>
+                        <input type="number" class="form-control" name="durationDays" id="addDurationDays" required min="1" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="addAvailableSpots">Available Spots</label>
+                        <input type="number" class="form-control" name="availableSpots" id="addAvailableSpots" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="addRegistrationFee">Registration Fee</label>
+                        <input type="number" step="0.01" class="form-control" name="registrationFee" id="addRegistrationFee" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="addHotelName">Hotel Name</label>
+                        <input type="text" class="form-control" name="hotelName" id="addHotelName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="addDescription">Description</label>
+                        <textarea class="form-control" name="description" id="addDescription" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="addPicture">Picture URL</label>
+                        <input type="url" class="form-control" name="picture" id="addPicture" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Save Trip</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 
-<!-- Enroll Modal -->
 <div class="modal fade" id="enrollModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
-        <form th:action="@{/enroll}" method="post" id="enrollForm">
+        <form th:action="@{/enroll}" method="post" id="enrollForm" class="needs-validation" novalidate>
             <input type="hidden" name="tripId" id="modalTripId"/>
             <div class="modal-content">
                 <div class="modal-header">
@@ -94,16 +172,17 @@
                     <div class="form-group mt-3">
                         <label>Card Number</label>
                         <input type="text" class="form-control" name="cardNumber" required pattern="\d{16}"
-                               maxlength="16">
+                               title="Please enter a 16-digit card number" maxlength="16">
                     </div>
                     <div class="form-group">
                         <label>CVV</label>
-                        <input type="text" class="form-control" name="cvv" required pattern="\d{3}" maxlength="3">
+                        <input type="text" class="form-control" name="cvv" required pattern="\d{3}"
+                               title="Please enter a 3-digit CVV" maxlength="3">
                     </div>
                     <div class="form-group">
                         <label>Expiration Date (MM/YY)</label>
                         <input type="text" class="form-control" name="expirationDate" required
-                               pattern="(0[1-9]|1[0-2])\/\d{2}">
+                               pattern="(0[1-9]|1[0-2])\/\d{2}" title="Please use MM/YY format" maxlength="5">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -115,10 +194,9 @@
     </div>
 </div>
 
-<!-- Edit Trip Modal -->
 <div class="modal fade" id="editTripModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
-        <form id="editTripForm" method="post" th:action="@{/update-trip}">
+        <form id="editTripForm" method="post" th:action="@{/update-trip}" class="needs-validation" novalidate>
             <input type="hidden" name="id" id="editTripId">
             <div class="modal-content">
                 <div class="modal-header">
@@ -129,55 +207,56 @@
                     <div class="form-group">
                         <label for="editGuideSelect">Select Guide</label>
                         <select class="form-control" name="guideId" id="editGuideSelect" required>
-                            <option value="" disabled selected>Select Guide</option>
+                            <option value="" disabled>Select Guide</option>
                             <option th:each="guide : ${guides}"
+                                    th:if="${guide != null}"
                                     th:value="${guide.id}"
                                     th:text="${guide.email}">
                             </option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Destination</label>
+                        <label for="editDestination">Destination</label>
                         <input type="text" class="form-control" name="destination" id="editDestination" required>
                     </div>
                     <div class="form-group">
-                        <label>Departure Location</label>
+                        <label for="editDepartureLocation">Departure Location</label>
                         <input type="text" class="form-control" name="departureLocation" id="editDepartureLocation" required>
                     </div>
                     <div class="form-group">
-                        <label>Departure Date</label>
+                        <label for="editDepartureDate">Departure Date</label>
                         <input type="date" class="form-control" name="departureDate" id="editDepartureDate" required>
                     </div>
                     <div class="form-group">
-                        <label>Return Date</label>
+                        <label for="editReturnDate">Return Date</label>
                         <input type="date" class="form-control" name="returnDate" id="editReturnDate" required>
                     </div>
                     <div class="form-group">
-                        <label>Departure Hour</label>
+                        <label for="editDepartureHour">Departure Hour</label>
                         <input type="time" class="form-control" name="departureHour" id="editDepartureHour" required>
                     </div>
                     <div class="form-group">
-                        <label>Duration (days)</label>
-                        <input type="number" class="form-control" name="durationDays" id="editDurationDays" required>
+                        <label for="editDurationDays">Duration (days)</label>
+                        <input type="number" class="form-control" name="durationDays" id="editDurationDays" required min="1" readonly>
                     </div>
                     <div class="form-group">
-                        <label>Available Spots</label>
-                        <input type="number" class="form-control" name="availableSpots" id="editAvailableSpots" required>
+                        <label for="editAvailableSpots">Available Spots</label>
+                        <input type="number" class="form-control" name="availableSpots" id="editAvailableSpots" required min="0">
                     </div>
                     <div class="form-group">
-                        <label>Registration Fee</label>
-                        <input type="number" class="form-control" name="registrationFee" id="editRegistrationFee" required>
+                        <label for="editRegistrationFee">Registration Fee</label>
+                        <input type="number" step="0.01" class="form-control" name="registrationFee" id="editRegistrationFee" required min="0">
                     </div>
                     <div class="form-group">
-                        <label>Hotel Name</label>
+                        <label for="editHotelName">Hotel Name</label>
                         <input type="text" class="form-control" name="hotelName" id="editHotelName" required>
                     </div>
                     <div class="form-group">
-                        <label>Description</label>
+                        <label for="editDescription">Description</label>
                         <textarea class="form-control" name="description" id="editDescription" required></textarea>
                     </div>
                     <div class="form-group">
-                        <label>Picture URL</label>
+                        <label for="editPicture">Picture URL</label>
                         <input type="url" class="form-control" name="picture" id="editPicture" required>
                     </div>
                 </div>
@@ -190,7 +269,6 @@
     </div>
 </div>
 
-<!-- Delete Trip Modal -->
 <div class="modal fade" id="deleteTripModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <form id="deleteTripForm" method="post" th:action="@{/delete-trip}">
@@ -216,28 +294,207 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    function openEditTripModal(button) {
-        const row = $(button).closest('tr');
-        $('#editTripId').val(row.find('td:eq(0)').text());
-        $('#editDestination').val(row.find('td:eq(1)').text());
-        $('#editDepartureLocation').val(row.find('td:eq(2)').text());
-        $('#editDepartureDate').val(row.find('td:eq(3)').text());
-        $('#editDepartureHour').val(row.find('td:eq(4)').text());
-        $('#editReturnDate').val(row.find('td:eq(5)').text());
-        $('#editDurationDays').val(row.find('td:eq(6)').text());
-        $('#editAvailableSpots').val(row.find('td:eq(7)').text());
-        $('#editRegistrationFee').val(row.find('td:eq(8)').text());
-        $('#editDescription').val(row.find('td:eq(10)').text());
-        $('#editHotelName').val(row.find('td:eq(11)').text());
-        $('#editPicture').val(row.find('td:eq(12)').find('img').attr('src'));
+    // Functie pentru calcul durata si validare date
+    function calculateAndUpdateDuration(departureDateInput, returnDateInput, durationInput) {
+        const departureDateStr = $(departureDateInput).val();
+        const returnDateStr = $(returnDateInput).val();
+        const durationField = $(durationInput);
 
-        // Match guide email and select it
-        const guideEmail = row.find('td:eq(9)').text().trim();
+        durationField.removeClass('is-invalid is-valid');
+        $(returnDateInput).removeClass('is-invalid is-valid');
+        $(departureDateInput).removeClass('is-invalid is-valid');
+
+        if (departureDateStr && returnDateStr) {
+            const departureDate = new Date(departureDateStr);
+            const returnDate = new Date(returnDateStr);
+
+            if (returnDate >= departureDate) {
+                const timeDiff = returnDate.getTime() - departureDate.getTime();
+                const durationDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)) + 1;
+
+                if (durationDays >= 1) {
+                    durationField.val(durationDays).addClass('is-valid');
+                    $(returnDateInput).addClass('is-valid');
+                    $(departureDateInput).addClass('is-valid');
+                } else {
+                    durationField.val(1).addClass('is-valid');
+                    $(returnDateInput).addClass('is-valid');
+                    $(departureDateInput).addClass('is-valid');
+                }
+            } else {
+                durationField.val('').addClass('is-invalid');
+                $(returnDateInput).addClass('is-invalid');
+                if ($(departureDateInput)[0].checkValidity()) {
+                    $(departureDateInput).addClass('is-valid');
+                } else {
+                    $(departureDateInput).addClass('is-invalid');
+                }
+            }
+        } else {
+            durationField.val('');
+            if (!returnDateStr && $(returnDateInput).prop('required')) {
+                $(returnDateInput).addClass('is-invalid');
+            } else if (returnDateStr && $(returnDateInput)[0].checkValidity()) {
+                $(returnDateInput).addClass('is-valid');
+            } else if (returnDateStr) {
+                $(returnDateInput).addClass('is-invalid');
+            }
+
+            if (!departureDateStr && $(departureDateInput).prop('required')) {
+                $(departureDateInput).addClass('is-invalid');
+            } else if (departureDateStr && $(departureDateInput)[0].checkValidity()) {
+                $(departureDateInput).addClass('is-valid');
+            } else if (departureDateStr) {
+                $(departureDateInput).addClass('is-invalid');
+            }
+        }
+    }
+
+    // Functie curatare validare formular
+    function clearFormValidation(formElement) {
+        const form = $(formElement);
+        form.removeClass('was-validated');
+        form.find('.is-valid, .is-invalid').removeClass('is-valid is-invalid');
+    }
+
+    // Functie validare camp individual (on blur)
+    function validateFormField(fieldElement) {
+        const field = $(fieldElement);
+        const form = field.closest('form');
+        field.removeClass('is-valid is-invalid');
+
+        let isValid = fieldElement.checkValidity();
+
+        if (field.attr('id') === 'addReturnDate' || field.attr('id') === 'editReturnDate') {
+            const departureInputId = field.attr('id') === 'addReturnDate' ? '#addDepartureDate' : '#editDepartureDate';
+            const departureInput = form.find(departureInputId);
+            if (isValid && field.val() && departureInput.val()) {
+                const returnDate = new Date(field.val());
+                const departureDate = new Date(departureInput.val());
+                if (returnDate < departureDate) {
+                    isValid = false;
+                }
+            }
+        }
+        // Specific check for expiration date format if basic validity passed
+        if (field.attr('name') === 'expirationDate' && isValid) {
+            if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(field.val())) {
+                isValid = false;
+            }
+            // Optional: Add check for expiration date being in the past
+            /*
+            else {
+                const parts = field.val().split('/');
+                const month = parseInt(parts[0], 10);
+                const year = parseInt('20' + parts[1], 10); // Assuming 21st century
+                const now = new Date();
+                const currentMonth = now.getMonth() + 1; // JS months are 0-11
+                const currentYear = now.getFullYear();
+                // Expired if year is past, or if year is current and month is past
+                if (year < currentYear || (year === currentYear && month < currentMonth)) {
+                    isValid = false;
+                    // Consider adding a specific message or handling in validateForm if needed
+                }
+            }
+            */
+        }
+
+
+        if (isValid) {
+            field.addClass('is-valid');
+        } else {
+            field.addClass('is-invalid');
+        }
+    }
+
+    // Functie validare formular complet (on submit / edit open)
+    function validateForm(formElement) {
+        const form = $(formElement);
+        let isFormValid = true;
+
+        form.find('input, select, textarea').filter('[required]').each(function() {
+            validateFormField(this); // Ruleaza validarea individuala
+            if ($(this).hasClass('is-invalid')) { // Verifica rezultatul
+                isFormValid = false;
+            }
+        });
+
+        const durationInput = form.find('input[name="durationDays"]');
+        if (durationInput.length > 0) {
+            const returnDateInputId = form.attr('id') === 'addTripForm' ? '#addReturnDate' : '#editReturnDate';
+            const departureDateInputId = form.attr('id') === 'addTripForm' ? '#addDepartureDate' : '#editDepartureDate';
+            if (form.find(returnDateInputId).hasClass('is-invalid') || form.find(departureDateInputId).hasClass('is-invalid')) {
+                durationInput.removeClass('is-valid').addClass('is-invalid');
+                isFormValid = false;
+            } else {
+                const durationValue = parseInt(durationInput.val(), 10);
+                if (isNaN(durationValue) || durationValue < 1) {
+                    durationInput.removeClass('is-valid').addClass('is-invalid');
+                    isFormValid = false;
+                } else {
+                    durationInput.removeClass('is-invalid').addClass('is-valid');
+                }
+            }
+        }
+        return isFormValid;
+    }
+
+    // --- Functii deschidere modale ---
+
+    function openAddTripModal() {
+        const form = $('#addTripForm');
+        form[0].reset();
+        clearFormValidation(form);
+        $('#addDurationDays').val('');
+        $('#addTripModal').modal('show');
+    }
+
+    function openEditTripModal(button) {
+        const form = $('#editTripForm');
+        clearFormValidation(form);
+
+        const row = $(button).closest('tr');
+        const tripId = row.find('td:eq(0)').text().trim();
+        const destination = row.find('td:eq(1)').text().trim();
+        const departureLocation = row.find('td:eq(2)').text().trim();
+        const departureDate = row.find('td:eq(3)').text().trim();
+        const departureHour = row.find('td:eq(4)').text().trim();
+        const returnDate = row.find('td:eq(5)').text().trim();
+        const availableSpots = row.find('td:eq(7)').text().trim();
+        const registrationFee = row.find('td:eq(8)').text().trim();
+        const guideEmail = row.find('td:eq(9) span:first').text().trim();
+        const description = row.find('td:eq(10)').text().trim();
+        const hotelName = row.find('td:eq(11)').text().trim();
+        const pictureUrl = row.find('td:eq(12) img').attr('src');
+
+        $('#editTripId').val(tripId);
+        $('#editDestination').val(destination);
+        $('#editDepartureLocation').val(departureLocation);
+        $('#editDepartureDate').val(departureDate);
+        $('#editDepartureHour').val(departureHour);
+        $('#editReturnDate').val(returnDate);
+        $('#editAvailableSpots').val(availableSpots);
+        $('#editRegistrationFee').val(registrationFee);
+        $('#editDescription').val(description);
+        $('#editHotelName').val(hotelName);
+        $('#editPicture').val(pictureUrl);
+
+        let guideFound = false;
         $('#editGuideSelect option').each(function () {
             if ($(this).text().trim() === guideEmail) {
                 $(this).prop('selected', true);
+                guideFound = true;
+            } else {
+                $(this).prop('selected', false);
             }
         });
+        if (!guideFound) {
+            $('#editGuideSelect option[value=""]').prop('selected', true);
+        }
+
+        calculateAndUpdateDuration('#editDepartureDate', '#editReturnDate', '#editDurationDays');
+        validateForm('#editTripForm');
+        $('#editTripForm').addClass('was-validated');
 
         $('#editTripModal').modal('show');
     }
@@ -249,12 +506,110 @@
     }
 
     $('#enrollModal').on('show.bs.modal', function (event) {
+        const form = $('#enrollForm');
+        clearFormValidation(form);
         const button = $(event.relatedTarget);
         const tripId = button.data('tripid');
         const destination = button.data('destination');
         $('#modalTripId').val(tripId);
         $('#modalDestination').text(destination);
+        form[0].reset();
+        $('#modalTripId').val(tripId);
     });
+
+
+    // --- Event Listeners pentru Validare Dinamica ---
+
+    // Validare AddTrip fields on blur
+    $('#addTripForm').find('input[required], select[required], textarea[required]').on('blur', function() {
+        if (this.id !== 'addDurationDays') {
+            validateFormField(this);
+        }
+        if (this.id === 'addDepartureDate' || this.id === 'addReturnDate') {
+            calculateAndUpdateDuration('#addDepartureDate', '#addReturnDate', '#addDurationDays');
+            const otherDateField = (this.id === 'addDepartureDate') ? '#addReturnDate' : '#addDepartureDate';
+            // Trigger blur pe celalalt camp de data doar daca are o valoare, pt a re-valida dependenta
+            if ($(otherDateField).val()) {
+                $(otherDateField).trigger('blur');
+            }
+        }
+    });
+
+    // Validare Enroll fields on blur
+    $('#enrollForm').find('input[required]').on('blur', function() {
+        validateFormField(this);
+    });
+
+    // Formatter pentru Data Expirarii (MM/YY) - NOU
+    $('#enrollForm input[name="expirationDate"]').on('input', function(e) {
+        var input = $(this);
+        var value = input.val();
+        var cursor = this.selectionStart;
+        var originalLength = value.length;
+
+        // Pastreaza doar cifrele
+        var digits = value.replace(/\D/g, '');
+
+        // Formateaza MM/YY
+        var formattedValue = digits;
+        if (digits.length >= 2) {
+            // Insereaza slash dupa primele 2 cifre
+            formattedValue = digits.substring(0, 2) + '/' + digits.substring(2, 4);
+        }
+
+        // Aplica valoarea formatata (maxlength="5" in HTML limiteaza lungimea)
+        input.val(formattedValue);
+
+        // Recalculeaza pozitia cursorului
+        // (Simplificare: muta cursorul la sfarsit dupa formatare automata)
+        // O logica mai complexa ar fi necesara pentru a pastra pozitia exact in timpul editarii
+        if (formattedValue.length > originalLength || (formattedValue.length === 3 && originalLength === 2)) {
+            // Daca s-a adaugat slash-ul, muta cursorul dupa el
+            this.setSelectionRange(formattedValue.length, formattedValue.length);
+        } else {
+            // Incearca sa mentina pozitia relativa (aproximativ)
+            let currentDigitCount = formattedValue.replace(/\D/g, '').length;
+            let oldDigitCount = value.substring(0, cursor).replace(/\D/g, '').length;
+            let newCursorPos = oldDigitCount;
+            if (oldDigitCount >= 2) newCursorPos++; // Adauga 1 pt slash
+            newCursorPos = Math.min(newCursorPos, formattedValue.length);
+            // Ajustare fina pentru stergere slash
+            if (originalLength === 3 && formattedValue.length === 2 && cursor <= 2) {
+                newCursorPos = cursor;
+            } else if (originalLength > 3 && formattedValue.length < originalLength && cursor <=2) {
+                newCursorPos = cursor;
+            }
+            this.setSelectionRange(newCursorPos, newCursorPos);
+        }
+
+    });
+
+
+    // Recalculare durata la schimbare date in AddTrip
+    $('#addDepartureDate, #addReturnDate').on('input change', function() {
+        calculateAndUpdateDuration('#addDepartureDate', '#addReturnDate', '#addDurationDays');
+    });
+
+    // Recalculare durata si revalidare completa la schimbare date in EditTrip
+    $('#editDepartureDate, #editReturnDate').on('input change', function() {
+        calculateAndUpdateDuration('#editDepartureDate', '#editReturnDate', '#editDurationDays');
+        validateForm('#editTripForm');
+        $('#editTripForm').addClass('was-validated');
+    });
+
+
+    // --- Handler pentru Submit ---
+    $('.needs-validation').submit(function(event) {
+        const form = this;
+        const isValid = validateForm(form);
+
+        if (!isValid) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        $(form).addClass('was-validated');
+    });
+
 </script>
 </body>
 </html>
