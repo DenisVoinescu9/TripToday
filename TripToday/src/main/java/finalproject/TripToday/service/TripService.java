@@ -96,10 +96,13 @@ public class TripService {
     }
 
 
+    // In TripService.java -> updateTrip method
+
     public Trip updateTrip(Integer id, Trip tripDetails) {
         Optional<Trip> optionalTrip = tripRepository.findById(id);
         if (optionalTrip.isPresent()) {
-            Trip trip = optionalTrip.get();
+            Trip trip = optionalTrip.get(); // Entitatea existenta
+
             trip.setDestination(tripDetails.getDestination());
             trip.setDepartureLocation(tripDetails.getDepartureLocation());
             trip.setDepartureDate(tripDetails.getDepartureDate());
@@ -111,7 +114,9 @@ public class TripService {
             trip.setDescription(tripDetails.getDescription());
             trip.setPicture(tripDetails.getPicture());
             trip.setHotelName(tripDetails.getHotelName());
-            trip.setDepartureDate(tripDetails.getDepartureDate());
+
+            trip.setDepartureHour(tripDetails.getDepartureHour());
+
             return tripRepository.save(trip);
         }
         return null;
