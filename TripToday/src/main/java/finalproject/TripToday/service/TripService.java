@@ -102,7 +102,7 @@ public class TripService {
         Optional<Trip> optionalTrip = tripRepository.findById(id);
         if (optionalTrip.isPresent()) {
             Trip trip = optionalTrip.get(); // Entitatea existenta
-
+            // Copierea valorilor din tripDetails (formular) in trip (entitate)
             trip.setDestination(tripDetails.getDestination());
             trip.setDepartureLocation(tripDetails.getDepartureLocation());
             trip.setDepartureDate(tripDetails.getDepartureDate());
