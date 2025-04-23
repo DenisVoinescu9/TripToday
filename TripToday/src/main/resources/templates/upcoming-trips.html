@@ -9,6 +9,10 @@
             background-color: #e9ecef; /* Culoare standard Bootstrap pentru readonly */
             cursor: not-allowed;
         }
+        /* Stil popover (optional, Bootstrap are stiluri default) */
+        .popover {
+            max-width: 250px; /* Limiteaza latimea popover-ului */
+        }
     </style>
 </head>
 <body>
@@ -25,7 +29,6 @@
         <table class="table table-bordered table-striped">
             <thead>
             <tr>
-<!--                <th>Trip ID</th>-->
                 <th>Destination</th>
                 <th>Departure Location</th>
                 <th>Departure Date</th>
@@ -44,7 +47,6 @@
             </thead>
             <tbody>
             <tr th:each="trip : ${trips}">
-<!--                <td th:text="${trip.id}"></td>-->
                 <td th:text="${trip.destination}"></td>
                 <td th:text="${trip.departureLocation}"></td>
                 <td th:text="${trip.departureDate}"></td>
@@ -60,13 +62,12 @@
                 <td th:text="${trip.description}"></td>
                 <td th:text="${trip.hotelName}"></td>
                 <td><img th:src="@{${trip.picture}}" width="150" height="150" alt="Trip Image"/></td>
-                <td>
-                    <button type="button" class="btn btn-primary"
-                            data-toggle="modal"
-                            data-target="#enrollModal"
-                            th:attr="data-tripid=${trip.id}, data-destination=${trip.destination}">
-                        Enroll
-                    </button>
+                <td> <button type="button" class="btn btn-primary enroll-button"
+                             th:attr="data-tripid=${trip.id},
+                                     data-destination=${trip.destination},
+                                     data-spots=${trip.availableSpots}">
+                    Enroll
+                </button>
                 </td>
                 <td th:if="${user.get('role') == 'Manager' || user.get('role') == 'Manager | Guide' || user.get('role') == 'Manager | Guide | Traveler'}">
                     <button class="btn btn-warning btn-sm" th:attr="data-tripid=${trip.id}" onclick="openEditTripModal(this)">Edit</button>
@@ -182,8 +183,8 @@
                     <div class="form-group">
                         <label>Expiration Date (MM/YY)</label>
                         <input type="text" class="form-control" name="expirationDate" required
-                               pattern="(0[1-9]|1[0-2])\/\d{2}" title="Please use MM/YY format" maxlength="5">
-                    </div>
+                               pattern="(0[1-9]|1[0-2])\/\d{2}"
+                               title="Use MM/YY format. Date cannot be in the past." maxlength="5"> </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -291,10 +292,11 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"></script>
 
 <script>
-    // Functie PENTRU calcul durata si validare date CU FEEDBACK PE AMBELE DATE la ordine gresita
+    // Functie PENTRU calcul durata si validare date
     function calculateAndUpdateDuration(departureDateInput, returnDateInput, durationInput) {
         const departureDateStr = $(departureDateInput).val();
         const returnDateStr = $(returnDateInput).val();
@@ -302,16 +304,13 @@
         const departureDateElem = $(departureDateInput)[0];
         const returnDateElem = $(returnDateInput)[0];
 
-        // Curata starea anterioara
         durationField.removeClass('is-invalid is-valid');
         $(returnDateInput).removeClass('is-invalid is-valid');
         $(departureDateInput).removeClass('is-invalid is-valid');
 
-        // Verifica validitatea individuala mai intai (respecta 'min' pe departure)
         let isDepartureIndividuallyValid = departureDateElem.checkValidity();
         let isReturnIndividuallyValid = returnDateElem.checkValidity();
 
-        // Aplica clasele initiale bazate pe validitatea individuala
         if (!departureDateStr || !isDepartureIndividuallyValid) {
             $(departureDateInput).addClass('is-invalid');
             isDepartureIndividuallyValid = false;
@@ -325,108 +324,90 @@
             $(returnDateInput).addClass('is-valid');
         }
 
-        // Compara si calculeaza durata DOAR daca AMBELE date sunt individual valide SI prezente
         if (isDepartureIndividuallyValid && isReturnIndividuallyValid && departureDateStr && returnDateStr) {
             const departureDate = new Date(departureDateStr);
             const returnDate = new Date(returnDateStr);
 
-            if (returnDate >= departureDate) { // Ordine corecta
-                // Datele raman 'is-valid' din verificarile individuale
+            if (returnDate >= departureDate) {
                 const timeDiff = returnDate.getTime() - departureDate.getTime();
                 const durationDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)) + 1;
-
-                if (durationDays >= 1) {
-                    durationField.val(durationDays).addClass('is-valid');
-                } else {
-                    durationField.val(1).addClass('is-valid');
-                }
-            } else { // Ordine INCORECTA (return < departure)
+                durationField.val(durationDays >= 1 ? durationDays : 1).addClass('is-valid');
+            } else {
                 durationField.val('').addClass('is-invalid');
-                // Marcheaza AMBELE date ca invalide din cauza ordinii
                 $(returnDateInput).removeClass('is-valid').addClass('is-invalid');
                 $(departureDateInput).removeClass('is-valid').addClass('is-invalid');
             }
-        } else { // Una sau ambele date lipsesc sau sunt individual invalide
+        } else {
             durationField.val('').addClass('is-invalid');
-            // Validitatea individuala a datelor a fost deja setata mai sus
         }
     }
 
-    // Functie validare camp individual (on blur) - Simplificata putin
-    // Se concentreaza pe checkValidity() si formatul datei de expirare
+    // Functie validare camp individual (on blur) - Actualizata pentru data expirare
     function validateFormField(fieldElement) {
         const field = $(fieldElement);
         field.removeClass('is-valid is-invalid'); // Sterge starea anterioara
 
-        let isValid = fieldElement.checkValidity(); // Verifica constrangerile HTML5
+        let isValid = fieldElement.checkValidity(); // Verifica constrangerile HTML5 (required, pattern etc.)
 
-        // Verifica specific formatul datei de expirare DACA validitatea de baza e ok
+        // Verifica specific formatul SI data de expirare DACA validitatea de baza e ok
         if (field.attr('name') === 'expirationDate' && isValid) {
-            if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(field.val())) {
+            const datePattern = /^(0[1-9]|1[0-2])\/(\d{2})$/; // Pattern MM/YY
+            const match = field.val().match(datePattern);
+
+            if (!match) {
+                // Formatul nu este MM/YY conform patternului
                 isValid = false;
+            } else {
+                // Formatul este corect, acum verificam daca data e in trecut
+                const expiryMonth = parseInt(match[1], 10); // Luna (1-12)
+                const expiryYearSuffix = parseInt(match[2], 10); // Sufix an (ex: 25)
+                const expiryYear = 2000 + expiryYearSuffix; // Anul (ex: 2025)
+
+                const today = new Date();
+                const currentYear = today.getFullYear();
+                const currentMonth = today.getMonth() + 1; // getMonth() e 0-11, adunam 1
+
+                // Verificarea efectiva: An expirat < An curent SAU (An expirat == An curent SI Luna expirata < Luna curenta)
+                if (expiryYear < currentYear || (expiryYear === currentYear && expiryMonth < currentMonth)) {
+                    console.log(`Validation failed: Expiry date ${expiryMonth}/${expiryYear} is in the past relative to ${currentMonth}/${currentYear}.`);
+                    isValid = false; // Data a expirat
+                } else {
+                    // Data este valida (curenta sau viitoare)
+                    console.log(`Validation OK: Expiry date ${expiryMonth}/${expiryYear} is valid relative to ${currentMonth}/${currentYear}.`);
+                }
             }
-            // Aici poti adauga si verificarea daca data cardului a expirat
         }
 
-        // Aplica clasa corespunzatoare
+        // Aplica clasa corespunzatoare bazata pe validitatea finala
         if (isValid) {
             field.addClass('is-valid');
         } else {
             field.addClass('is-invalid');
         }
-        // NU mai verifica ordinea datelor aici, se face in calculateAndUpdateDuration
     }
 
-
-    // Functie validare formular complet (on submit / edit open) - Ajustata
+    // Functie validare formular complet
     function validateForm(formElement) {
         const form = $(formElement);
         let isFormValid = true;
-
-        // 1. Valideaza individual toate campurile required
         form.find('input, select, textarea').filter('[required]').each(function() {
-            validateFormField(this); // Aplica is-valid/is-invalid individual
-            if ($(this).hasClass('is-invalid')) {
-                isFormValid = false; // Daca orice camp individual e invalid, tot form-ul e invalid
+            if (this.id !== 'addDurationDays' && this.id !== 'editDurationDays') {
+                validateFormField(this); // Reutilizam functia de validare individuala
+                if ($(this).hasClass('is-invalid')) isFormValid = false;
             }
         });
-
-        // 2. Verifica specific ordinea datelor si durata pt formularele de trip
         if (form.attr('id') === 'addTripForm' || form.attr('id') === 'editTripForm') {
-            const departureInput = form.find(form.attr('id') === 'addTripForm' ? '#addDepartureDate' : '#editDepartureDate');
-            const returnInput = form.find(form.attr('id') === 'addTripForm' ? '#addReturnDate' : '#editReturnDate');
-            const durationInput = form.find(form.attr('id') === 'addTripForm' ? '#addDurationDays' : '#editDurationDays');
-
-            // Verifica ordinea DOAR daca ambele date sunt prezente si individual valide
-            if (departureInput.hasClass('is-valid') && returnInput.hasClass('is-valid')) {
-                const departureDate = new Date(departureInput.val());
-                const returnDate = new Date(returnInput.val());
-                if (returnDate < departureDate) {
-                    // Marcheaza explicit ambele ca invalide pentru submit
-                    departureInput.removeClass('is-valid').addClass('is-invalid');
-                    returnInput.removeClass('is-valid').addClass('is-invalid');
-                    durationInput.removeClass('is-valid').addClass('is-invalid');
-                    isFormValid = false;
-                } else {
-                    // Ordinea e OK, verifica durata calculata
-                    const durationValue = parseInt(durationInput.val(), 10);
-                    if (isNaN(durationValue) || durationValue < 1) {
-                        durationInput.removeClass('is-valid').addClass('is-invalid');
-                        isFormValid = false;
-                    } else {
-                        // Daca a ajuns aici, totul e ok
-                        durationInput.removeClass('is-invalid').addClass('is-valid');
-                    }
-                }
-            } else {
-                // Daca una din date era deja invalida individual, durata e sigur invalida
-                durationInput.removeClass('is-valid').addClass('is-invalid');
-                // isFormValid este deja 'false' de la validarea individuala
+            const departureInputId = form.attr('id') === 'addTripForm' ? '#addDepartureDate' : '#editDepartureDate';
+            const returnInputId = form.attr('id') === 'addTripForm' ? '#addReturnDate' : '#editReturnDate';
+            const durationInputId = form.attr('id') === 'addTripForm' ? '#addDurationDays' : '#editDurationDays';
+            calculateAndUpdateDuration(departureInputId, returnInputId, durationInputId);
+            if (form.find(departureInputId).hasClass('is-invalid') || form.find(returnInputId).hasClass('is-invalid') || form.find(durationInputId).hasClass('is-invalid')) {
+                isFormValid = false;
             }
         }
-
         return isFormValid;
     }
+
     // Functie curatare validare formular
     function clearFormValidation(formElement) {
         const form = $(formElement);
@@ -434,58 +415,54 @@
         form.find('.is-valid, .is-invalid').removeClass('is-valid is-invalid');
     }
 
-
-    // Functie pentru deschiderea modalului ADAUGARE excursie
+    // Deschidere modal ADAUGARE
     function openAddTripModal() {
-        const form = $('#addTripForm'); // Selecteaza formularul de adaugare
-        form[0].reset(); // Reseteaza campurile formularului
-        clearFormValidation(form); // Sterge clasele de validare vechi
-        $('#addDurationDays').val(''); // Goleste specific campul durata
-
-        // --- START: Seteaza data minima pentru plecare la ZIUA DE MAINE ---
+        const form = $('#addTripForm');
+        form[0].reset();
+        clearFormValidation(form);
+        $('#addDurationDays').val('');
         const today = new Date();
-        const tomorrow = new Date(today); // Creeaza o copie a datei de azi
-        tomorrow.setDate(today.getDate() + 1); // Adauga o zi
-
-        // Formateaza data de MAINE
-        const yyyy = tomorrow.getFullYear();
-        const mm = String(tomorrow.getMonth() + 1).padStart(2, '0'); // Ianuarie e 0
-        const dd = String(tomorrow.getDate()).padStart(2, '0');
-        const tomorrowString = `${yyyy}-${mm}-${dd}`; // Format YYYY-MM-DD
-
-        // Seteaza atributul 'min' la data de maine pentru modalul ADD
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
+        const tomorrowString = tomorrow.toISOString().split('T')[0];
         $('#addDepartureDate').attr('min', tomorrowString);
-        // --- END: Seteaza data minima pentru plecare ---
-
-        $('#addTripModal').modal('show'); // Afiseaza modalul de adaugare
+        $('#addReturnDate').attr('min', tomorrowString);
+        $('#addTripModal').modal('show');
     }
 
     // Functie pentru deschiderea modalului EDITARE excursie
     function openEditTripModal(button) {
-        const form = $('#editTripForm'); // Selecteaza formularul de editare
-        clearFormValidation(form); // Sterge clasele de validare vechi
+        const form = $('#editTripForm');
+        clearFormValidation(form);
 
-        // --- START: Populeaza campurile formularului din datele tabelului ---
-        const row = $(button).closest('tr'); // Gaseste randul tabelului parinte al butonului
-        // Extrage datele din celulele (td) randului
-        const tripId = row.find('td:eq(0)').text().trim();
-        const destination = row.find('td:eq(1)').text().trim();
-        const departureLocation = row.find('td:eq(2)').text().trim();
-        const departureDate = row.find('td:eq(3)').text().trim(); // Preia data existenta
-        const departureHour = row.find('td:eq(4)').text().trim();
-        const returnDate = row.find('td:eq(5)').text().trim();
-        const availableSpots = row.find('td:eq(7)').text().trim();
-        const registrationFee = row.find('td:eq(8)').text().trim();
-        const guideEmail = row.find('td:eq(9) span:first').text().trim(); // Email ghid
-        const description = row.find('td:eq(10)').text().trim();
-        const hotelName = row.find('td:eq(11)').text().trim();
-        const pictureUrl = row.find('td:eq(12) img').attr('src'); // URL poza
+        const tripId = $(button).data('tripid');
+        const row = $(button).closest('tr');
 
-        // Seteaza valorile extrase in campurile formularului de editare
-        $('#editTripId').val(tripId); // ID-ul ascuns
+        const destination = row.find('td:eq(0)').text().trim();
+        const departureLocation = row.find('td:eq(1)').text().trim();
+        const departureDate = row.find('td:eq(2)').text().trim();
+        const departureHourRaw = row.find('td:eq(3)').text().trim();
+        const departureHour = departureHourRaw.replace(' UTC', '').trim();
+        const returnDate = row.find('td:eq(4)').text().trim();
+        const availableSpots = row.find('td:eq(6)').text().trim();
+        const registrationFeeRaw = row.find('td:eq(7)').text().trim();
+        const registrationFee = registrationFeeRaw.replace(' RON', '').trim();
+        let guideEmail = row.find('td:eq(8) span:first').text().trim();
+        let initialGuideId = '';
+        $('#editGuideSelect option').each(function() {
+            if ($(this).text().trim() === guideEmail && guideEmail !== 'No guide assigned') {
+                initialGuideId = $(this).val();
+            }
+        });
+
+        const description = row.find('td:eq(9)').text().trim();
+        const hotelName = row.find('td:eq(10)').text().trim();
+        const pictureUrl = row.find('td:eq(11) img').attr('src');
+
+        $('#editTripId').val(tripId);
         $('#editDestination').val(destination);
         $('#editDepartureLocation').val(departureLocation);
-        $('#editDepartureDate').val(departureDate); // Seteaza data existenta
+        $('#editDepartureDate').val(departureDate);
         $('#editDepartureHour').val(departureHour);
         $('#editReturnDate').val(returnDate);
         $('#editAvailableSpots').val(availableSpots);
@@ -493,154 +470,156 @@
         $('#editDescription').val(description);
         $('#editHotelName').val(hotelName);
         $('#editPicture').val(pictureUrl);
+        $('#editGuideSelect').val(initialGuideId || '');
 
-        // Selecteaza ghidul corect in dropdown
-        let guideFound = false;
-        $('#editGuideSelect option').each(function () {
-            if ($(this).text().trim() === guideEmail) {
-                $(this).prop('selected', true);
-                guideFound = true;
-            } else {
-                $(this).prop('selected', false);
-            }
-        });
-        if (!guideFound) {
-            $('#editGuideSelect option[value=""]').prop('selected', true);
-        }
-        // --- END: Populeaza campurile formularului ---
-
-        // --- START: Seteaza data minima pentru plecare la ZIUA DE MAINE ---
         const today = new Date();
         const tomorrow = new Date(today);
-        tomorrow.setDate(today.getDate() + 1); // Adauga o zi
-
-        const yyyy = tomorrow.getFullYear();
-        const mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
-        const dd = String(tomorrow.getDate()).padStart(2, '0');
-        const tomorrowString = `${yyyy}-${mm}-${dd}`; // Format YYYY-MM-DD
-
-        // Seteaza atributul 'min' la data de maine pentru modalul EDIT
+        tomorrow.setDate(today.getDate() + 1);
+        const tomorrowString = tomorrow.toISOString().split('T')[0];
         $('#editDepartureDate').attr('min', tomorrowString);
-        // --- END: Seteaza data minima pentru plecare ---
+        if (departureDate >= tomorrowString) {
+            $('#editReturnDate').attr('min', departureDate);
+        } else {
+            $('#editReturnDate').attr('min', tomorrowString);
+        }
 
-
-        // --- START: Calculeaza durata, valideaza si aplica starea initiala ---
-        calculateAndUpdateDuration('#editDepartureDate', '#editReturnDate', '#editDurationDays');
+        if (departureDate && returnDate) {
+            calculateAndUpdateDuration('#editDepartureDate', '#editReturnDate', '#editDurationDays');
+        } else {
+            $('#editDurationDays').val('').removeClass('is-valid is-invalid');
+        }
         validateForm('#editTripForm');
-        $('#editTripForm').addClass('was-validated');
-        // --- END: Calculeaza, valideaza si aplica starea initiala ---
+        form.addClass('was-validated');
 
-        $('#editTripModal').modal('show'); // Afiseaza modalul de editare
+        $('#editTripModal').modal('show');
     }
 
-    // Restul functiilor tale (openDeleteModal, handler-ul pt enrollModal,
-    // calculateAndUpdateDuration, clearFormValidation, validateFormField, validateForm,
-    // listenerii de evenimente 'blur', 'input', 'change', 'submit') raman la fel.
-
+    // Deschidere modal STERGE
     function openDeleteModal(button) {
         const tripId = $(button).data('tripid');
         $('#deleteTripId').val(tripId);
         $('#deleteTripModal').modal('show');
     }
 
-    $('#enrollModal').on('show.bs.modal', function (event) {
-        const form = $('#enrollForm');
-        clearFormValidation(form);
-        const button = $(event.relatedTarget);
-        const tripId = button.data('tripid');
-        const destination = button.data('destination');
-        $('#modalTripId').val(tripId);
-        $('#modalDestination').text(destination);
-        form[0].reset();
-        $('#modalTripId').val(tripId);
-    });
+    // --- Event Listeners ---
 
-
-    // --- Event Listeners pentru Validare Dinamica ---
-
-    // Validare AddTrip fields on blur
+    // Validare la blur pt AddTrip
     $('#addTripForm').find('input[required], select[required], textarea[required]').on('blur', function() {
-        if (this.id !== 'addDurationDays') {
-            validateFormField(this);
-        }
+        if (this.id !== 'addDurationDays') validateFormField(this);
         if (this.id === 'addDepartureDate' || this.id === 'addReturnDate') {
+            const departureDateVal = $('#addDepartureDate').val();
+            if (this.id === 'addDepartureDate' && departureDateVal && this.checkValidity()) $('#addReturnDate').attr('min', departureDateVal);
             calculateAndUpdateDuration('#addDepartureDate', '#addReturnDate', '#addDurationDays');
-            const otherDateField = (this.id === 'addDepartureDate') ? '#addReturnDate' : '#addDepartureDate';
-            // Trigger blur pe celalalt camp de data doar daca are o valoare, pt a re-valida dependenta
-            if ($(otherDateField).val()) {
-                $(otherDateField).trigger('blur');
-            }
+            const otherDateFieldId = (this.id === 'addDepartureDate') ? '#addReturnDate' : '#addDepartureDate';
+            if ($(otherDateFieldId).val()) validateFormField($(otherDateFieldId)[0]);
         }
     });
 
-    // Validare Enroll fields on blur
-    $('#enrollForm').find('input[required]').on('blur', function() {
-        validateFormField(this);
+    // Validare la blur pt EditTrip
+    $('#editTripForm').find('input[required], select[required], textarea[required]').on('blur', function() {
+        if (this.id !== 'editDurationDays') validateFormField(this);
+        if (this.id === 'editDepartureDate' || this.id === 'editReturnDate') {
+            const departureDateVal = $('#editDepartureDate').val();
+            if (this.id === 'editDepartureDate' && departureDateVal && this.checkValidity()) $('#editReturnDate').attr('min', departureDateVal);
+            calculateAndUpdateDuration('#editDepartureDate', '#editReturnDate', '#editDurationDays');
+            const otherDateFieldId = (this.id === 'editDepartureDate') ? '#editReturnDate' : '#editDepartureDate';
+            if ($(otherDateFieldId).val()) validateFormField($(otherDateFieldId)[0]);
+        }
     });
 
-    // Formatter pentru Data Expirarii (MM/YY) - NOU
+    // Validare la blur pt Enroll (Acum valideaza si data expirare)
+    $('#enrollForm').find('input[required]').on('blur', function() { validateFormField(this); });
+
+    // Formatare data expirare card
     $('#enrollForm input[name="expirationDate"]').on('input', function(e) {
-        var input = $(this);
-        var value = input.val();
-        var cursor = this.selectionStart;
-        var originalLength = value.length;
-
-        // Pastreaza doar cifrele
-        var digits = value.replace(/\D/g, '');
-
-        // Formateaza MM/YY
-        var formattedValue = digits;
-        if (digits.length >= 2) {
-            // Insereaza slash dupa primele 2 cifre
-            formattedValue = digits.substring(0, 2) + '/' + digits.substring(2, 4);
-        }
-
-        // Aplica valoarea formatata (maxlength="5" in HTML limiteaza lungimea)
+        var input = $(this), value = input.val(), digits = value.replace(/\D/g, ''), formattedValue = digits;
+        if (digits.length >= 2) formattedValue = digits.substring(0, 2) + '/' + digits.substring(2, 4);
         input.val(formattedValue);
-
-        // Recalculeaza pozitia cursorului
-        // (Simplificare: muta cursorul la sfarsit dupa formatare automata)
-        // O logica mai complexa ar fi necesara pentru a pastra pozitia exact in timpul editarii
-        if (formattedValue.length > originalLength || (formattedValue.length === 3 && originalLength === 2)) {
-            // Daca s-a adaugat slash-ul, muta cursorul dupa el
-            this.setSelectionRange(formattedValue.length, formattedValue.length);
-        } else {
-            // Incearca sa mentina pozitia relativa (aproximativ)
-            let currentDigitCount = formattedValue.replace(/\D/g, '').length;
-            let oldDigitCount = value.substring(0, cursor).replace(/\D/g, '').length;
-            let newCursorPos = oldDigitCount;
-            if (oldDigitCount >= 2) newCursorPos++; // Adauga 1 pt slash
-            newCursorPos = Math.min(newCursorPos, formattedValue.length);
-            // Ajustare fina pentru stergere slash
-            if (originalLength === 3 && formattedValue.length === 2 && cursor <= 2) {
-                newCursorPos = cursor;
-            } else if (originalLength > 3 && formattedValue.length < originalLength && cursor <=2) {
-                newCursorPos = cursor;
-            }
-            this.setSelectionRange(newCursorPos, newCursorPos);
-        }
-
     });
 
-
-    // Recalculare durata la schimbare date in AddTrip
+    // Recalculare durata la schimbare date AddTrip
     $('#addDepartureDate, #addReturnDate').on('input change', function() {
+        const departureDateVal = $('#addDepartureDate').val();
+        if (this.id === 'addDepartureDate' && departureDateVal && this.checkValidity()) $('#addReturnDate').attr('min', departureDateVal);
         calculateAndUpdateDuration('#addDepartureDate', '#addReturnDate', '#addDurationDays');
     });
 
-    // Recalculare durata si revalidare completa la schimbare date in EditTrip
+    // Recalculare durata la schimbare date EditTrip
     $('#editDepartureDate, #editReturnDate').on('input change', function() {
+        const departureDateVal = $('#editDepartureDate').val();
+        if (this.id === 'editDepartureDate' && departureDateVal && this.checkValidity()) $('#editReturnDate').attr('min', departureDateVal);
         calculateAndUpdateDuration('#editDepartureDate', '#editReturnDate', '#editDurationDays');
-        validateForm('#editTripForm');
-        $('#editTripForm').addClass('was-validated');
     });
 
+    // --- Inițializare Popover și Handler pentru click pe butonul Enroll ---
+    $(document).ready(function() {
 
-    // --- Handler pentru Submit ---
+        // Initializare Popovers pentru butoanele fara locuri
+        $('.enroll-button').each(function() {
+            const button = $(this);
+            const spots = parseInt(button.data('spots'), 10);
+
+            if (isNaN(spots) || spots <= 0) {
+                button.popover({
+                    content: 'Sorry, there are no available spots left.',
+                    trigger: 'focus',
+                    placement: 'top',
+                    // container: 'body'
+                });
+            } else {
+                if (button.data('bs.popover')) {
+                    button.popover('dispose');
+                }
+            }
+        });
+
+        // Handler pentru click pe butonul Enroll
+        $('.enroll-button').on('click', function(event) {
+            const button = $(this);
+            const spots = parseInt(button.data('spots'), 10);
+            const tripId = button.data('tripid');
+            const destination = button.data('destination');
+
+            if (isNaN(spots) || spots <= 0) {
+                console.log("Enroll clicked, spots <= 0. Popover should show via focus.");
+                event.preventDefault();
+            } else {
+                console.log("Enroll clicked, spots > 0. Opening modal.");
+                if (button.data('bs.popover')) {
+                    button.popover('dispose');
+                }
+                const enrollModal = $('#enrollModal');
+                const enrollForm = $('#enrollForm');
+                clearFormValidation(enrollForm);
+                enrollForm[0].reset();
+                enrollModal.find('#modalTripId').val(tripId);
+                enrollModal.find('#modalDestination').text(destination);
+                enrollModal.modal('show');
+            }
+        });
+
+        // Inchide popovers deschise daca se da click in afara lor
+        $('body').on('click', function (e) {
+            $('.enroll-button').each(function () {
+                if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+                    if ($(this).data('bs.popover')) {
+                        $(this).popover('hide');
+                    }
+                }
+            });
+        });
+
+    }); // Sfarsit $(document).ready()
+
+    // Handler vechi 'show.bs.modal' nu mai e necesar pt enrollModal
+    /*
+    $('#enrollModal').on('show.bs.modal', function (event) { ... });
+    */
+
+    // --- Handler general pentru Submit ---
     $('.needs-validation').submit(function(event) {
         const form = this;
-        const isValid = validateForm(form);
-
+        const isValid = validateForm(form); // Ruleaza validarea completa
         if (!isValid) {
             event.preventDefault();
             event.stopPropagation();
