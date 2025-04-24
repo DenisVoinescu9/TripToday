@@ -6,6 +6,19 @@
 <body>
 <div th:replace="~{/fragments/header :: header}"></div>
 
-<div th:replace="~{/fragments/guides :: guides}"></div>
+<h2>Our guides</h2>
+<div class="guides-list">
+    <div class="guide-card" th:each="guide : ${guides}">
+        <img width="200" height="200" th:src="${guide['picture']}" alt="User Avatar" class="user-avatar">
+        <div class="guide-info">
+            <p><strong>Email:</strong> <span th:text="${guide['email']}"></span></p>
+
+
+
+            <td th:text="'Description: ' + ${guide['description']}"></td>
+
+        </div>
+    </div>
+</div>
 </body>
 </html>
