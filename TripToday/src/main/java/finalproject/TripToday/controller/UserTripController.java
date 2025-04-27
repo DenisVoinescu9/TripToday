@@ -1,27 +1,21 @@
 package finalproject.TripToday.controller;
 
-// import finalproject.TripToday.entity.Trip; // Unused import
 import finalproject.TripToday.entity.UserTrip;
-// import finalproject.TripToday.service.TripService; // Unused import
 import finalproject.TripToday.service.UserTripService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-// import java.util.ArrayList; // Unused import
 import java.util.List;
-// import java.util.Optional; // No longer directly needed here
 
 @RestController
 @RequestMapping("/api/v2/user-trips")
 public class UserTripController {
 
     private final UserTripService userTripService;
-    // private final TripService tripService; // Not used in provided methods
 
-    public UserTripController(UserTripService userTripService /*, TripService tripService */) {
+    public UserTripController(UserTripService userTripService ) {
         this.userTripService = userTripService;
-        // this.tripService = tripService;
     }
 
     @PostMapping
@@ -37,7 +31,6 @@ public class UserTripController {
 
     @GetMapping("/trip/{id}")
     public List<UserTrip> getAllUserTripsByTripId(@PathVariable Integer id) {
-        // Service now returns List directly or empty list
         return userTripService.getAllUserTripsByTripId(id);
     }
 

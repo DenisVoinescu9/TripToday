@@ -17,21 +17,18 @@ import java.util.*;
 @Service
 public class Auth0Service {
 
-    // Fields for configuration values
-    private final String clientId;
-    private final String clientSecret; // Be careful with secrets!
+     private final String clientId;
+    private final String clientSecret;
     private final String audience;
     private final String guideRoleId;
 
-    // Constructed URLs
-    private final String tokenUrl;
+     private final String tokenUrl;
     private final String usersApiBaseUrl;
     private final String rolesApiBaseUrl;
 
     private final RestTemplate restTemplate;
 
-    // Cache fields for API Token
-    private volatile String cachedApiToken = null;
+     private volatile String cachedApiToken = null;
     private volatile Instant apiTokenExpiryTime = Instant.MIN;
     private final Object apiTokenLock = new Object();
 
@@ -47,11 +44,9 @@ public class Auth0Service {
         this.audience = audience;
         this.guideRoleId = guideRoleId;
 
-        // Construct tokenUrl directly from the constructor parameter
-        this.tokenUrl = issuerUrl + "/oauth/token";
+         this.tokenUrl = issuerUrl + "/oauth/token";
 
-        // Construct base URLs safely based on audience
-        String apiBase = "";
+         String apiBase = "";
         if (audience != null && !audience.trim().isEmpty()) {
             apiBase = audience.endsWith("/") ? audience : audience + "/";
         }
@@ -59,12 +54,7 @@ public class Auth0Service {
         this.rolesApiBaseUrl = apiBase + "roles/";
     }
 
-    /**
-     * Gets a valid API access token (Client Credentials flow), using an internal cache.
-     * This method is thread-safe.
-     * @return String Access Token (without "Bearer ").
-     * @throws RuntimeException if fetching the token fails.
-     */
+
     public String getApiToken() {
         Instant now = Instant.now();
         if (cachedApiToken != null && now.isBefore(apiTokenExpiryTime.minus(60, ChronoUnit.SECONDS))) {
@@ -86,8 +76,7 @@ public class Auth0Service {
 
                     HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
 
-                    // Use the constructed tokenUrl field
-                    ResponseEntity<Map> response = restTemplate.exchange(this.tokenUrl, HttpMethod.POST, requestEntity, Map.class);
+                     ResponseEntity<Map> response = restTemplate.exchange(this.tokenUrl, HttpMethod.POST, requestEntity, Map.class);
 
                     if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
                         Map<String, Object> responseBody = response.getBody();
@@ -125,8 +114,7 @@ public class Auth0Service {
         if (this.usersApiBaseUrl == null || this.usersApiBaseUrl.isEmpty() || userId == null || userId.trim().isEmpty()) {
             return "";
         }
-        // Use the constructed usersApiBaseUrl field
-        String url = this.usersApiBaseUrl + userId.trim();
+         String url = this.usersApiBaseUrl + userId.trim();
         String accessToken = getApiToken();
 
         HttpHeaders headers = new HttpHeaders();

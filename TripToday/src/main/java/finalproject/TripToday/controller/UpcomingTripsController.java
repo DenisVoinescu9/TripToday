@@ -11,15 +11,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Controller
 public class UpcomingTripsController {
@@ -71,22 +67,27 @@ public class UpcomingTripsController {
     }
 
     @PostMapping("/delete-trip")
-    public String deleteTrip(@RequestParam("id") Integer tripId) {
-        tripService.deleteTrip(tripId);
+    public String deleteTripPost(@RequestParam("id") Integer tripId, RedirectAttributes redirectAttributes) {
+        boolean success = tripService.deleteTrip(tripId);
+        if (success) {
+            redirectAttributes.addFlashAttribute("successMessage", "Trip was successfully canceled.");
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Could not find the trip to mark as canceled.");
+        }
         return "redirect:/trips";
     }
 
 
     @PostMapping("/enroll")
     public String enrollInTrip(@RequestParam("tripId") Integer tripId,
-                               @RequestParam(required = false) String cardNumber, // Le păstrăm chiar dacă nu le folosim explicit aici
+                               @RequestParam(required = false) String cardNumber,
                                @RequestParam(required = false) String cvv,
                                @RequestParam(required = false) String expirationDate,
                                @AuthenticationPrincipal OidcUser principal,
                                RedirectAttributes redirectAttributes) { // Adăugăm RedirectAttributes
 
         if (principal == null) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Trebuie să fii autentificat pentru a te înscrie.");
+            redirectAttributes.addFlashAttribute("errorMessage", "You must be authenticated to enroll in a trip.");
             return "redirect:/trips";
         }
 

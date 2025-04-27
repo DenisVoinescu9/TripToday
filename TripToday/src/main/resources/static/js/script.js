@@ -179,9 +179,10 @@ function openDeleteModal(button) {
 }
 
 function openViewTravelersModal(buttonElement) {
+    console.log("openViewTravelersModal called for scrolling list!");
     const tripId = buttonElement.getAttribute('data-tripid');
     const listElement = document.getElementById('enrolledTravelersList');
-    const modalTitle = document.getElementById('viewTravelersModalLabel');
+
 
     listElement.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div></div>';
     $('#viewTravelersModal').modal('show');
@@ -216,6 +217,7 @@ function openViewTravelersModal(buttonElement) {
                     ul.appendChild(li);
                 });
                 listElement.appendChild(ul);
+
             } else {
                 listElement.innerHTML = '<p>No travelers currently enrolled in this trip.</p>';
             }
@@ -225,6 +227,10 @@ function openViewTravelersModal(buttonElement) {
             listElement.innerHTML = `<p class="text-danger">Could not load traveler list. Error: ${error.message}</p>`;
         });
 }
+
+
+
+
 
 $(document).ready(function() {
 

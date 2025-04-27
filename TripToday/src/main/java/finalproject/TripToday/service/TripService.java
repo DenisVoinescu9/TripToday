@@ -79,8 +79,8 @@ public class TripService {
         if (tripOpt.isPresent()) {
             Trip trip = tripOpt.get();
             if (trip.getAvailableSpots() > 0) {
-                trip.setAvailableSpots(trip.getAvailableSpots() - 1);  // Decrease available spots by 1
-                tripRepository.save(trip);  // Save the updated trip back to the database
+                trip.setAvailableSpots(trip.getAvailableSpots() - 1);
+                tripRepository.save(trip);
                 return true;
             }
         }
@@ -95,14 +95,12 @@ public class TripService {
     }
 
 
-    // In TripService.java -> updateTrip method
 
     public Trip updateTrip(Integer id, Trip tripDetails) {
         Optional<Trip> optionalTrip = tripRepository.findById(id);
         if (optionalTrip.isPresent()) {
-            Trip trip = optionalTrip.get(); // Entitatea existenta
-            // Copierea valorilor din tripDetails (formular) in trip (entitate)
-            trip.setDestination(tripDetails.getDestination());
+            Trip trip = optionalTrip.get();
+             trip.setDestination(tripDetails.getDestination());
             trip.setDepartureLocation(tripDetails.getDepartureLocation());
             trip.setDepartureDate(tripDetails.getDepartureDate());
             trip.setReturnDate(tripDetails.getReturnDate());
@@ -122,10 +120,13 @@ public class TripService {
     }
 
 
+    @Transactional
     public boolean deleteTrip(Integer id) {
         Optional<Trip> optionalTrip = tripRepository.findById(id);
         if (optionalTrip.isPresent()) {
-            tripRepository.deleteById(id);
+            Trip trip = optionalTrip.get();
+            trip.setCanceled(true);
+            tripRepository.save(trip);
             return true;
         }
         return false;

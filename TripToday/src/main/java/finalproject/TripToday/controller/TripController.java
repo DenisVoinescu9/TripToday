@@ -53,9 +53,9 @@ public class TripController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTrip(@PathVariable Integer id) {
-        boolean isDeleted = tripService.deleteTrip(id);
-        if (isDeleted) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        boolean success = tripService.deleteTrip(id);
+        if (success) {
+            return new ResponseEntity<>(HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

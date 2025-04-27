@@ -4,53 +4,54 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>User Profile</title> <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" th:href="@{/css/style.css}"> <style>
-    /* Stiluri simple pentru card-ul de profil, pot fi mutate în CSS */
-    .profile-card {
-        max-width: 800px;
-        margin: 20px auto;
-        padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        box-shadow: 2px 2px 12px rgba(0,0,0,0.1);
-    }
-    .profile-card img {
-        display: block;
-        margin: 0 auto 15px auto;
-        border-radius: 50%; /* Face imaginea circulară */
-    }
-    .description-container, .picture-update-container {
-        margin-top: 15px;
-        padding-top: 15px;
-        border-top: 1px solid #eee;
-    }
-    textarea {
-        width: 100%;
-        min-height: 80px;
-        margin-bottom: 10px;
-    }
-    .trips-section {
-        margin-top: 20px;
-        padding-top: 20px;
-        border-top: 1px solid #ddd;
-    }
-    .trip-details {
-        margin-bottom: 15px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid #eee;
-    }
-    .trip-details:last-child {
-        border-bottom: none;
-    }
-    .alert {
-        margin-top: 15px;
-    }
-</style>
+    <title>User Profile</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .profile-card {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 2px 2px 12px rgba(0,0,0,0.1);
+        }
+        .profile-card img {
+            display: block;
+            margin: 0 auto 15px auto;
+            border-radius: 50%;
+        }
+        .description-container, .picture-update-container {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        textarea {
+            width: 100%;
+            min-height: 80px;
+            margin-bottom: 10px;
+        }
+        .trips-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        .trip-details {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .trip-details:last-child {
+            border-bottom: none;
+        }
+        .alert {
+            margin-top: 15px;
+        }
+    </style>
 </head>
 <body>
 
-<div th:replace="~{fragments/header :: header}"></div>
+<div th:replace="~{/fragments/header :: header}"></div>
 
 <div class="container">
 
@@ -70,7 +71,8 @@
     <div class="profile-card">
 
         <div th:if="${user != null}">
-            <img width="150" height="150" th:src="${user.picture ?: 'default_picture_url.jpg'}" alt="Profile Picture"/> <p class="text-center"><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+            <img width="150" height="150" th:src="${user.picture ?: 'default_picture_url.jpg'}" alt="Profile Picture"/>
+            <p class="text-center"><strong>Email:</strong> <span th:text="${user.email}"></span></p>
             <p class="text-center">
                 <strong>Account role(s):</strong>
                 <span th:text="${user.role}"></span>
@@ -109,6 +111,7 @@
                 <p>No upcoming trips found.</p>
             </div>
             <div th:each="trip, iterStat : ${upcomingTrips}" class="trip-details">
+                <p th:if="${trip.canceled}" class="text-danger font-weight-bold">This trip was canceled. The enrolling fee was transferred back to you.</p>
                 <p>
                     <span th:if="${trip.guideId == user.user_id}"><strong>You are the guide for this trip</strong></span>
                     <span th:unless="${trip.guideId == user.user_id}">
@@ -132,6 +135,7 @@
                 <p>No past trips found.</p>
             </div>
             <div th:each="trip, iterStat : ${pastTrips}" class="trip-details">
+                <p th:if="${trip.canceled}" class="text-danger font-weight-bold">This trip was canceled</p>
                 <p>
                     <span th:if="${trip.guideId == user.user_id}"><strong>You were the guide for this trip</strong></span>
                     <span th:unless="${trip.guideId == user.user_id}">
@@ -151,7 +155,10 @@
             </div>
         </div>
 
-    </div> </div> <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"></script>
 

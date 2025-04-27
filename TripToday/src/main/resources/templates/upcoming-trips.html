@@ -12,6 +12,19 @@
         .popover {
             max-width: 250px;
         }
+        input[readonly] {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+        .popover {
+            max-width: 250px;
+        }
+
+
+        #enrolledTravelersList {
+            max-height: 400px;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
@@ -60,8 +73,8 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="trip : ${trips}">
-                <td th:text="${trip.destination}"></td>
+            <tr th:each="trip : ${trips}" th:if="${!trip.canceled}">
+            <td th:text="${trip.destination}"></td>
                 <td th:text="${trip.departureLocation}"></td>
                 <td th:text="${trip.departureDate}"></td>
                 <td th:text="${trip.departureHour} + ' UTC'"></td>
@@ -86,8 +99,8 @@
                 </td>
                 <td th:if="${user != null and (user.get('role') == 'Manager' || user.get('role') == 'Manager | Guide' || user.get('role') == 'Manager | Guide | Traveler')}">
                     <button class="btn btn-info btn-sm mr-1" th:attr="data-tripid=${trip.id}" onclick="openViewTravelersModal(this)">View Travelers</button>
-                    <button class="btn btn-warning btn-sm mr-1" th:attr="data-tripid=${trip.id}" onclick="openEditTripModal(this)">Edit</button>
-                    <button class="btn btn-danger btn-sm" th:attr="data-tripid=${trip.id}" onclick="openDeleteModal(this)">Delete</button>
+                    <button class="btn btn-warning btn-sm mr-1" th:attr="data-tripid=${trip.id}" onclick="openEditTripModal(this)">Edit trip</button>
+                    <button class="btn btn-danger btn-sm" th:attr="data-tripid=${trip.id}" onclick="openDeleteModal(this)">Cancel trip</button>
                 </td>
                 </td>
             </tr>
