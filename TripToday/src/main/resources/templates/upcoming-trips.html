@@ -18,9 +18,24 @@
 <div th:replace="~{fragments/header :: header}"></div>
 
 <div class="container-fluid mt-4">
+
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
     <h1>Available Trips</h1>
 
-    <div th:if="${user.get('role') == 'Manager' || user.get('role') == 'Manager | Guide' || user.get('role') == 'Manager | Guide | Traveler'}">
+    <div th:if="${user != null and (user.get('role') == 'Manager' || user.get('role') == 'Manager | Guide' || user.get('role') == 'Manager | Guide | Traveler')}">
         <button class="btn btn-success mb-3" onclick="openAddTripModal()">Add New Trip</button>
     </div>
 
@@ -41,7 +56,7 @@
                 <th>Hotel</th>
                 <th>Picture</th>
                 <th>Enroll</th>
-                <th th:if="${user.get('role') == 'Manager' || user.get('role') == 'Manager | Guide' || user.get('role') == 'Manager | Guide | Traveler'}">Actions</th>
+                <th th:if="${user != null and (user.get('role') == 'Manager' || user.get('role') == 'Manager | Guide' || user.get('role') == 'Manager | Guide | Traveler')}">Actions</th>
             </tr>
             </thead>
             <tbody>
@@ -69,9 +84,11 @@
                         Enroll
                     </button>
                 </td>
-                <td th:if="${user.get('role') == 'Manager' || user.get('role') == 'Manager | Guide' || user.get('role') == 'Manager | Guide | Traveler'}">
-                    <button class="btn btn-warning btn-sm" th:attr="data-tripid=${trip.id}" onclick="openEditTripModal(this)">Edit</button>
+                <td th:if="${user != null and (user.get('role') == 'Manager' || user.get('role') == 'Manager | Guide' || user.get('role') == 'Manager | Guide | Traveler')}">
+                    <button class="btn btn-info btn-sm mr-1" th:attr="data-tripid=${trip.id}" onclick="openViewTravelersModal(this)">View Travelers</button>
+                    <button class="btn btn-warning btn-sm mr-1" th:attr="data-tripid=${trip.id}" onclick="openEditTripModal(this)">Edit</button>
                     <button class="btn btn-danger btn-sm" th:attr="data-tripid=${trip.id}" onclick="openDeleteModal(this)">Delete</button>
+                </td>
                 </td>
             </tr>
             </tbody>
@@ -82,7 +99,7 @@
         <p>No trips available at the moment.</p>
     </div>
 </div>
-
+<div th:replace="~{fragments/tripModals :: viewTravelersModal}"></div>
 <div th:replace="~{fragments/tripModals :: addTripModal}"></div>
 <div th:replace="~{fragments/tripModals :: enrollModal}"></div>
 <div th:replace="~{fragments/tripModals :: editTripModal}"></div>
@@ -92,5 +109,6 @@
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"></script>
 
-<script th:src="@{js/script.js}"></script> </body>
+<script th:src="@{/js/script.js}"></script>
+</body>
 </html>

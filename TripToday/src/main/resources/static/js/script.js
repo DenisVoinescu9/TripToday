@@ -178,6 +178,54 @@ function openDeleteModal(button) {
     $('#deleteTripModal').modal('show');
 }
 
+function openViewTravelersModal(buttonElement) {
+    const tripId = buttonElement.getAttribute('data-tripid');
+    const listElement = document.getElementById('enrolledTravelersList');
+    const modalTitle = document.getElementById('viewTravelersModalLabel');
+
+    listElement.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div></div>';
+    $('#viewTravelersModal').modal('show');
+
+    const apiUrl = `/api/v2/user-trips/trip/${tripId}`;
+
+    fetch(apiUrl)
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    throw new Error(`HTTP error! Status: ${response.status}, Message: ${text || 'No details'}`);
+                });
+            }
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                return response.json();
+            } else {
+                return [];
+            }
+        })
+        .then(userTrips => {
+            listElement.innerHTML = '';
+
+            if (userTrips && userTrips.length > 0) {
+                const ul = document.createElement('ul');
+                ul.className = 'list-group';
+
+                userTrips.forEach(userTrip => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item';
+                    li.textContent = `User ID: ${userTrip.userId}`;
+                    ul.appendChild(li);
+                });
+                listElement.appendChild(ul);
+            } else {
+                listElement.innerHTML = '<p>No travelers currently enrolled in this trip.</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching enrolled travelers:', error);
+            listElement.innerHTML = `<p class="text-danger">Could not load traveler list. Error: ${error.message}</p>`;
+        });
+}
+
 $(document).ready(function() {
 
     $('.enroll-button').each(function() {
@@ -281,6 +329,3 @@ $(document).ready(function() {
     });
 
 });
-
-
-

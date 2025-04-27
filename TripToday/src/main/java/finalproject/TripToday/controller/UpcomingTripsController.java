@@ -6,13 +6,17 @@ import finalproject.TripToday.service.Auth0Service;
 import finalproject.TripToday.service.TripService;
 import finalproject.TripToday.service.UserTripService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -40,13 +44,12 @@ public class UpcomingTripsController {
             model.addAttribute("user", principal.getClaims());
         }
 
-        // Obține excursiile viitoare
         List<Trip> trips = tripService.getUpcomingTrips();
         model.addAttribute("trips", trips);
 
-        // Obține ghizii, cu id și email (pentru a le trimite în model)
-        List<Map<String, String>> guides = auth0Service.getAllGuides(); // Lista de ghizi cu id și email
-        model.addAttribute("guides", guides); // Trimitem ghizii în model
+
+        List<Map<String, String>> guides = auth0Service.getAllGuides();
+        model.addAttribute("guides", guides);
 
         return "upcoming-trips";
     }
@@ -74,29 +77,34 @@ public class UpcomingTripsController {
     }
 
 
-
     @PostMapping("/enroll")
     public String enrollInTrip(@RequestParam("tripId") Integer tripId,
-                               @AuthenticationPrincipal OidcUser principal) {
+                               @RequestParam(required = false) String cardNumber, // Le păstrăm chiar dacă nu le folosim explicit aici
+                               @RequestParam(required = false) String cvv,
+                               @RequestParam(required = false) String expirationDate,
+                               @AuthenticationPrincipal OidcUser principal,
+                               RedirectAttributes redirectAttributes) { // Adăugăm RedirectAttributes
 
-        if (principal != null) {
-            String userId = principal.getName(); // User ID from the authentication principal
-            UserTrip userTrip = new UserTrip();
-            userTrip.setUserId(userId);
-            userTrip.setTripId(tripId);
-
-            // Save the UserTrip entity (enrollment)
-            userTripService.createUserTrip(userTrip);
-
-            // Decrement available spots for the trip
-            boolean success = tripService.decrementAvailableSpots(tripId);
-
-            if (!success) {
-                // Handle the case when there are no available spots
-                return "redirect:/trips?error=No available spots";
-            }
+        if (principal == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Trebuie să fii autentificat pentru a te înscrie.");
+            return "redirect:/trips";
         }
 
-        return "redirect:/trips"; // Redirect after enrollment
+        String userId = principal.getName();
+        UserTrip userTrip = new UserTrip();
+        userTrip.setUserId(userId);
+        userTrip.setTripId(tripId);
+
+        try {
+            userTripService.createUserTrip(userTrip);
+            redirectAttributes.addFlashAttribute("successMessage", "You successfully enrolled in this trip!");
+        } catch (DataIntegrityViolationException e) {
+
+            redirectAttributes.addFlashAttribute("errorMessage", "You are already enrolled in this trip.");
+
+        }
+
+
+        return "redirect:/trips";
     }
 }

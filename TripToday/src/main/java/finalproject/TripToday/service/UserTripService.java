@@ -2,9 +2,9 @@ package finalproject.TripToday.service;
 
 import finalproject.TripToday.entity.UserTrip;
 import finalproject.TripToday.repository.UserTripRepository;
-import org.apache.catalina.User;
+// import org.apache.catalina.User; // Unused import
 import org.springframework.stereotype.Service;
-
+import java.util.Collections; // Import needed for emptyList
 import java.util.List;
 import java.util.Optional;
 
@@ -30,7 +30,11 @@ public class UserTripService {
     }
 
     public List<UserTrip> getAllUserTripsByUserId(String userId) {
-        return userTripRepository.findAllByUserId(userId);
+        return userTripRepository.findAllByUserId(userId).orElse(Collections.emptyList());
+    }
+
+    public List<UserTrip> getAllUserTripsByTripId(Integer tripId) {
+        return userTripRepository.findAllByTripId(tripId).orElse(Collections.emptyList());
     }
 
     public UserTrip updateUserTrip(Integer id, UserTrip userTripDetails) {
@@ -45,8 +49,7 @@ public class UserTripService {
     }
 
     public boolean deleteUserTrip(Integer id) {
-        Optional<UserTrip> optionalUserTrip = userTripRepository.findById(id);
-        if (optionalUserTrip.isPresent()) {
+        if (userTripRepository.existsById(id)) {
             userTripRepository.deleteById(id);
             return true;
         }
