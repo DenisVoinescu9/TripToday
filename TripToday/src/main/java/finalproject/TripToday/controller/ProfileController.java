@@ -178,6 +178,6 @@ public class ProfileController {
             redirectAttributes.addFlashAttribute("errorMessage", "Failed to update profile picture. Reason: " + e.getMessage());
         }
 
-        return "redirect:/profile"; // Redirecționează inapoi la profil
+        return "redirect:/profile";
     }
 }
