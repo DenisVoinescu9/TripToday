@@ -1,112 +1,68 @@
 package finalproject.TripToday.controller;
 
-import org.springframework.http.*;
+import finalproject.TripToday.service.Auth0Service; // Service import
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.ui.Model;
-
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+
 
 @Controller
 public class GuidesController {
 
-    private static final String CLIENT_ID = "yDqKD2YmmwBCbMgx3hEq9P8YZ2jX7B99";
-    private static final String CLIENT_SECRET = "30QJIcLVHKOyD7G_4Arnfb5WK5B1ZN6bS2XP64X6dg3TJ7T36rMmcolOtNFrougW";
-    private static final String AUDIENCE = "https://dev-an6hxzzvf6uoryjw.us.auth0.com/api/v2/";
-    private static final String DOMAIN = "https://dev-an6hxzzvf6uoryjw.us.auth0.com";
+    private final Auth0Service auth0Service;
 
-    private static final String TOKEN_URL = DOMAIN + "/oauth/token";
-
-    private String getApi2Token() {
-        RestTemplate restTemplate = new RestTemplate();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        Map<String, String> requestBody = Map.of("grant_type", "client_credentials", "client_id", CLIENT_ID, "client_secret", CLIENT_SECRET, "audience", AUDIENCE);
-
-        HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
-
-        ResponseEntity<Map> response = restTemplate.exchange(TOKEN_URL, HttpMethod.POST, requestEntity, Map.class);
-
-        if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-            return response.getBody().get("access_token").toString();
-        } else {
-            throw new RuntimeException("Could not retrieve access token");
-        }
+    @Autowired
+    public GuidesController(Auth0Service auth0Service) {
+        this.auth0Service = auth0Service;
     }
 
     @GetMapping("/guides")
     public String guides(Model model, @AuthenticationPrincipal OidcUser principal) {
-        String accessToken = "Bearer " + getApi2Token();
+        List<Map<String, String>> guidesForView = new ArrayList<>();
 
-        String getARolesUsersAPI = "https://dev-an6hxzzvf6uoryjw.us.auth0.com/api/v2/roles/rol_y9CbKaiBPr8RoikW/users";
-        String getUserByIdAPI = "https://dev-an6hxzzvf6uoryjw.us.auth0.com/api/v2/users/";
+        try {
+            // 1. Get initial guide list (id, email, name, picture) from service
+            List<Map<String, String>> initialGuides = auth0Service.getAllGuides();
 
-        // Configurare headers
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", accessToken);
-
-        // Configurare request pentru obținerea ghidurilor
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        RestTemplate restTemplate = new RestTemplate();
-
-        // Efectuare cerere GET pentru ghiduri
-        ResponseEntity<List> response = restTemplate.exchange(getARolesUsersAPI, HttpMethod.GET, entity, List.class);
-        List<Map<String, Object>> guides = response.getBody();
-
-        // Iterăm prin lista de ghiduri și facem un request pentru fiecare pentru a obține "user_metadata.description"
-        if (guides != null && !guides.isEmpty()) {
-            for (Map<String, Object> guide : guides) {
-                String userId = (String) guide.get("user_id");  // presupunem că există un câmp user_id în fiecare guide
-
-                String userApiUrl = getUserByIdAPI + "/" + userId;
-
-                HttpEntity<String> userEntity = new HttpEntity<>(headers);
-
-                ResponseEntity<Map> userResponse = restTemplate.exchange(userApiUrl, HttpMethod.GET, userEntity, Map.class);
-                Map<String, Object> userDetails = userResponse.getBody();
-
-                System.out.println(userDetails);
-                assert userDetails != null;
-                if (userDetails.containsKey("user_metadata")) {
-                    Map<String, Object> userMetadata = (Map<String, Object>) userDetails.get("user_metadata");
-
-                    if (userMetadata.containsKey("description")) {
-
-                        if (userMetadata.get("description").toString().trim().isEmpty())
-
-                            // user.user_metadata has key description but it's empty
-                            guide.put("description", "The guide has no description...");
-                        else guide.put("description", userMetadata.get("description").toString());
-                    } else {
-
-                        // user.user_metadata doesn't have key 'description'
-                        guide.put("description", "The guide has no description.");
-                    }
-                } else {
-
-                    // user.user_metadata is null
-                    guide.put("description", "The guide has no description.");
+            // 2. For each guide, get description and add to the map
+            for (Map<String, String> guide : initialGuides) {
+                String guideId = guide.get("id");
+                // Proceed only if guideId is valid
+                if (guideId != null && !guideId.isEmpty()) {
+                    // Get description (service returns "" on error or if not found)
+                    String description = auth0Service.getGuideDescription(guideId);
+                    // Add description to the existing map, providing a default if empty
+                    guide.put("description", description.isEmpty() ? "The guide has no description." : description);
+                    // Add the completed map to the list for the view
+                    guidesForView.add(guide);
                 }
-
-
+                // Guides with missing IDs are implicitly skipped
             }
 
+            // 3. Add the final list (with descriptions) to the model
+            model.addAttribute("guides", guidesForView);
 
+            // Add logged-in user profile if available
+            if (principal != null) {
+                model.addAttribute("profile", principal.getClaims());
+            }
+
+            return "guides"; // Return the view name
+
+        } catch (Exception e) {
+            // Catch major exceptions (e.g., failure in getAllGuides or token fetching)
+            // Add a generic error message for the UI
+            model.addAttribute("errorMessage", "An unexpected error occurred while loading guide information. Please try again later.");
+            // Return the general error page name
+            return "error"; // Ensure you have an error.html template
         }
-
-
-        // Adăugare date în model pentru Thymeleaf
-        model.addAttribute("guides", guides);
-
-        return "guides";
     }
-
-
 }

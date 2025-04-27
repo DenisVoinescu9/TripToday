@@ -45,7 +45,6 @@ public class TripService {
         return trips;
     }
 
-// Existing TripService...
 
     public Map<String, List<Trip>> splitUserTripsByDate(String userId) {
         List<UserTrip> userTrips = userTripService.getAllUserTripsByUserId(userId);

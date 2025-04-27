@@ -8,20 +8,22 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
-public class AppConfig { // Numește clasa cum dorești
+public class AppConfig {
 
     @Bean
     public RestTemplate restTemplate() {
-        // 1. Creează un client Apache HttpClient
-        //    Poți folosi createDefault() sau îl poți customiza mai mult dacă e nevoie
-        //    (ex: setare timeout-uri, pool de conexiuni etc.)
+
+        // Create Apache HttpClient
+
         CloseableHttpClient httpClient = HttpClients.createDefault();
 
-        // 2. Creează un Request Factory bazat pe clientul Apache HttpClient
+        // Create Request Factory based on Apache HTTP Client
+
         HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
         requestFactory.setHttpClient(httpClient);
 
-        // 3. Creează bean-ul RestTemplate folosind acest request factory
+        // Create the bean using the Request Factory
+
         return new RestTemplate(requestFactory);
     }
 }
