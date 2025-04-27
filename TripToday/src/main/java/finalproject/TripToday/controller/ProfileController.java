@@ -15,10 +15,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
-import java.util.Collections; // Pentru Collections.emptyList()
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors; // Pentru colectarea emailurilor
 
 @Controller
 public class ProfileController {
@@ -36,7 +35,6 @@ public class ProfileController {
     @GetMapping("/profile")
     public String profile(Model model, @AuthenticationPrincipal OidcUser principal) {
         if (principal == null) {
-
             return "redirect:/";
         }
 
@@ -46,10 +44,8 @@ public class ProfileController {
         String userId = principal.getName();
 
         try {
-
             String description = auth0Service.getGuideDescription(userId);
             model.addAttribute("description", description);
-
 
             Map<String, List<Trip>> splitTrips = tripService.splitUserTripsByDate(userId);
             List<Trip> pastTrips = splitTrips.getOrDefault("pastTrips", Collections.emptyList());
@@ -57,28 +53,45 @@ public class ProfileController {
             model.addAttribute("pastTrips", pastTrips);
             model.addAttribute("upcomingTrips", upcomingTrips);
 
-
-            List<String> upcomingTripGuideEmails = upcomingTrips.stream().map(Trip::getGuideId).distinct()
-                    .map(auth0Service::getGuideIdAndEmail)
-                    .collect(Collectors.toMap(map -> map.get("guideId"), map -> map.get("guideEmail")))
-                    .entrySet().stream()
-                    .filter(entry -> entry.getValue() != null && !entry.getValue().isEmpty())
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
-                    .values().stream().collect(Collectors.toList());
-
+            List<String> upcomingTripGuideEmails = new ArrayList<>();
+            for (Trip trip : upcomingTrips) {
+                String guideId = trip.getGuideId();
+                if (guideId != null && !guideId.trim().isEmpty()) {
+                    try {
+                        Map<String, String> guideInfo = auth0Service.getGuideIdAndEmail(guideId);
+                        String email = guideInfo.getOrDefault("guideEmail", null);
+                        upcomingTripGuideEmails.add(email);
+                    } catch (Exception e) {
+                        logger.error("Failed to get email for upcoming trip guideId {}: {}", guideId, e.getMessage());
+                        upcomingTripGuideEmails.add(null);
+                    }
+                } else {
+                    upcomingTripGuideEmails.add(null);
+                }
+            }
             model.addAttribute("upcomingTripGuideEmails", upcomingTripGuideEmails);
 
+            List<String> pastTripGuideEmails = new ArrayList<>();
+            for (Trip trip : pastTrips) {
+                String guideId = trip.getGuideId();
+                if (guideId != null && !guideId.trim().isEmpty()) {
+                    try {
+                        Map<String, String> guideInfo = auth0Service.getGuideIdAndEmail(guideId);
+                        String email = guideInfo.getOrDefault("guideEmail", null);
+                        pastTripGuideEmails.add(email);
+                    } catch (Exception e) {
 
-            List<String> pastTripGuideEmails = pastTrips.stream().map(Trip::getGuideId).distinct().map(auth0Service::getGuideIdAndEmail).collect(Collectors.toMap(map -> map.get("guideId"), map -> map.get("guideEmail"))).entrySet().stream().filter(entry -> entry.getValue() != null && !entry.getValue().isEmpty()).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)).values().stream().collect(Collectors.toList());
-
-
+                        pastTripGuideEmails.add(null);
+                    }
+                } else {
+                    pastTripGuideEmails.add(null);
+                }
+            }
             model.addAttribute("pastTripGuideEmails", pastTripGuideEmails);
-
 
         } catch (Exception e) {
 
             model.addAttribute("errorMessage", "Could not load profile data. Please try again later.");
-
             model.addAttribute("description", "");
             model.addAttribute("pastTrips", Collections.emptyList());
             model.addAttribute("upcomingTrips", Collections.emptyList());
@@ -89,22 +102,16 @@ public class ProfileController {
         return "profile";
     }
 
-
     @PostMapping("/profile/update-description")
     public String updateDescription(@RequestParam("description") String description, @AuthenticationPrincipal OidcUser principal, RedirectAttributes redirectAttributes) {
-
         if (principal == null) {
-
             redirectAttributes.addFlashAttribute("errorMessage", "Authentication required.");
             return "redirect:/";
         }
         String userId = principal.getName();
 
-
         try {
-
             auth0Service.updateGuideDescription(userId, description);
-
             redirectAttributes.addFlashAttribute("successMessage", "Description updated successfully!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Failed to update description. Reason: " + e.getMessage());
@@ -113,28 +120,24 @@ public class ProfileController {
         return "redirect:/profile";
     }
 
-
     @PostMapping("/profile/update-picture")
     public String updatePicture(@RequestParam("imageUrl") String imageUrl, @AuthenticationPrincipal OidcUser principal, RedirectAttributes redirectAttributes) {
-
         if (principal == null) {
             redirectAttributes.addFlashAttribute("errorMessage", "Authentication required.");
             return "redirect:/";
         }
         String userId = principal.getName();
 
-
         if (imageUrl == null || imageUrl.trim().isEmpty() || !imageUrl.trim().toLowerCase().startsWith("http")) {
-
             redirectAttributes.addFlashAttribute("errorMessage", "Invalid image URL provided. Please enter a valid URL.");
             return "redirect:/profile";
         }
 
         try {
             auth0Service.updatePicture(userId, imageUrl.trim());
-            redirectAttributes.addFlashAttribute("successMessage", "Profile picture updated successfully!");
+            redirectAttributes.addFlashAttribute("successMessage", "Profile picture updated successfully! Please log in again to see the changes.");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Failed to update profile picture. Reason: " + e.getMessage());
+             redirectAttributes.addFlashAttribute("errorMessage", "Failed to update profile picture. Reason: " + e.getMessage());
         }
 
         return "redirect:/profile";

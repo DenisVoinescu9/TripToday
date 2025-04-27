@@ -3,6 +3,7 @@ package finalproject.TripToday.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -65,6 +66,11 @@ public class Trip {
     @Size(max = 255)
     @Column(name = "hotel_name")
     private String hotelName;
+
+    @NotNull
+    @Column(name = "canceled", nullable = false)
+    @ColumnDefault("false")
+    private Boolean canceled = false;
 
     public Integer getId() {
         return id;
@@ -170,4 +176,11 @@ public class Trip {
         this.hotelName = hotelName;
     }
 
+    public Boolean getCanceled() {
+        return canceled;
+    }
+
+    public void setCanceled(Boolean canceled) {
+        this.canceled = canceled;
+    }
 }
