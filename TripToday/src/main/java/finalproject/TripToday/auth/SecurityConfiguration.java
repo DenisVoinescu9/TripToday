@@ -17,10 +17,12 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-    @Value("${okta.oauth2.issuer}")
-    private String issuer;
-    @Value("${okta.oauth2.client-id}")
-    private String clientId;
+    @Value("${AUTH0_ISSUER}")
+    private String AUTH0_ISSUER;
+    @Value("${AUTH0_CLIENT_ID}")
+    private String AUTH0_CLIENT_ID;
+
+
 
     @Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
@@ -28,6 +30,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/").permitAll()
                         .requestMatchers("/about").permitAll()
+                        .requestMatchers("/guides").permitAll()
                         .requestMatchers("/api/v2/**").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -37,11 +40,13 @@ public class SecurityConfiguration {
         return http.build();
     }
 
+    // What happens on logout
+
     private LogoutHandler logoutHandler() {
         return (request, response, authentication) -> {
             try {
                 String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
-                response.sendRedirect(issuer + "v2/logout?client_id=" + clientId + "&returnTo=" + baseUrl);
+                response.sendRedirect(AUTH0_ISSUER + "v2/logout?client_id=" + AUTH0_CLIENT_ID + "&returnTo=" + baseUrl);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

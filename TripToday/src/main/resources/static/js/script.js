@@ -280,7 +280,7 @@ $(document).ready(function() {
         $(form).addClass('was-validated');
     });
 
-}); // Sfarsit $(document).ready()
+});
 
 
 
