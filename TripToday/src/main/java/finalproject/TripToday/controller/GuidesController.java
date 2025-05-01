@@ -51,7 +51,7 @@ public class GuidesController {
             model.addAttribute("errorMessage", "An unexpected error occurred while loading guide information. Please try again later.");
 
         }
-        return "guides";
+        return "guides-page";
 
 
     }

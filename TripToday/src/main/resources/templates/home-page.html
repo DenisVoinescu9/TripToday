@@ -1,0 +1,28 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
+    <title>Home | TripToday</title>
+
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
+    <script src="http://localhost:35729/livereload.js"></script>
+
+    <link rel="stylesheet" type="text/css" th:href="@{/css/home-page.css}"/>
+</head>
+
+
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+<div class="wrapper">
+    <div class="about-us">
+        <h1 class="about-us__heading">Discover the world with us</h1>
+        <p class="about-us__paragraph">
+            Explore unforgettable destinations with TripToday! We create immersive guided tours led by passionate
+            experts. Our guides share authentic stories and insights, making your journey seamless and memorable. Leave
+            the details to us, enjoy the discovery. Find your next adventure with TripToday!
+        </p>
+    </div>
+</div>
+</body>
+</html>
