@@ -99,7 +99,7 @@ public class ProfileController {
             model.addAttribute("upcomingTripGuideEmails", Collections.emptyList());
         }
 
-        return "profile";
+        return "profile-page";
     }
 
     @PostMapping("/profile/update-description")

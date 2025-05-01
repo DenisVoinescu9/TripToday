@@ -47,7 +47,7 @@ public class UpcomingTripsController {
         List<Map<String, String>> guides = auth0Service.getAllGuides();
         model.addAttribute("guides", guides);
 
-        return "upcoming-trips";
+        return "upcoming-trips-page";
     }
 
 
