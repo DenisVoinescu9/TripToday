@@ -1,0 +1,17 @@
+.navbar-container{
+     display: flex;
+    justify-content: center;
+}
+.navbar-container .navbar-container-items {
+     width: 60rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+.navbar-container .navbar-container-image {
+    width: 10rem;
+ }
+.navbar-container .navbar-container-image img {
+    max-width: 5rem;
+    max-height: 5rem;
+}

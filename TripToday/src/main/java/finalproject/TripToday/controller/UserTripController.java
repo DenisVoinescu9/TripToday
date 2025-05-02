@@ -1,21 +1,27 @@
 package finalproject.TripToday.controller;
 
 import finalproject.TripToday.entity.UserTrip;
+import finalproject.TripToday.service.Auth0Service; // Import Auth0Service
 import finalproject.TripToday.service.UserTripService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map; // Import Map
+import java.util.stream.Collectors; // Import Collectors
 
 @RestController
 @RequestMapping("/api/v2/user-trips")
 public class UserTripController {
 
     private final UserTripService userTripService;
+    private final Auth0Service auth0Service; // Inject Auth0Service
 
-    public UserTripController(UserTripService userTripService ) {
+    // Updated constructor to inject Auth0Service
+    public UserTripController(UserTripService userTripService, Auth0Service auth0Service) {
         this.userTripService = userTripService;
+        this.auth0Service = auth0Service;
     }
 
     @PostMapping
@@ -26,7 +32,20 @@ public class UserTripController {
 
     @GetMapping
     public List<UserTrip> getAllUserTrips() {
+        // This endpoint remains unchanged, returns basic UserTrip data
         return userTripService.getAllUserTrips();
+    }
+
+    @GetMapping("/trip/{id}/details") // Changed path slightly to avoid conflict and indicate details
+    public List<Map<String, Object>> getTravelerDetailsByTripId(@PathVariable Integer id) {
+        List<UserTrip> userTrips = userTripService.getAllUserTripsByTripId(id);
+
+
+        return userTrips.stream()
+                .map(UserTrip::getUserId)
+                .filter(userId -> userId != null && !userId.trim().isEmpty())
+                .map(auth0Service::getUserDetails)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/trip/{id}")
