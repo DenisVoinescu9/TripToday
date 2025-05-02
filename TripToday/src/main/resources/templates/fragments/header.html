@@ -1,25 +1,31 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5" xmlns:Email="http://www.w3.org/1999/xhtml">
+<link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
+<script src="http://localhost:35729/livereload.js"></script>
 
 <head>
 <body>
-// Header when user is authenticated
-<div sec:authorize="isAuthenticated()" th:fragment="header">
-    <a th:href="@{/home}">Home</a>
-    <a th:href="@{/about}">Contact us</a>
-    <a th:href="@{/trips}">Upcoming trips</a>
-    <a th:href="@{/guides}">Meet the guides</a>
-    <a th:href="@{/profile}">My profile</a>
-    <a th:href="@{/logout}">Sign out</a>
-</div>
 
-// Header when user is not authenticated
-<div sec:authorize="!isAuthenticated()" th:fragment="header">
-    <a th:href="@{/}">Home</a>
-    <a th:href="@{/about}">Contact us</a>
-    <a th:href="@{/guides}">Meet the guides</a>
-    <a th:href="@{/oauth2/authorization/okta}">Sign in</a>
+<div class="navbar-container" th:fragment="header">
+    <div class="navbar-container-image">
+        <img th:src="@{/images/logo1.png}" alt="TripToday logo">
+    </div>
+
+    <div class="navbar-container-items" sec:authorize="isAuthenticated()">
+        <a th:href="@{/home}">Home</a>
+        <a th:href="@{/about}">Contact us</a>
+        <a th:href="@{/trips}">Upcoming trips</a>
+        <a th:href="@{/guides}">Meet the guides</a>
+        <a th:href="@{/profile}">My profile</a>
+        <a th:href="@{/logout}">Sign out</a>
+    </div>
+    <div class="navbar" sec:authorize="!isAuthenticated()">
+        <a th:href="@{/}">Home</a>
+        <a th:href="@{/about}">Contact us</a>
+        <a th:href="@{/guides}">Meet the guides</a>
+        <a th:href="@{/oauth2/authorization/okta}">Sign in</a>
+    </div>
 </div>
 </body>
 </html>

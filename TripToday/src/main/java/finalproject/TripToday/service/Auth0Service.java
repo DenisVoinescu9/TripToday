@@ -5,6 +5,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException; // Import needed
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.util.LinkedMultiValueMap;
@@ -17,18 +18,18 @@ import java.util.*;
 @Service
 public class Auth0Service {
 
-     private final String clientId;
+    private final String clientId;
     private final String clientSecret;
     private final String audience;
     private final String guideRoleId;
 
-     private final String tokenUrl;
+    private final String tokenUrl;
     private final String usersApiBaseUrl;
     private final String rolesApiBaseUrl;
 
     private final RestTemplate restTemplate;
 
-     private volatile String cachedApiToken = null;
+    private volatile String cachedApiToken = null;
     private volatile Instant apiTokenExpiryTime = Instant.MIN;
     private final Object apiTokenLock = new Object();
 
@@ -43,10 +44,8 @@ public class Auth0Service {
         this.clientSecret = clientSecret;
         this.audience = audience;
         this.guideRoleId = guideRoleId;
-
-         this.tokenUrl = issuerUrl + "/oauth/token";
-
-         String apiBase = "";
+        this.tokenUrl = issuerUrl + "/oauth/token";
+        String apiBase = "";
         if (audience != null && !audience.trim().isEmpty()) {
             apiBase = audience.endsWith("/") ? audience : audience + "/";
         }
@@ -76,7 +75,7 @@ public class Auth0Service {
 
                     HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
 
-                     ResponseEntity<Map> response = restTemplate.exchange(this.tokenUrl, HttpMethod.POST, requestEntity, Map.class);
+                    ResponseEntity<Map> response = restTemplate.exchange(this.tokenUrl, HttpMethod.POST, requestEntity, Map.class);
 
                     if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
                         Map<String, Object> responseBody = response.getBody();
@@ -114,7 +113,7 @@ public class Auth0Service {
         if (this.usersApiBaseUrl == null || this.usersApiBaseUrl.isEmpty() || userId == null || userId.trim().isEmpty()) {
             return "";
         }
-         String url = this.usersApiBaseUrl + userId.trim();
+        String url = this.usersApiBaseUrl + userId.trim();
         String accessToken = getApiToken();
 
         HttpHeaders headers = new HttpHeaders();
@@ -132,6 +131,7 @@ public class Auth0Service {
                         .orElse("");
             }
         } catch (RestClientException e) {
+            // Existing handling - kept as is
             System.out.println(e.getMessage());
         }
         return "";
@@ -162,11 +162,57 @@ public class Auth0Service {
                 }
             }
         }
-         catch (Exception e) {
-             System.out.println(e.getMessage());
+        catch (Exception e) {
+            // Existing handling - kept as is
+            System.out.println(e.getMessage());
         }
         return defaultResult;
     }
+
+    // START: Added Method
+    public Map<String, Object> getUserDetails(String userId) {
+        Map<String, Object> defaultResult = new HashMap<>();
+        defaultResult.put("user_id", userId); // Always include userId
+
+        if (this.usersApiBaseUrl == null || this.usersApiBaseUrl.isEmpty() || userId == null || userId.trim().isEmpty()) {
+            // Cannot fetch without config or ID
+            return defaultResult;
+        }
+        String url = this.usersApiBaseUrl + userId.trim();
+        String accessToken = getApiToken();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        try {
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    entity,
+                    new ParameterizedTypeReference<Map<String, Object>>() {}
+            );
+
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                Map<String, Object> userDetails = response.getBody();
+                Map<String, Object> result = new HashMap<>();
+                result.put("user_id", userDetails.getOrDefault("user_id", userId));
+                result.put("email", userDetails.getOrDefault("email", "N/A"));
+                result.put("name", userDetails.getOrDefault("name", "N/A"));
+                // Return null if picture is missing, let frontend handle default
+                result.put("picture", userDetails.get("picture"));
+                return result;
+            }
+        } catch (HttpClientErrorException.NotFound e) {
+            // User not found, return default map with just ID
+            System.out.println("User not found for ID: " + userId); // Kept simple output
+        } catch (Exception e) {
+            // Other errors (network, parsing, etc.), return default map with just ID
+            System.out.println("Error fetching details for user ID " + userId + ": " + e.getMessage()); // Kept simple output
+        }
+        return defaultResult; // Return map with only userId on any failure
+    }
+    // END: Added Method
 
 
     public List<Map<String, String>> getAllGuides() {
@@ -196,12 +242,14 @@ public class Auth0Service {
                         guide.put("id", userIdOpt.get());
                         guide.put("email", emailOpt.get());
                         guide.put("name", Optional.ofNullable(user.get("name")).map(Object::toString).orElse("N/A"));
+                        // Return empty string if picture is missing to avoid null downstream? Or keep null? Let's keep empty string for consistency with original code.
                         guide.put("picture", Optional.ofNullable(user.get("picture")).map(Object::toString).orElse(""));
                         guides.add(guide);
                     }
                 }
             }
         }  catch (Exception e) {
+            // Existing handling - kept as is
             System.out.println(e.getMessage());
         }
         return guides;

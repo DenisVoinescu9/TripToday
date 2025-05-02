@@ -28,13 +28,13 @@ public class SecurityConfiguration {
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http    .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/").permitAll()
-                        .requestMatchers("/about").permitAll()
-                        .requestMatchers("/guides").permitAll()
-                        .requestMatchers("/api/v2/**").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/favicon.ico").permitAll()
+                        .requestMatchers("/","/home","/about", "/guides", "/api/v2/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .oauth2Login(withDefaults())
+                .oauth2Login(login -> login
+                 .defaultSuccessUrl("/", true)
+        )
                 .logout(logout -> logout
                         .addLogoutHandler(logoutHandler()));
         return http.build();
