@@ -84,7 +84,7 @@ public class UpcomingTripsController {
                                @RequestParam(required = false) String cvv,
                                @RequestParam(required = false) String expirationDate,
                                @AuthenticationPrincipal OidcUser principal,
-                               RedirectAttributes redirectAttributes) { // Adăugăm RedirectAttributes
+                               RedirectAttributes redirectAttributes) {
 
         if (principal == null) {
             redirectAttributes.addFlashAttribute("errorMessage", "You must be authenticated to enroll in a trip.");

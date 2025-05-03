@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
@@ -10,13 +11,12 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/home-page.css}"/>
 </head>
 
-
 <body>
 
 <div th:replace="~{fragments/header :: header}"></div>
 <div class="wrapper">
-    <div class="about-us-container">
-        <div class="about-us-container-text">
+    <div class="about-us-wrapper">
+        <div class="about-us-container-text slide-in-left">
             <h1 class="about-us-container-text__heading">Discover the world with us</h1>
             <p class="about-us-container-text__paragraph">
                 Explore unforgettable destinations with TripToday! We create immersive guided tours led by passionate
@@ -25,12 +25,30 @@
                 the details to us, enjoy the discovery. Find your next adventure with TripToday!
             </p>
         </div>
-        <div class="about-us-container-image">
-
+        <div class="about-us-container-image slide-in-right">
             <img class="about-us-container-image__picture" th:src="@{/images/guides.jpg}" alt="Guides group photo">
-
+        </div>
+    </div>
+    <div class="our-travelers-wrapper">
+        <div class="our-travelers-title">
+            <h1 class="our-travelers-title__heading slide-in-bottom">Our travelers' testimonials</h1>
+        </div>
+        <div class="our-travelers-body">
+            <div class="our-travelers-body__card slide-in-bottom">
+                <img class="our-travelers-body__card__image" th:src="@{/images/guides.jpg}"  alt="Traveler1 image">
+                <p class="our-travelers-body__card__body">"Booking our trip through this company was incredibly straightforward. Our guides were so experienced and passionate, making the stunning historical sites truly come alive. A seamless and amazing experience!"</p>
+            </div>
+            <div class="our-travelers-body__card slide-in-bottom">
+                <img class="our-travelers-body__card__image" th:src="@{/images/guides.jpg}"  alt="Traveler1 image">
+                <p class="our-travelers-body__card__body">"What a fantastic adventure! Signing up was a breeze online. The guides knew the nature trails inside out and were super friendly. Saw breathtaking landscapes thanks to their expert planning"</p>
+            </div>
+            <div class="our-travelers-body__card slide-in-bottom">
+                <img class="our-travelers-body__card__image" th:src="@{/images/guides.jpg}"  alt="Traveler1 image">
+                <p class="our-travelers-body__card__body">"Everything was handled perfectly, from the easy booking to the tour itself. Our guide was exceptionally knowledgeable and made exploring the region fun. Absolutely brilliant service and location!"</p>
+            </div>
         </div>
     </div>
 </div>
+
 </body>
 </html>

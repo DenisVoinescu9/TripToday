@@ -1,22 +1,78 @@
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
+    <meta charset="UTF-8">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
-    <script src="http://localhost:35729/livereload.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}"/>
     <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
-
-    <title>Contact us | TripToday</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/contact-page.css}">
+    <script src="http://localhost:35729/livereload.js"></script>
+    <title th:text="${pageTitle}"></title>
 </head>
 <body>
-    <div th:replace="~{fragments/header :: header}"></div>
+<div th:replace="~{fragments/header :: header}"></div>
 
-    <div>Welcome to TripToday, your trusted partner in unforgettable travel experiences. We are a passionate team dedicated to curating unique trips to a variety of stunning destinations worldwide. Whether you're looking for an adventurous getaway, a relaxing retreat, or a cultural immersion, we've got something for everyone.
+<div class="wrapper">
+    <div class="our-contacts-wrapper">
+        <div class="our-contacts-body">
+            <div class="our-contacts-item">
+                <div> <i class="fa-solid fa-envelope"></i>&nbsp;
+                    <strong>Email</strong>
+                </div>
+                <div> <a th:href="'mailto:' + ${contactEmail}" th:text="${contactEmail}"></a>
+                </div>
+            </div>
 
-        Our team consists of travel enthusiasts, local experts, and experienced planners who understand what it takes to create the perfect journey. We believe that travel should be more than just a vacation – it should be an opportunity to explore new places, meet fascinating people, and create memories that last a lifetime.
+            <div class="our-contacts-item">
+                <div> <i class="fa-solid fa-phone"></i>&nbsp;
+                    <strong>Phone</strong>
+                </div>
+                <div> <span th:text="${contactPhone}"></span>
+                </div>
+            </div>
 
-        At TripToday, we take pride in offering personalized services that cater to your interests and preferences. Our mission is to make every trip an experience that exceeds expectations, from seamless bookings to exceptional customer service.
+            <div class="our-contacts-item">
+                <div> <i class="fa-solid fa-location-dot"></i>&nbsp;
+                    <strong>Office</strong>
+                </div>
+                <div> <span th:text="${contactAddress}"></span>
+                </div>
+            </div>
 
-        Join us as we explore the world together, one trip at a time!</div>
+            <div class="our-contacts-item">
+                <div> <i class="fa-solid fa-clock"></i>&nbsp;
+                    <strong>Working hours</strong> </div>
+                <div> <span th:text="${contactHours}"></span> </div>
+            </div>
+        </div>
+    </div>
+    <div class="value-feedback-wrapper">
+        <div class="contact-us-container-text slide-in-left">
+            <h1 class="contact-us-container-text__heading" th:text="${heading}"></h1>
+            <p class="contact-us-container-text__paragraph" th:text="${paragraph}"></p>
+        </div>
+        <div class="contact-us-container-image slide-in-right">
+            <img class="contact-us-container-image__picture" th:src="@{${imageUrl}}" th:alt="${imageAlt}">
+        </div>
+    </div>
+    <div class="faq-wrapper">
+        <h2 class="faq-heading" th:text="${faqHeading}"></h2>
+        <div class="faq-body" th:if="${faqs != null and !faqs.isEmpty()}">
+            <div class="faq-item" th:each="faqEntry : ${faqs}">
+                <h3 class="faq-item-question">
+                    <strong th:text="'Q: '"></strong> <span th:text="${faqEntry.key}"></span>
+                </h3>
+                <p class="faq-item-answer">
+                    <strong th:text="'A: '"></strong> <span th:text="${faqEntry.value}"></span>
+                </p>
+            </div>
+        </div>
+        <div th:if="${faqs == null or faqs.isEmpty()}">
+            <p th:text="${noFaqsMessage}"></p>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
