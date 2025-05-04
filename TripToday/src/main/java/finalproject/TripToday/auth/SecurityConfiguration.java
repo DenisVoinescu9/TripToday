@@ -28,8 +28,8 @@ public class SecurityConfiguration {
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http    .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/css/**", "/js/**", "/favicon.ico").permitAll()
-                        .requestMatchers("/","/home","/about", "/guides", "/api/v2/**").permitAll()
+                        .requestMatchers("/css/**", "/js/**","/images/**", "/favicon.ico").permitAll()
+                        .requestMatchers("/","/home","/contact", "/guides", "/api/v2/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(login -> login

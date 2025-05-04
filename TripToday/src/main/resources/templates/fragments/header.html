@@ -9,7 +9,7 @@
 
 <div class="navbar-container" th:fragment="header">
     <div class="navbar-container-image">
-        <img th:src="@{/images/logo1.png}" alt="TripToday logo">
+        <img th:src="@{/images/logo2.png}"  alt="TripToday logo">
     </div>
 
     <div class="navbar-container-items" sec:authorize="isAuthenticated()">
@@ -20,12 +20,14 @@
         <a th:href="@{/profile}">My profile</a>
         <a th:href="@{/logout}">Sign out</a>
     </div>
-    <div class="navbar" sec:authorize="!isAuthenticated()">
+    <div class="navbar-container-items" sec:authorize="!isAuthenticated()">
         <a th:href="@{/}">Home</a>
         <a th:href="@{/contact}">Contact us</a>
         <a th:href="@{/guides}">Meet the guides</a>
         <a th:href="@{/oauth2/authorization/okta}">Sign in</a>
     </div>
+    <hr>
+    <br>
 </div>
 </body>
 </html>
