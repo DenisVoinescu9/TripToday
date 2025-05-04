@@ -17,7 +17,7 @@ public class ContactController {
         String mainHeading = "We value your feedback";
         String mainParagraph = "At TripToday, your satisfaction is paramount. To ensure the best possible experience, we encourage you to contact us with any inquiries or requests. We're dedicated to making your adventure seamless and enjoyable.";
         String imageAltText = "Guides group photo";
-        String imageUrl = "/images/guides.jpg";
+        String imageUrl = "/images/your-experience-text.png";
 
         // Date de contact
 
