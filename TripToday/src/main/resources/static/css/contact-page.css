@@ -55,10 +55,14 @@
     text-align: center;
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
     width: 15rem;
+    min-height: 4rem;
     opacity: 0;
     animation: slideInFromBottom 0.6s ease-out forwards;
 }
+
 
 .our-contacts-body > .our-contacts-item:nth-child(1) {
     animation-delay: 0.2s;

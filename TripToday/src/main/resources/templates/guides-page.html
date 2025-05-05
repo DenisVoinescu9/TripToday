@@ -1,26 +1,58 @@
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
+    <title>Meet the guides | TripToday</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}" /></head>
-<link rel="stylesheet" type="text/css" th:href="@{/css/header.css}"/>
-<title>Meet the guides | TripToday</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/guides-page.css}">
+    <script src="http://localhost:35729/livereload.js"></script>
 </head>
 <body>
 <div th:replace="~{fragments/header :: header}"></div>
 
-<h2>Our guides</h2>
-<div class="guides-list">
-    <div class="guide-card" th:each="guide : ${guides}">
-        <img width="200" height="200" th:src="${guide['picture']}" alt="User Avatar" class="user-avatar">
-        <div class="guide-info">
-            <p><strong>Email:</strong> <span th:text="${guide['email']}"></span></p>
+<div class="guides-page-wrapper">
+    <h2>Meet Your Expert Guides</h2>
+    <p>Get to know the knowledgeable and friendly faces who will bring your destinations to life. Our guides aren't just experts in history and nature; they're passionate storytellers dedicated to making your TripToday experience authentic and unforgettable. Find out more about the individuals ready to lead your next adventure!</p>
 
+    <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+        <span th:text="${errorMessage}"></span>
+    </div>
 
-
-            <td th:text="'Description: ' + ${guide['description']}"></td>
-
+    <div class="guides-list" th:if="${guides != null and not #lists.isEmpty(guides)}">
+        <div class="guide-card" th:each="guide : ${guides}">
+            <img th:src="${guide['picture']}" alt="User Avatar" class="user-avatar">
+            <div class="guide-info">
+                <p class="guide-email">
+                    <span th:text="${guide['email']}"></span>
+                </p>
+                <p class="guide-description" th:text="${guide['description']}"></p>
+            </div>
         </div>
     </div>
+
+    <div th:if="${guides == null or #lists.isEmpty(guides)}">
+        <p>No guides found.</p>
+    </div>
+
+    <div class="pagination" th:if="${totalPages > 1}">
+        <a th:if="${page > 0}" th:href="@{'/guides?page=' + ${page - 1}}">
+            <button>&#8592;</button>
+        </a>
+
+        <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+            <a th:if="${i != page}" th:href="@{'/guides?page=' + ${i}}">
+                <button th:text="${i + 1}"></button>
+            </a>
+            <span th:if="${i == page}" class="current-page" th:text="${i + 1}"></span>
+        </span>
+
+        <a th:if="${page + 1 < totalPages}" th:href="@{'/guides?page=' + ${page + 1}}">
+            <button>&#8594;</button>
+        </a>
+    </div>
 </div>
+
 </body>
 </html>
