@@ -67,6 +67,7 @@ public class UpcomingTripsController {
 
         List<Map<String, String>> guides = auth0Service.getAllGuides();
         model.addAttribute("guides", guides);
+        System.out.println(guides);
 
         model.addAttribute("pageTitle", "Upcoming trips | TripToday");
         model.addAttribute("labelDestination", "Destination");
@@ -145,6 +146,7 @@ public class UpcomingTripsController {
                                @AuthenticationPrincipal OidcUser principal,
                                RedirectAttributes redirectAttributes) {
 
+
         if (principal == null) {
             redirectAttributes.addFlashAttribute("errorMessage", "You must be authenticated to enroll in a trip.");
             return "redirect:/trips";
@@ -159,6 +161,20 @@ public class UpcomingTripsController {
             }
 
             Trip trip = optionalTrip.get();
+
+            // ✅ Verifică dacă utilizatorul curent este ghidul
+            String userEmail = principal.getEmail();
+            if (trip.getGuideId() != null) {
+                List<Map<String, String>> guides = auth0Service.getAllGuides();
+                for (Map<String, String> guide : guides) {
+                    if (guide != null
+                            && guide.get("id").equals(trip.getGuideId())
+                            && guide.get("email").equalsIgnoreCase(userEmail)) {
+                        redirectAttributes.addFlashAttribute("errorMessage", "Enrollment failed because you are the guide for that trip.");
+                        return "redirect:/trips";
+                    }
+                }
+            }
 
             if (trip.getAvailableSpots() <= 0) {
                 redirectAttributes.addFlashAttribute("errorMessage", "Sorry, this trip is full.");
@@ -175,14 +191,13 @@ public class UpcomingTripsController {
                 trip.setAvailableSpots(trip.getAvailableSpots() - 1);
                 tripRepository.save(trip);
                 redirectAttributes.addFlashAttribute("successMessage", "You successfully enrolled in this trip!");
-
             } catch (DataIntegrityViolationException e) {
                 redirectAttributes.addFlashAttribute("errorMessage", "You are already enrolled in this trip.");
             }
 
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "An unexpected error occurred during enrollment process.");
-            e.printStackTrace(); // Afiseaza eroarea in consola serverului pentru debug
+            e.printStackTrace();
         }
 
         return "redirect:/trips";
