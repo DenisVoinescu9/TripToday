@@ -36,7 +36,14 @@
     margin-bottom: 1.5rem;
     opacity: 0;
     animation: slideInFromBottom 0.6s ease-out forwards;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Adaugat transition */
 }
+
+.trip-card:hover {
+    transform: translateY(-5px); /* Adaugat hover effect */
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1); /* Adaugat hover effect */
+}
+
 
 .trip-card--manager {
     grid-template-columns: 13rem minmax(0, 1fr) 10rem;
@@ -143,7 +150,7 @@
     gap: 0.75rem;
 }
 .trip-manager-buttons .btn {
-    width: auto;
+    width: 8rem; /* Ai modificat asta? Aici era auto inainte */
     max-width: 100%;
 }
 .btn {
@@ -161,13 +168,12 @@
     flex-shrink: 0;
 }
 
-/* Stil nou pentru butonul Enroll dezactivat */
 .enroll-button:disabled {
-    background-color: #007bff; /* Culoarea primara Bootstrap */
-    border-color: #007bff; /* Culoarea primara Bootstrap */
-    color: #fff; /* Text alb */
-    opacity: 0.65; /* Opacitate standard pentru disabled */
-    cursor: not-allowed; /* Cursor specific */
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+    opacity: 0.65;
+    cursor: not-allowed;
 }
 
 h1 {
