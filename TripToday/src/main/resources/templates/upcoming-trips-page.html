@@ -13,6 +13,13 @@
             background-color: #e9ecef;
             cursor: not-allowed;
         }
+        .enroll-button:disabled {
+            /* Stilurile sunt acum in fisierul CSS principal */
+            /* background-color: #cccccc; */
+            /* border-color: #cccccc; */
+            cursor: not-allowed;
+            /* opacity si culorile sunt definite in CSS */
+        }
     </style>
 </head>
 <body>
@@ -53,8 +60,8 @@
                         th:attr="data-tripid=${trip.id},
                                  data-destination=${trip.destination},
                                  data-spots=${trip.availableSpots}"
-                        th:text="${buttonEnroll}">
-                    Enroll
+                        th:text="${buttonEnroll}"
+                        th:disabled="${trip.availableSpots <= 0}">
                 </button>
             </div>
 
@@ -78,7 +85,7 @@
                     </div>
                     <div class="trip-wrapper-details-item">
                         <h1 th:text="${labelRemainingSpots}"></h1>
-                        <p th:text="${trip.availableSpots}"></p>
+                        <p th:text="${trip.availableSpots + ' ' + unitSpots}"></p>
                     </div>
                     <div class="trip-wrapper-details-item">
                         <h1 th:text="${labelEnrollmentFee}"></h1>
