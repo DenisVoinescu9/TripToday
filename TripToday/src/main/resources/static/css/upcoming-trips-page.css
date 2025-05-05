@@ -214,7 +214,18 @@ h1 {
         transform: translateX(0);
     }
 }
+.alert-container {
+    width: 60rem; /* Seteaza latimea dorita (ex: 60rem) */
+    /* Optional: Adauga margini sus/jos daca e necesar */
+    margin: 1.5rem auto 0;
+}
 
+/* Optional: Ajusteaza marginea alertelor din interior */
+.alert-container .alert {
+    margin-bottom: 1rem; /* Pastreaza spatiu sub alerta */
+    /* Poti reseta margin-top daca .alert-container o ofera deja */
+    /* margin-top: 0; */
+}
 @keyframes slideInFromRight {
     from {
         opacity: 0;
