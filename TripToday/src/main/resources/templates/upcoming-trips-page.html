@@ -2,36 +2,21 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Upcoming trips | TripToday</title>
+    <title th:text="${pageTitle}">Upcoming trips | TripToday</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}" /></head>
-<link rel="stylesheet" type="text/css" th:href="@{/css/header.css}"/>
-<style>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/upcoming-trips-page.css}">
+    <script src="http://localhost:35729/livereload.js"></script>
+    <style>
         input[readonly] {
             background-color: #e9ecef;
             cursor: not-allowed;
-        }
-        .popover {
-            max-width: 250px;
-        }
-        input[readonly] {
-            background-color: #e9ecef;
-            cursor: not-allowed;
-        }
-        .popover {
-            max-width: 250px;
-        }
-
-
-        #enrolledTravelersList {
-            max-height: 400px;
-            overflow-y: auto;
         }
     </style>
 </head>
 <body>
 <div th:replace="~{fragments/header :: header}"></div>
-
 <div class="container-fluid mt-4">
 
     <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
@@ -40,7 +25,6 @@
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
-
     <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
         <span th:text="${errorMessage}"></span>
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -48,72 +32,103 @@
         </button>
     </div>
 
-    <h1>Available Trips</h1>
+    <div class="trip-wrapper" th:if="${trips != null and not #lists.isEmpty(trips)}">
+        <div th:if="${user != null and (user.get('role') == 'Manager' || user.get('role') == 'Manager | Guide' || user.get('role') == 'Manager | Guide | Traveler')}">
+            <button class="btn btn-success mb-3" onclick="openAddTripModal()" th:text="${buttonCreateTrip}">Create trip</button>
+        </div>
 
-    <div th:if="${user != null and (user.get('role') == 'Manager' || user.get('role') == 'Manager | Guide' || user.get('role') == 'Manager | Guide | Traveler')}">
-        <button class="btn btn-success mb-3" onclick="openAddTripModal()">Add New Trip</button>
-    </div>
+        <div th:each="trip : ${trips}" th:if="${!trip.canceled}" class="trip-card">
 
-    <div th:if="${trips != null and not #lists.isEmpty(trips)}">
-        <table class="table table-bordered table-striped">
-            <thead>
-            <tr>
-                <th>Destination</th>
-                <th>Departure Location</th>
-                <th>Departure Date</th>
-                <th>Departure Hour</th>
-                <th>Return Date</th>
-                <th>Duration (days)</th>
-                <th>Available Spots</th>
-                <th>Registration Fee</th>
-                <th>Guide</th>
-                <th>Description</th>
-                <th>Hotel</th>
-                <th>Picture</th>
-                <th>Enroll</th>
-                <th th:if="${user != null and (user.get('role') == 'Manager' || user.get('role') == 'Manager | Guide' || user.get('role') == 'Manager | Guide | Traveler')}">Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="trip : ${trips}" th:if="${!trip.canceled}">
-            <td th:text="${trip.destination}"></td>
-                <td th:text="${trip.departureLocation}"></td>
-                <td th:text="${trip.departureDate}"></td>
-                <td th:text="${trip.departureHour} + ' UTC'"></td>
-                <td th:text="${trip.returnDate}"></td>
-                <td th:text="${trip.durationDays}"></td>
-                <td th:text="${trip.availableSpots}"></td>
-                <td th:text="${trip.registrationFee + ' RON'}"></td>
-                <td>
-                    <span th:each="guide : ${guides}" th:if="${guide != null and guide['id'] == trip.guideId}" th:text="${guide['email']}"></span>
-                    <span th:if="${trip.guideId == null}">No guide assigned</span>
-                </td>
-                <td th:text="${trip.description}"></td>
-                <td th:text="${trip.hotelName}"></td>
-                <td><img th:src="@{${trip.picture}}" width="150" height="150" alt="Trip Image"/></td>
-                <td>
-                    <button type="button" class="btn btn-primary enroll-button"
-                            th:attr="data-tripid=${trip.id},
-                                     data-destination=${trip.destination},
-                                     data-spots=${trip.availableSpots}">
-                        Enroll
-                    </button>
-                </td>
-                <td th:if="${user != null and (user.get('role') == 'Manager' || user.get('role') == 'Manager | Guide' || user.get('role') == 'Manager | Guide | Traveler')}">
-                    <button class="btn btn-info btn-sm mr-1" th:attr="data-tripid=${trip.id}" onclick="openViewTravelersModal(this)">View Travelers</button>
-                    <button class="btn btn-warning btn-sm mr-1" th:attr="data-tripid=${trip.id}" onclick="openEditTripModal(this)">Edit trip</button>
-                    <button class="btn btn-danger btn-sm" th:attr="data-tripid=${trip.id}" onclick="openDeleteModal(this)">Cancel trip</button>
-                </td>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+            <div class="trip-column-image">
+                <img th:src="@{${trip.picture}}" alt="Trip Image"/>
+                <p th:text="${trip.destination}"></p>
+                <button type="button" class="btn btn-primary enroll-button"
+                        th:attr="data-tripid=${trip.id},
+                                 data-destination=${trip.destination},
+                                 data-spots=${trip.availableSpots}"
+                        th:text="${buttonEnroll}">
+                    Enroll
+                </button>
+            </div>
+
+            <div class="trip-details-wrapper">
+                <div class="trip-info-grid">
+                    <div class="trip-wrapper-details-item">
+                        <h1 th:text="${labelDepartureLocation}"></h1>
+                        <p th:text="${trip.departureLocation}"></p>
+                    </div>
+                    <div class="trip-wrapper-details-item">
+                        <h1 th:text="${labelDepartureDate}"></h1>
+                        <p th:text="${trip.departureDate}"></p>
+                    </div>
+                    <div class="trip-wrapper-details-item">
+                        <h1 th:text="${labelDepartureHour}"></h1>
+                        <p th:text="${trip.departureHour + ' ' + unitTimezone}"></p>
+                    </div>
+                    <div class="trip-wrapper-details-item">
+                        <h1 th:text="${labelReturnDate}"></h1>
+                        <p th:text="${trip.returnDate}"></p>
+                    </div>
+                    <div class="trip-wrapper-details-item">
+                        <h1 th:text="${labelRemainingSpots}"></h1>
+                        <p th:text="${trip.availableSpots}"></p>
+                    </div>
+                    <div class="trip-wrapper-details-item">
+                        <h1 th:text="${labelEnrollmentFee}"></h1>
+                        <p th:text="${trip.registrationFee + ' ' + unitCurrency}"></p>
+                    </div>
+                    <div class="trip-wrapper-details-item">
+                        <h1 th:text="${labelHotel}"></h1>
+                        <p th:text="${trip.hotelName}"></p>
+                    </div>
+                    <div class="trip-wrapper-details-item trip-guide-item">
+                        <h1 th:text="${labelGuide}"></h1>
+                        <p>
+                            <span th:if="${trip.guideId == null}" th:text="${textNoGuideAssigned}">No guide assigned</span>
+                            <span th:each="guide : ${guides}" th:if="${guide != null and guide['id'] == trip.guideId}"
+                                  th:text="${guide['email']}"></span>
+                        </p>
+                    </div>
+                </div>
+                <div class="trip-wrapper-description">
+                    <p th:text="${trip.description}"></p>
+                </div>
+            </div>
+
+            <div class="trip-manager-buttons"
+                 th:if="${user != null and (user.get('role') == 'Manager' || user.get('role') == 'Manager | Guide' || user.get('role') == 'Manager | Guide | Traveler')}">
+                <button class="btn btn-info" th:attr="data-tripid=${trip.id}"
+                        onclick="openViewTravelersModal(this)" th:text="${buttonViewTravelers}"></button>
+                <button class="btn btn-warning" th:attr="data-tripid=${trip.id}"
+                        onclick="openEditTripModal(this)" th:text="${buttonEdit}"></button>
+                <button class="btn btn-danger" th:attr="data-tripid=${trip.id}"
+                        onclick="openDeleteModal(this)" th:text="${buttonCancelTrip}"></button>
+            </div>
+        </div>
+
+        <div class="pagination" th:if="${totalPages > 1}">
+            <a th:if="${page > 0}" th:href="@{'/trips?page=' + ${page - 1}}">
+                <button>&#8592;</button>
+            </a>
+            <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                <a th:if="${i != page}" th:href="@{'/trips?page=' + ${i}}">
+                    <button th:text="${i + 1}"></button>
+                </a>
+                <span th:if="${i == page}" class="current-page" th:text="${i + 1}"></span>
+            </span>
+            <a th:if="${page + 1 < totalPages}" th:href="@{'/trips?page=' + ${page + 1}}">
+                <button>&#8594;</button>
+            </a>
+        </div>
+
     </div>
 
     <div th:if="${trips == null or #lists.isEmpty(trips)}">
-        <p>No trips available at the moment.</p>
+        <p th:text="${messageNoTrips}">No trips available at the moment.</p>
     </div>
+
 </div>
+
 <div th:replace="~{fragments/trip-modals :: viewTravelersModal}"></div>
 <div th:replace="~{fragments/trip-modals :: addTripModal}"></div>
 <div th:replace="~{fragments/trip-modals :: enrollModal}"></div>
@@ -123,7 +138,6 @@
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"></script>
-
 <script th:src="@{/js/script.js}"></script>
 </body>
 </html>

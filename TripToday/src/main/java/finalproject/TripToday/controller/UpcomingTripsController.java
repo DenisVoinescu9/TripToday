@@ -21,11 +21,8 @@ import java.util.Map;
 public class UpcomingTripsController {
 
     private final TripService tripService;
-
     private final UserTripService userTripService;
-
     private final Auth0Service auth0Service;
-
 
     @Autowired
     public UpcomingTripsController(TripService tripService, UserTripService userTripService, Auth0Service auth0Service) {
@@ -35,28 +32,68 @@ public class UpcomingTripsController {
     }
 
     @GetMapping("/trips")
-    public String trips(Model model, @AuthenticationPrincipal OidcUser principal) {
+    public String trips(@RequestParam(defaultValue = "0") int page, Model model, @AuthenticationPrincipal OidcUser principal) {
         if (principal != null) {
             model.addAttribute("user", principal.getClaims());
         }
 
-        List<Trip> trips = tripService.getUpcomingTrips();
-        model.addAttribute("trips", trips);
+        List<Trip> allTrips = tripService.getUpcomingTrips()
+                .stream()
+                .filter(trip -> !trip.getCanceled())
+                .toList();
 
+        int pageSize = 3;
+        int totalPages = (int) Math.ceil((double) allTrips.size() / pageSize);
+
+        if (page < 0) page = 0;
+        if (page >= totalPages && totalPages > 0) page = totalPages - 1;
+
+        int fromIndex = page * pageSize;
+        int toIndex = Math.min(fromIndex + pageSize, allTrips.size());
+
+        List<Trip> pageTrips = allTrips.subList(fromIndex, toIndex);
+
+        model.addAttribute("trips", pageTrips);
+        model.addAttribute("page", page);
+        model.addAttribute("totalPages", totalPages);
 
         List<Map<String, String>> guides = auth0Service.getAllGuides();
         model.addAttribute("guides", guides);
+
+        // labels
+        model.addAttribute("pageTitle", "Upcoming trips | TripToday");
+        model.addAttribute("labelDestination", "Destination");
+        model.addAttribute("labelDescription", "Description");
+        model.addAttribute("labelDepartureLocation", "Departure location");
+        model.addAttribute("labelDepartureDate", "Departure date");
+        model.addAttribute("labelDepartureHour", "Departure hour");
+        model.addAttribute("labelReturnDate", "Return date");
+        model.addAttribute("labelDuration", "Duration (days):");
+        model.addAttribute("labelRemainingSpots", "Remaining spots");
+        model.addAttribute("labelEnrollmentFee", "Enrollment fee");
+        model.addAttribute("labelGuide", "Guide");
+        model.addAttribute("labelHotel", "Hotel");
+        model.addAttribute("textNoGuideAssigned", "No guide assigned");
+        model.addAttribute("buttonEnroll", "Enroll");
+        model.addAttribute("buttonViewTravelers", "View travelers");
+        model.addAttribute("buttonEdit", "Edit trip");
+        model.addAttribute("buttonCancelTrip", "Cancel trip");
+        model.addAttribute("buttonCreateTrip", "Create trip");
+        model.addAttribute("messageNoTrips", "No trips available at the moment.");
+        model.addAttribute("unitDays", "days");
+        model.addAttribute("unitSpots", "spots");
+        model.addAttribute("unitCurrency", "RON");
+        model.addAttribute("unitTimezone", "UTC");
 
         return "upcoming-trips-page";
     }
 
 
+
     @PostMapping("/create-trip")
     public String createTrip(@ModelAttribute Trip trip, Model model) {
-
         tripService.createTrip(trip);
         model.addAttribute("trip", trip);
-
         return "redirect:/trips";
     }
 
@@ -76,7 +113,6 @@ public class UpcomingTripsController {
         }
         return "redirect:/trips";
     }
-
 
     @PostMapping("/enroll")
     public String enrollInTrip(@RequestParam("tripId") Integer tripId,
@@ -100,11 +136,8 @@ public class UpcomingTripsController {
             userTripService.createUserTrip(userTrip);
             redirectAttributes.addFlashAttribute("successMessage", "You successfully enrolled in this trip!");
         } catch (DataIntegrityViolationException e) {
-
             redirectAttributes.addFlashAttribute("errorMessage", "You are already enrolled in this trip.");
-
         }
-
 
         return "redirect:/trips";
     }
