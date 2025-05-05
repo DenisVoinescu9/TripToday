@@ -2,6 +2,7 @@ package finalproject.TripToday.controller;
 
 import finalproject.TripToday.entity.Trip;
 import finalproject.TripToday.entity.UserTrip;
+import finalproject.TripToday.repository.TripRepository;
 import finalproject.TripToday.service.Auth0Service;
 import finalproject.TripToday.service.TripService;
 import finalproject.TripToday.service.UserTripService;
@@ -10,12 +11,14 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 public class UpcomingTripsController {
@@ -23,12 +26,17 @@ public class UpcomingTripsController {
     private final TripService tripService;
     private final UserTripService userTripService;
     private final Auth0Service auth0Service;
+    private final TripRepository tripRepository;
 
     @Autowired
-    public UpcomingTripsController(TripService tripService, UserTripService userTripService, Auth0Service auth0Service) {
+    public UpcomingTripsController(TripService tripService,
+                                   UserTripService userTripService,
+                                   Auth0Service auth0Service,
+                                   TripRepository tripRepository) {
         this.tripService = tripService;
         this.userTripService = userTripService;
         this.auth0Service = auth0Service;
+        this.tripRepository = tripRepository;
     }
 
     @GetMapping("/trips")
@@ -60,7 +68,6 @@ public class UpcomingTripsController {
         List<Map<String, String>> guides = auth0Service.getAllGuides();
         model.addAttribute("guides", guides);
 
-        // labels
         model.addAttribute("pageTitle", "Upcoming trips | TripToday");
         model.addAttribute("labelDestination", "Destination");
         model.addAttribute("labelDescription", "Description");
@@ -75,6 +82,7 @@ public class UpcomingTripsController {
         model.addAttribute("labelHotel", "Hotel");
         model.addAttribute("textNoGuideAssigned", "No guide assigned");
         model.addAttribute("buttonEnroll", "Enroll");
+        model.addAttribute("buttonFull", "Full");
         model.addAttribute("buttonViewTravelers", "View travelers");
         model.addAttribute("buttonEdit", "Edit trip");
         model.addAttribute("buttonCancelTrip", "Cancel trip");
@@ -91,15 +99,29 @@ public class UpcomingTripsController {
 
 
     @PostMapping("/create-trip")
-    public String createTrip(@ModelAttribute Trip trip, Model model) {
-        tripService.createTrip(trip);
-        model.addAttribute("trip", trip);
+    public String createTrip(@ModelAttribute Trip trip, Model model, RedirectAttributes redirectAttributes) {
+        try {
+            tripService.createTrip(trip);
+            redirectAttributes.addFlashAttribute("successMessage", "Trip successfully created!");
+            // model.addAttribute("trip", trip); // Nu mai este necesar la redirect
+        } catch (Exception e) {
+            // Logheaza eroarea
+            redirectAttributes.addFlashAttribute("errorMessage", "Error creating trip. Please try again.");
+            e.printStackTrace(); // Pentru debug
+        }
         return "redirect:/trips";
     }
 
     @PostMapping("/update-trip")
-    public String updateTrip(@ModelAttribute Trip trip) {
-        tripService.updateTrip(trip.getId(), trip);
+    public String updateTrip(@ModelAttribute Trip trip, RedirectAttributes redirectAttributes) {
+        try {
+            tripService.updateTrip(trip.getId(), trip);
+            redirectAttributes.addFlashAttribute("successMessage", "Trip successfully updated!");
+        } catch (Exception e) {
+            // Logheaza eroarea
+            redirectAttributes.addFlashAttribute("errorMessage", "Error updating trip. Please try again.");
+            e.printStackTrace(); // Pentru debug
+        }
         return "redirect:/trips";
     }
 
@@ -115,6 +137,7 @@ public class UpcomingTripsController {
     }
 
     @PostMapping("/enroll")
+    @Transactional
     public String enrollInTrip(@RequestParam("tripId") Integer tripId,
                                @RequestParam(required = false) String cardNumber,
                                @RequestParam(required = false) String cvv,
@@ -127,18 +150,43 @@ public class UpcomingTripsController {
             return "redirect:/trips";
         }
 
-        String userId = principal.getName();
-        UserTrip userTrip = new UserTrip();
-        userTrip.setUserId(userId);
-        userTrip.setTripId(tripId);
-
         try {
-            userTripService.createUserTrip(userTrip);
-            redirectAttributes.addFlashAttribute("successMessage", "You successfully enrolled in this trip!");
-        } catch (DataIntegrityViolationException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "You are already enrolled in this trip.");
+            Optional<Trip> optionalTrip = tripService.getTripById(tripId);
+
+            if (optionalTrip.isEmpty()) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Trip not found.");
+                return "redirect:/trips";
+            }
+
+            Trip trip = optionalTrip.get();
+
+            if (trip.getAvailableSpots() <= 0) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Sorry, this trip is full.");
+                return "redirect:/trips";
+            }
+
+            String userId = principal.getName();
+            UserTrip userTrip = new UserTrip();
+            userTrip.setUserId(userId);
+            userTrip.setTripId(tripId);
+
+            try {
+                userTripService.createUserTrip(userTrip);
+                trip.setAvailableSpots(trip.getAvailableSpots() - 1);
+                tripRepository.save(trip);
+                redirectAttributes.addFlashAttribute("successMessage", "You successfully enrolled in this trip!");
+
+            } catch (DataIntegrityViolationException e) {
+                redirectAttributes.addFlashAttribute("errorMessage", "You are already enrolled in this trip.");
+            }
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "An unexpected error occurred during enrollment process.");
+            e.printStackTrace(); // Afiseaza eroarea in consola serverului pentru debug
         }
 
         return "redirect:/trips";
     }
+
+
 }

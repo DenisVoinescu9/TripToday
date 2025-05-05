@@ -122,21 +122,30 @@ function openEditTripModal(button) {
     clearFormValidation(form);
 
     const tripId = $(button).data('tripid');
-    const row = $(button).closest('tr');
+    // --- Modificare: Gaseste cardul parinte in loc de randul de tabel ---
+    const card = $(button).closest('.trip-card');
 
-    const destination = row.find('td:eq(0)').text().trim();
-    const departureLocation = row.find('td:eq(1)').text().trim();
-    const departureDate = row.find('td:eq(2)').text().trim();
-    const departureHourRaw = row.find('td:eq(3)').text().trim();
+    // --- Modificare: Extrage datele din elementele specifice ale cardului ---
+    // Gaseste elementele relevante in interiorul cardului, folosind clase sau structura DOM
+    // Nota: Aceste selectoare sunt exemple si trebuie adaptate EXACT la structura HTML finala!
+    // Presupunand ca folosim clase/id-uri sau data-atribute pe elementele H1/P din .trip-wrapper-details-item
+
+    // Exemplu ipotetic (necesita adaptare la HTML-ul tau exact!)
+    const destination = card.find('.trip-column-image p').text().trim(); // Destinatia din coloana imaginii
+    const departureLocation = card.find('.trip-wrapper-details-item:contains("Departure location") p').text().trim(); // Gaseste dupa textul H1 - fragil
+    const departureDate = card.find('.trip-wrapper-details-item:contains("Departure date") p').text().trim(); // Gaseste dupa textul H1 - fragil
+    const departureHourRaw = card.find('.trip-wrapper-details-item:contains("Departure hour") p').text().trim(); // Gaseste dupa textul H1 - fragil
     const departureHour = departureHourRaw.includes(':') ? departureHourRaw.replace(' UTC', '').trim() : '00:00';
-    const returnDate = row.find('td:eq(4)').text().trim();
-    const availableSpots = row.find('td:eq(6)').text().trim();
-    const registrationFeeRaw = row.find('td:eq(7)').text().trim();
+    const returnDate = card.find('.trip-wrapper-details-item:contains("Return date") p').text().trim(); // Gaseste dupa textul H1 - fragil
+    const availableSpots = card.find('.trip-wrapper-details-item:contains("Remaining spots") p').text().replace(/\D/g,'').trim(); // Ia doar cifrele
+    const registrationFeeRaw = card.find('.trip-wrapper-details-item:contains("Enrollment fee") p').text().trim(); // Gaseste dupa textul H1 - fragil
     const registrationFee = registrationFeeRaw.replace(/[^\d.-]/g, '');
-    let guideEmail = row.find('td:eq(8) span:first').text().trim();
-    const description = row.find('td:eq(9)').text().trim();
-    const hotelName = row.find('td:eq(10)').text().trim();
-    const pictureUrl = row.find('td:eq(11) img').attr('src');
+    let guideElement = card.find('.trip-guide-item p span'); // Gaseste span-ul din item-ul de ghid
+    let guideEmail = guideElement.length > 0 ? guideElement.text().trim() : 'No guide assigned';
+    const description = card.find('.trip-wrapper-description p').text().trim(); // Descrierea
+    const hotelName = card.find('.trip-wrapper-details-item:contains("Hotel") p').text().trim(); // Gaseste dupa textul H1 - fragil
+    const pictureUrl = card.find('.trip-column-image img').attr('src'); // URL-ul imaginii
+
 
     let initialGuideId = '';
     $('#editGuideSelect option').each(function() {
@@ -194,8 +203,7 @@ function openViewTravelersModal(buttonElement) {
     listElement.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div></div>';
     $('#viewTravelersModal').modal('show');
 
-    // Corrected API URL to fetch detailed traveler info including pictures
-    const apiUrl = `/api/v2/user-trips/trip/${tripId}/details`; // Using the new detailed endpoint
+    const apiUrl = `/api/v2/user-trips/trip/${tripId}/details`;
 
     fetch(apiUrl)
         .then(response => {
@@ -211,7 +219,7 @@ function openViewTravelersModal(buttonElement) {
                 return [];
             }
         })
-        .then(travelers => { // Expecting array of objects like { user_id: '...', picture: '...', ... }
+        .then(travelers => {
             listElement.innerHTML = '';
 
             if (travelers && travelers.length > 0) {
@@ -222,30 +230,26 @@ function openViewTravelersModal(buttonElement) {
                     const travelerItem = document.createElement('div');
                     travelerItem.className = 'list-group-item d-flex align-items-center';
 
-                    // Create image element using the picture URL from the traveler object
                     const img = document.createElement('img');
-                    // Use traveler.picture; provide a default if it's null or empty
-                    img.src = traveler.picture || '/img/default-avatar.png'; // <-- Make sure you have a default avatar image at this path or change it
-                    img.alt = 'Traveler picture'; // Corrected alt text
+                    img.src = traveler.picture || '/img/default-avatar.png';
+                    img.alt = 'Traveler picture';
                     img.width = 65;
                     img.height = 65;
-                    img.className = 'rounded-circle mr-2'; // Bootstrap classes
+                    img.className = 'rounded-circle mr-2';
 
-                    // Create span for userId (Auth0 ID)
                     const spanId = document.createElement('span');
-                    spanId.textContent = traveler.user_id || 'Unknown User ID'; // Use user_id from the returned map
-                    spanId.className = 'mr-2'; // Add some margin
+                    spanId.textContent = traveler.user_id || 'Unknown User ID';
+                    spanId.className = 'mr-2';
 
-                    // Optionally, display name or email if available
                     const spanName = document.createElement('span');
-                    spanName.textContent = `(${traveler.name || traveler.email || ''})`; // Display name or email in parentheses
-                    spanName.style.fontSize = '0.9em'; // Make name/email slightly smaller
-                    spanName.style.color = '#6c757d'; // Use a secondary color
+                    spanName.textContent = `(${traveler.name || traveler.email || ''})`;
+                    spanName.style.fontSize = '0.9em';
+                    spanName.style.color = '#6c757d';
 
 
-                    travelerItem.appendChild(img); // Add image
-                    travelerItem.appendChild(spanId); // Add ID
-                    travelerItem.appendChild(spanName); // Add name/email
+                    travelerItem.appendChild(img);
+                    travelerItem.appendChild(spanId);
+                    travelerItem.appendChild(spanName);
                     listGroup.appendChild(travelerItem);
                 });
                 listElement.appendChild(listGroup);
@@ -264,14 +268,16 @@ $(document).ready(function() {
     $('.enroll-button').each(function() {
         const button = $(this);
         const spots = parseInt(button.data('spots'), 10);
+        // Initializam popover DOAR daca locurile sunt 0 pentru a arata mesajul la hover/focus
         if (isNaN(spots) || spots <= 0) {
             button.popover({
                 content: 'Sorry, there are no available spots left.',
-                trigger: 'hover focus',
+                trigger: 'hover focus', // Arata la hover/focus initial
                 placement: 'top',
                 container: 'body'
             });
         } else {
+            // Daca sunt locuri, ne asiguram ca nu exista un popover ramas de la o stare anterioara
             if (button.data('bs.popover')) {
                 button.popover('dispose');
             }
@@ -284,9 +290,24 @@ $(document).ready(function() {
         const tripId = button.data('tripid');
         const destination = button.data('destination');
 
+        // Verifica locurile INAINTE de a deschide modalul
         if (isNaN(spots) || spots <= 0) {
-            event.preventDefault();
+            // Optional: Arata popover scurt pentru feedback la click pe buton dezactivat/plin
+            if (!button.data('bs.popover')) {
+                button.popover({
+                    content: 'Sorry, there are no available spots left.',
+                    trigger: 'manual',
+                    placement: 'top',
+                    container: 'body'
+                });
+            }
+            button.popover('show');
+            setTimeout(function() { button.popover('hide'); }, 2500);
+
+            // Opreste executia ulterioara, NU deschide modalul
+            return;
         } else {
+            // Daca sunt locuri, distruge popover-ul (daca exista) si deschide modalul
             if (button.data('bs.popover')) {
                 button.popover('dispose');
             }
@@ -302,8 +323,13 @@ $(document).ready(function() {
 
     $('body').on('click', function (e) {
         $('.enroll-button').each(function () {
+            // Daca se da click in afara butonului SI in afara popover-ului deschis
             if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+                // Ascunde popover-ul daca exista (util pt cele manuale sau hover/focus)
                 if ($(this).data('bs.popover')) {
+                    // Verifica daca popover-ul este vizibil inainte de a incerca sa il ascunzi
+                    // (Metoda isVisible poate depinde de versiunea exacta de Bootstrap/jQuery)
+                    // O abordare mai sigura e sa incerci sa-l ascunzi oricum.
                     $(this).popover('hide');
                 }
             }
