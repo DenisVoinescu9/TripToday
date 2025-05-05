@@ -32,12 +32,19 @@
         </button>
     </div>
 
+    <div class="trips-intro-section">
+        <h1>Your Next Adventure Awaits!</h1>
+        <p>Browse our currently available trips below. Find the perfect destination, check the details, and secure your spot for an unforgettable journey. Let's explore together!</p>
+    </div>
+
     <div class="trip-wrapper" th:if="${trips != null and not #lists.isEmpty(trips)}">
-        <div th:if="${user != null and (user.get('role') == 'Manager' || user.get('role') == 'Manager | Guide' || user.get('role') == 'Manager | Guide | Traveler')}">
+        <div class="create-trip-button-container" th:if="${user != null and (user.get('role') == 'Manager' || user.get('role') == 'Manager | Guide' || user.get('role') == 'Manager | Guide | Traveler')}">
             <button class="btn btn-success mb-3" onclick="openAddTripModal()" th:text="${buttonCreateTrip}">Create trip</button>
         </div>
 
-        <div th:each="trip : ${trips}" th:if="${!trip.canceled}" class="trip-card">
+        <div th:each="trip : ${trips}" th:if="${!trip.canceled}"
+             class="trip-card"
+             th:classappend="${user != null and (user.get('role') == 'Manager' || user.get('role') == 'Manager | Guide' || user.get('role') == 'Manager | Guide | Traveler')} ? 'trip-card--manager' : ''">
 
             <div class="trip-column-image">
                 <img th:src="@{${trip.picture}}" alt="Trip Image"/>
