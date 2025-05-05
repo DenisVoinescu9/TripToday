@@ -8,57 +8,15 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}" />
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}"/>
-    <style>
-        .profile-card {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-shadow: 2px 2px 12px rgba(0,0,0,0.1);
-        }
-        .profile-card img {
-            display: block;
-            margin: 0 auto 15px auto;
-            border-radius: 50%;
-        }
-        .description-container, .picture-update-container {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #eee;
-        }
-        textarea {
-            width: 100%;
-            min-height: 80px;
-            margin-bottom: 5px; /* Reduced margin slightly */
-        }
-        .char-counter {
-            margin-top: 0.25rem;
-            margin-bottom: 10px; /* Added margin below counter */
-        }
-        .trips-section {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #ddd;
-        }
-        .trip-details {
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
-        }
-        .trip-details:last-child {
-            border-bottom: none;
-        }
-        .alert {
-            margin-top: 15px;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/profile-page.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/upcoming-trips-page.css}" />
+    <script src="http://localhost:35729/livereload.js"></script>
 </head>
 <body>
 
 <div th:replace="~{/fragments/header :: header}"></div>
 
-<div class="container">
+<div class="profile-container container">
 
     <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
         <p th:text="${successMessage}"></p>
@@ -73,10 +31,9 @@
         </button>
     </div>
 
-    <div class="profile-card">
-
+    <div class="profile-info-card">
         <div th:if="${user != null}">
-            <img width="150" height="150" th:src="${user.picture ?: 'default_picture_url.jpg'}" alt="Profile Picture"/>
+            <img class="profile-avatar" width="150" height="150" th:src="${user.picture ?: 'default_picture_url.jpg'}" alt="Profile Picture"/>
             <p class="text-center"><strong>Email:</strong> <span th:text="${user.email}"></span></p>
             <p class="text-center">
                 <strong>Account role(s):</strong>
@@ -108,60 +65,168 @@
                 <button type="submit" class="btn btn-secondary">Update picture</button>
             </form>
         </div>
+    </div>
 
-        <div class="trips-section">
-            <h3 class="text-center">My Trips</h3>
+    <div class="trips-section">
 
+        <div class="trip-toggle-buttons">
+            <button id="show-upcoming-btn" class="btn btn-outline-primary active">Upcoming Trips</button>
+            <button id="show-past-btn" class="btn btn-outline-primary">Past Trips</button>
+        </div>
+
+        <div id="upcoming-trips-content">
             <h4>Upcoming Trips</h4>
-            <div th:if="${#lists.isEmpty(upcomingTrips)}">
+            <div th:if="${#lists.isEmpty(pageUpcomingTrips) and upcomingPage == 0}">
                 <p>No upcoming trips found.</p>
             </div>
-            <div th:each="trip, iterStat : ${upcomingTrips}" class="trip-details">
-                <p th:if="${trip.canceled}" class="text-danger font-weight-bold">This trip was canceled. The enrolling fee was transferred back to you.</p>
-                <p>
-                    <span th:if="${user != null and trip.guideId == user.user_id}"><strong>You are the guide for this trip</strong></span>
-                    <span th:unless="${user != null and trip.guideId == user.user_id}">
-                         <strong>Guide:</strong>
-                         <span th:text="${!#lists.isEmpty(upcomingTripGuideEmails) and iterStat.index < #lists.size(upcomingTripGuideEmails) ? upcomingTripGuideEmails[iterStat.index] : 'N/A'}">Guide Email</span>
-                         </span>
-                </p>
-                <p><strong>Destination:</strong> <span th:text="${trip.destination}"></span></p>
-                <p><strong>Departure:</strong> <span th:text="${trip.departureLocation}"></span></p>
-                <p><strong>Departure Date:</strong> <span th:text="${#temporals.format(trip.departureDate, 'dd-MM-yyyy')}"></span></p>
-                <p><strong>Return Date:</strong> <span th:text="${#temporals.format(trip.returnDate, 'dd-MM-yyyy')}"></span></p>
-                <p><strong>Duration:</strong> <span th:text="${trip.durationDays}"></span> days</p>
-                <p><strong>Available Spots:</strong> <span th:text="${trip.availableSpots}"></span></p>
-                <p><strong>Fee:</strong> <span th:text="${trip.registrationFee}"></span> RON</p>
-                <p><strong>Hotel:</strong> <span th:text="${trip.hotelName ?: 'Not specified'}"></span></p>
-                <img th:src="${trip.picture}" width="200" height="150" alt="Trip image" class="img-thumbnail"/>
+            <div th:each="trip, iterStat : ${pageUpcomingTrips}" class="trip-card">
+                <div class="trip-column-image">
+                    <img th:src="@{${trip.picture}}" alt="Trip Image"/>
+                    <p th:text="${trip.destination}"></p>
+                </div>
+                <div class="trip-details-wrapper">
+                    <p th:if="${trip.canceled}" class="text-danger font-weight-bold mb-2">This trip was canceled. The enrolling fee was transferred back to you.</p>
+                    <div class="trip-info-grid">
+                        <div class="trip-wrapper-details-item">
+                            <h1>Departure location</h1>
+                            <p th:text="${trip.departureLocation}"></p>
+                        </div>
+                        <div class="trip-wrapper-details-item">
+                            <h1>Departure date</h1>
+                            <p th:text="${#temporals.format(trip.departureDate, 'dd-MM-yyyy')}"></p>
+                        </div>
+                        <div class="trip-wrapper-details-item">
+                            <h1>Departure hour</h1>
+                            <p th:text="${trip.departureHour + ' UTC'}"></p>
+                        </div>
+                        <div class="trip-wrapper-details-item">
+                            <h1>Return date</h1>
+                            <p th:text="${#temporals.format(trip.returnDate, 'dd-MM-yyyy')}"></p>
+                        </div>
+                        <div class="trip-wrapper-details-item">
+                            <h1>Duration</h1>
+                            <p th:text="${trip.durationDays + ' days'}"></p>
+                        </div>
+                        <div class="trip-wrapper-details-item">
+                            <h1>Available Spots</h1>
+                            <p th:text="${trip.availableSpots + ' spots'}"></p>
+                        </div>
+                        <div class="trip-wrapper-details-item">
+                            <h1>Enrollment fee</h1>
+                            <p th:text="${trip.registrationFee + ' RON'}"></p>
+                        </div>
+                        <div class="trip-wrapper-details-item">
+                            <h1>Hotel</h1>
+                            <p th:text="${trip.hotelName ?: 'Not specified'}"></p>
+                        </div>
+                        <div class="trip-wrapper-details-item trip-guide-item">
+                            <h1>Guide</h1>
+                            <p>
+                                <span th:if="${user != null and trip.guideId == user.user_id}" class="font-weight-bold">You are the guide</span>
+                                <span th:unless="${user != null and trip.guideId == user.user_id}"
+                                      th:text="${!#lists.isEmpty(upcomingTripGuideEmailsOnPage) and iterStat.index < #lists.size(upcomingTripGuideEmailsOnPage) ? upcomingTripGuideEmailsOnPage[iterStat.index] : 'N/A'}">
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="trip-wrapper-description" th:if="${trip.description != null and !trip.description.isEmpty()}">
+                        <p th:text="${trip.description}"></p>
+                    </div>
+                </div>
             </div>
-
-            <h4 style="margin-top: 30px;">Past Trips</h4>
-            <div th:if="${#lists.isEmpty(pastTrips)}">
-                <p>No past trips found.</p>
-            </div>
-            <div th:each="trip, iterStat : ${pastTrips}" class="trip-details">
-                <p th:if="${trip.canceled}" class="text-danger font-weight-bold">This trip was canceled</p>
-                <p>
-                    <span th:if="${user != null and trip.guideId == user.user_id}"><strong>You were the guide for this trip</strong></span>
-                    <span th:unless="${user != null and trip.guideId == user.user_id}">
-                         <strong>Guide:</strong>
-                         <span th:text="${!#lists.isEmpty(pastTripGuideEmails) and iterStat.index < #lists.size(pastTripGuideEmails) ? pastTripGuideEmails[iterStat.index] : 'N/A'}">Guide Email</span>
-                     </span>
-                </p>
-                <p><strong>Destination:</strong> <span th:text="${trip.destination}"></span></p>
-                <p><strong>Departure:</strong> <span th:text="${trip.departureLocation}"></span></p>
-                <p><strong>Departure Date:</strong> <span th:text="${#temporals.format(trip.departureDate, 'dd-MM-yyyy')}"></span></p>
-                <p><strong>Return Date:</strong> <span th:text="${#temporals.format(trip.returnDate, 'dd-MM-yyyy')}"></span></p>
-                <p><strong>Duration:</strong> <span th:text="${trip.durationDays}"></span> days</p>
-                <p><strong>Available Spots:</strong> <span th:text="${trip.availableSpots}"></span></p>
-                <p><strong>Fee:</strong> <span th:text="${trip.registrationFee}"></span> RON</p>
-                <p><strong>Hotel:</strong> <span th:text="${trip.hotelName ?: 'Not specified'}"></span></p>
-                <img th:src="${trip.picture}" width="200" height="150" alt="Trip image" class="img-thumbnail"/>
+            <div class="pagination" th:if="${totalUpcomingPages > 1}">
+                <a th:if="${upcomingPage > 0}" th:href="@{'/profile'(up_page=${upcomingPage - 1}, pa_page=${pastPage})}">
+                    <button>&#8592;</button>
+                </a>
+                <span th:each="i : ${#numbers.sequence(0, totalUpcomingPages - 1)}">
+                    <a th:if="${i != upcomingPage}" th:href="@{'/profile'(up_page=${i}, pa_page=${pastPage})}">
+                        <button th:text="${i + 1}"></button>
+                    </a>
+                    <span th:if="${i == upcomingPage}" class="current-page" th:text="${i + 1}"></span>
+                </span>
+                <a th:if="${upcomingPage + 1 < totalUpcomingPages}" th:href="@{'/profile'(up_page=${upcomingPage + 1}, pa_page=${pastPage})}">
+                    <button>&#8594;</button>
+                </a>
             </div>
         </div>
 
+        <div id="past-trips-content" style="display: none;">
+            <h4>Past Trips</h4>
+            <div th:if="${#lists.isEmpty(pagePastTrips) and pastPage == 0}">
+                <p>No past trips found.</p>
+            </div>
+            <div th:each="trip, iterStat : ${pagePastTrips}" class="trip-card">
+                <div class="trip-column-image">
+                    <img th:src="@{${trip.picture}}" alt="Trip Image"/>
+                    <p th:text="${trip.destination}"></p>
+                </div>
+                <div class="trip-details-wrapper">
+                    <p th:if="${trip.canceled}" class="text-danger font-weight-bold mb-2">This trip was canceled</p>
+                    <div class="trip-info-grid">
+                        <div class="trip-wrapper-details-item">
+                            <h1>Departure location</h1>
+                            <p th:text="${trip.departureLocation}"></p>
+                        </div>
+                        <div class="trip-wrapper-details-item">
+                            <h1>Departure date</h1>
+                            <p th:text="${#temporals.format(trip.departureDate, 'dd-MM-yyyy')}"></p>
+                        </div>
+                        <div class="trip-wrapper-details-item">
+                            <h1>Departure hour</h1>
+                            <p th:text="${trip.departureHour + ' UTC'}"></p>
+                        </div>
+                        <div class="trip-wrapper-details-item">
+                            <h1>Return date</h1>
+                            <p th:text="${#temporals.format(trip.returnDate, 'dd-MM-yyyy')}"></p>
+                        </div>
+                        <div class="trip-wrapper-details-item">
+                            <h1>Duration</h1>
+                            <p th:text="${trip.durationDays + ' days'}"></p>
+                        </div>
+                        <div class="trip-wrapper-details-item">
+                            <h1>Remaining spots</h1>
+                            <p th:text="${trip.availableSpots + ' spots'}"></p>
+                        </div>
+                        <div class="trip-wrapper-details-item">
+                            <h1>Fee</h1>
+                            <p th:text="${trip.registrationFee + ' RON'}"></p>
+                        </div>
+                        <div class="trip-wrapper-details-item">
+                            <h1>Hotel</h1>
+                            <p th:text="${trip.hotelName ?: 'Not specified'}"></p>
+                        </div>
+                        <div class="trip-wrapper-details-item trip-guide-item">
+                            <h1>Guide</h1>
+                            <p>
+                                <span th:if="${user != null and trip.guideId == user.user_id}" class="font-weight-bold">You were the guide</span>
+                                <span th:unless="${user != null and trip.guideId == user.user_id}"
+                                      th:text="${!#lists.isEmpty(pastTripGuideEmailsOnPage) and iterStat.index < #lists.size(pastTripGuideEmailsOnPage) ? pastTripGuideEmailsOnPage[iterStat.index] : 'N/A'}">
+                                 </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="trip-wrapper-description" th:if="${trip.description != null and !trip.description.isEmpty()}">
+                        <p th:text="${trip.description}"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="pagination" th:if="${totalPastPages > 1}">
+                <a th:if="${pastPage > 0}" th:href="@{'/profile'(up_page=${upcomingPage}, pa_page=${pastPage - 1})}">
+                    <button>&#8592;</button>
+                </a>
+                <span th:each="i : ${#numbers.sequence(0, totalPastPages - 1)}">
+                    <a th:if="${i != pastPage}" th:href="@{'/profile'(up_page=${upcomingPage}, pa_page=${i})}">
+                        <button th:text="${i + 1}"></button>
+                    </a>
+                    <span th:if="${i == pastPage}" class="current-page" th:text="${i + 1}"></span>
+                </span>
+                <a th:if="${pastPage + 1 < totalPastPages}" th:href="@{'/profile'(up_page=${upcomingPage}, pa_page=${pastPage + 1})}">
+                    <button>&#8594;</button>
+                </a>
+            </div>
+        </div>
     </div>
+
 </div>
 
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
@@ -170,19 +235,15 @@
 
 <script>
     $(document).ready(function() {
+        // Contor caractere descriere
         const descriptionTextarea = $('#description');
         const charCountDisplay = $('#description-char-count');
-        // Citeste maxlength direct din atributul textarea
-        const maxLength = parseInt(descriptionTextarea.attr('maxlength'), 10);
-
-        function updateCounter() {
-            // Asigura-te ca elementele exista inainte de a le folosi
-            if (descriptionTextarea.length > 0 && charCountDisplay.length > 0) {
-                const currentLength = descriptionTextarea.val().length;
-                // Afiseaza contorul doar daca maxLength este un numar valid
-                if (!isNaN(maxLength)) {
+        if (descriptionTextarea.length > 0) {
+            const maxLength = parseInt(descriptionTextarea.attr('maxlength'), 10);
+            function updateCounter() {
+                if (charCountDisplay.length > 0 && !isNaN(maxLength)) {
+                    const currentLength = descriptionTextarea.val().length;
                     charCountDisplay.text(currentLength + '/' + maxLength);
-                    // Optional: Schimba culoarea daca se apropie de limita
                     if (currentLength > maxLength * 0.95) {
                         charCountDisplay.removeClass('text-danger').addClass('text-warning');
                     } else {
@@ -190,15 +251,34 @@
                     }
                 }
             }
-        }
-
-        // Verifica daca textarea exista in pagina inainte de a atasa event listener
-        if (descriptionTextarea.length > 0) {
-            // Contor initial la incarcarea paginii
             updateCounter();
-            // Actualizeaza la input
             descriptionTextarea.on('input', updateCounter);
         }
+
+        // Logica pentru butoanele de toggle excursii
+        const upcomingBtn = $('#show-upcoming-btn');
+        const pastBtn = $('#show-past-btn');
+        const upcomingContent = $('#upcoming-trips-content');
+        const pastContent = $('#past-trips-content');
+
+        upcomingBtn.on('click', function() {
+            if (!$(this).hasClass('active')) {
+                pastContent.hide();
+                upcomingContent.show();
+                $(this).addClass('active');
+                pastBtn.removeClass('active');
+            }
+        });
+
+        pastBtn.on('click', function() {
+            if (!$(this).hasClass('active')) {
+                upcomingContent.hide();
+                pastContent.show();
+                $(this).addClass('active');
+                upcomingBtn.removeClass('active');
+            }
+        });
+
     });
 </script>
 
