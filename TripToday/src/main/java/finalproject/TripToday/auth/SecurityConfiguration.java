@@ -40,7 +40,6 @@ public class SecurityConfiguration {
         return http.build();
     }
 
-    // What happens on logout
 
     private LogoutHandler logoutHandler() {
         return (request, response, authentication) -> {

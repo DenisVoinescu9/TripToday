@@ -2,9 +2,8 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Meet the guides | TripToday</title>
+    <title th:text="${pageTitle}">Meet the guides | TripToday</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}"/>
@@ -15,8 +14,8 @@
 <div th:replace="~{fragments/header :: header}"></div>
 
 <div class="guides-page-wrapper">
-    <h2>Meet Your Expert Guides</h2>
-    <p>Get to know the knowledgeable and friendly faces who will bring your destinations to life. Our guides aren't just experts in history and nature; they're passionate storytellers dedicated to making your TripToday experience authentic and unforgettable. Find out more about the individuals ready to lead your next adventure!</p>
+    <h2 th:text="${mainHeading}"></h2>
+    <p th:text="${introParagraph}"></p>
 
     <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
         <span th:text="${errorMessage}"></span>
@@ -35,21 +34,19 @@
     </div>
 
     <div th:if="${guides == null or #lists.isEmpty(guides)}">
-        <p>No guides found.</p>
+        <p th:text="${noGuidesMessage}"></p>
     </div>
 
     <div class="pagination" th:if="${totalPages > 1}">
         <a th:if="${page > 0}" th:href="@{'/guides?page=' + ${page - 1}}">
             <button>&#8592;</button>
         </a>
-
         <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
             <a th:if="${i != page}" th:href="@{'/guides?page=' + ${i}}">
                 <button th:text="${i + 1}"></button>
             </a>
             <span th:if="${i == page}" class="current-page" th:text="${i + 1}"></span>
         </span>
-
         <a th:if="${page + 1 < totalPages}" th:href="@{'/guides?page=' + ${page + 1}}">
             <button>&#8594;</button>
         </a>

@@ -107,7 +107,7 @@
     flex-grow: 0;
 }
 
-/* Paginare */
+
 .pagination {
     margin-top: 2rem;
     display: flex;
@@ -133,7 +133,6 @@
     cursor: default;
 }
 
-/* Animatie intrare */
 @keyframes slideInFromBottom {
     from {
         opacity: 0;

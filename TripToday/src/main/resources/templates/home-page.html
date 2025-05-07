@@ -19,34 +19,21 @@
 <div class="wrapper">
     <div class="about-us-wrapper">
         <div class="about-us-container-text slide-in-left">
-            <h1 class="about-us-container-text__heading">Discover the world with us</h1>
-            <p class="about-us-container-text__paragraph">
-                Explore unforgettable destinations with TripToday! We create immersive guided tours led by passionate
-                experts. Our guides share authentic stories and insights, making your journey seamless and memorable.
-                Leave
-                the details to us, enjoy the discovery. Find your next adventure with TripToday!
-            </p>
+            <h1 class="about-us-container-text__heading" th:text="${aboutUsHeading}"></h1>
+            <p class="about-us-container-text__paragraph" th:text="${aboutUsParagraph}"></p>
         </div>
         <div class="about-us-container-image slide-in-right">
-            <img class="about-us-container-image__picture" th:src="@{/images/guides.jpg}" alt="Guides group photo">
+            <img class="about-us-container-image__picture" th:src="@{${aboutUsImageSrc}}" th:alt="${aboutUsImageAlt}">
         </div>
     </div>
     <div class="our-travelers-wrapper">
         <div class="our-travelers-title">
-            <h1 class="our-travelers-title__heading slide-in-bottom">Our travelers' testimonials</h1>
+            <h1 class="our-travelers-title__heading slide-in-bottom" th:text="${travelersTestimonialsHeading}"></h1>
         </div>
         <div class="our-travelers-body">
-            <div class="our-travelers-body__card slide-in-bottom">
-                <img class="our-travelers-body__card__image" th:src="@{/images/traveler1.png}"  alt="Traveler1 image">
-                <p class="our-travelers-body__card__body">"Booking our trip through this company was incredibly straightforward. Our guides were so experienced and passionate, making the stunning historical sites truly come alive. A seamless and amazing experience!"</p>
-            </div>
-            <div class="our-travelers-body__card slide-in-bottom">
-                <img class="our-travelers-body__card__image" th:src="@{/images/guides.jpg}"  alt="Traveler1 image">
-                <p class="our-travelers-body__card__body">"What a fantastic adventure! Signing up was a breeze online. The guides knew the nature trails inside out and were super friendly. Saw breathtaking landscapes thanks to their expert planning"</p>
-            </div>
-            <div class="our-travelers-body__card slide-in-bottom">
-                <img class="our-travelers-body__card__image" th:src="@{/images/guides.jpg}"  alt="Traveler1 image">
-                <p class="our-travelers-body__card__body">"Everything was handled perfectly, from the easy booking to the tour itself. Our guide was exceptionally knowledgeable and made exploring the region fun. Absolutely brilliant service and location!"</p>
+            <div class="our-travelers-body__card slide-in-bottom" th:each="testimonial, iterStat : ${testimonials}" th:style="${'animation-delay: ' + (0.4 + iterStat.index * 0.2) + 's'}">
+                <img class="our-travelers-body__card__image" th:src="@{${testimonial.imageSrc}}" th:alt="${testimonial.imageAlt}">
+                <p class="our-travelers-body__card__body" th:text="${testimonial.body}"></p>
             </div>
         </div>
     </div>

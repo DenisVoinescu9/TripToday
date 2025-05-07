@@ -14,47 +14,126 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.transaction.annotation.Transactional; // Importat pt /enroll
-import org.springframework.dao.DataIntegrityViolationException; // Importat pt /enroll
-import finalproject.TripToday.repository.TripRepository; // Importat pt /enroll
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional; // Importat pt /enroll
 import java.util.stream.Collectors;
 
 @Controller
 public class ProfileController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProfileController.class);
+    private static final int PAGE_SIZE = 3;
 
     private final TripService tripService;
     private final Auth0Service auth0Service;
-    // Asigura-te ca TripRepository este injectat daca e folosit in alta parte
-    // private final TripRepository tripRepository;
 
     @Autowired
     public ProfileController(TripService tripService, Auth0Service auth0Service) {
         this.tripService = tripService;
         this.auth0Service = auth0Service;
-        // this.tripRepository = tripRepository; // Daca l-ai injecta
     }
+
+    private void addPageTextToModel(Model model) {
+        Map<String, String> pageText = new HashMap<>();
+        pageText.put("title", "My profile | TripToday"); // Titlul paginii HTML, de obicei Title Case e OK
+        pageText.put("defaultPictureUrl", "/images/default_avatar.png");
+
+        pageText.put("emailLabel", "Email:");
+        pageText.put("roleLabel", "Account role(s):");
+        pageText.put("noUserDetails", "User details not available.");
+
+        pageText.put("guideDescriptionLabel", "Your description (as a guide):");
+        pageText.put("guideDescriptionPlaceholder", "Enter your description...");
+        pageText.put("guideDescriptionCharCounterSuffix", "/200");
+        pageText.put("guideDescriptionSaveButton", "Save description"); // Ajustat la Sentence case
+
+        pageText.put("pictureUpdateLabel", "Update profile picture:");
+        pageText.put("pictureUpdatePlaceholder", "Enter URL of picture here (e.g., https://...)");
+        pageText.put("pictureUpdateButton", "Update picture"); // Deja Sentence case
+
+        pageText.put("upcomingTripsButton", "Upcoming trips"); // Ajustat la Sentence case
+        pageText.put("pastTripsButton", "Past trips");       // Ajustat la Sentence case
+        pageText.put("upcomingTripsTitle", "Upcoming trips");  // Ajustat la Sentence case
+        pageText.put("pastTripsTitle", "Past trips");        // Ajustat la Sentence case
+        pageText.put("noUpcomingTrips", "No upcoming trips found.");
+        pageText.put("noPastTrips", "No past trips found.");
+
+        pageText.put("tripCanceledMessageUser", "This trip was canceled. The enrolling fee was transferred back to you.");
+        pageText.put("tripCanceledMessageGeneric", "This trip was canceled.");
+        pageText.put("departureLocationLabel", "Departure location");
+        pageText.put("departureDateLabel", "Departure date");
+        pageText.put("departureHourLabel", "Departure hour");
+        pageText.put("returnDateLabel", "Return date");
+        pageText.put("durationLabel", "Duration");
+        pageText.put("availableSpotsLabel", "Available spots"); // Ajustat la Sentence case
+        pageText.put("remainingSpotsLabel", "Remaining spots");
+        pageText.put("enrollmentFeeLabel", "Enrollment fee");
+        pageText.put("feeLabel", "Fee");
+        pageText.put("hotelLabel", "Hotel");
+        pageText.put("guideLabel", "Guide");
+
+        pageText.put("durationUnit", " days");
+        pageText.put("spotsUnit", " spots");
+        pageText.put("feeUnit", " RON");
+        pageText.put("hourUnit", " UTC");
+        pageText.put("hotelNotSpecified", "Not specified");
+        pageText.put("guideYouUpcoming", "You are the guide");
+        pageText.put("guideYouPast", "You were the guide");
+        pageText.put("guideNotAvailable", "N/A");
+
+        pageText.put("paginationPreviousSymbol", "\u2190");
+        pageText.put("paginationNextSymbol", "\u2192");
+
+        model.addAttribute("pageText", pageText);
+    }
+
 
     @GetMapping("/profile")
     public String profile(Model model,
-                          @RequestParam(name="up_page", defaultValue = "0") int upcomingPage,
-                          @RequestParam(name="pa_page", defaultValue = "0") int pastPage,
+                          @RequestParam(name="up_page", defaultValue = "0") int upcomingPageParam,
+                          @RequestParam(name="pa_page", defaultValue = "0") int pastPageParam,
                           @AuthenticationPrincipal OidcUser principal) {
+
+        addPageTextToModel(model); // Adaugam textele prima data
+        Map<String, String> pageText = (Map<String, String>) model.getAttribute("pageText"); // Recuperam pentru uz intern
+
+
         if (principal == null) {
             return "redirect:/";
         }
 
         Map<String, Object> claims = principal.getClaims();
-        model.addAttribute("user", claims);
         String userId = principal.getName();
-        logger.info("Loading profile for user: {} - up_page: {}, pa_page: {}", userId, upcomingPage, pastPage);
+        String userEmail = principal.getEmail();
+        String userPicture = principal.getPicture();
+
+        Object rolesClaim = claims.get("role");
+        List<String> userDisplayRoles = new ArrayList<>();
+        if (rolesClaim instanceof String) {
+            userDisplayRoles.addAll(List.of(((String)rolesClaim).split("\\s*\\|\\s*")));
+        } else if (rolesClaim instanceof List) {
+            for(Object roleObj : (List<?>)rolesClaim) {
+                if (roleObj instanceof String) {
+                    userDisplayRoles.add((String)roleObj);
+                }
+            }
+        }
+
+        boolean isGuide = userDisplayRoles.contains("Guide");
+        boolean isAuth0User = userId != null && userId.startsWith("auth0|");
+
+        model.addAttribute("userEmail", userEmail);
+        model.addAttribute("displayUserPicture", userPicture != null && !userPicture.isEmpty() ? userPicture : (pageText != null ? pageText.get("defaultPictureUrl") : "/images/default_avatar.png"));
+        model.addAttribute("userDisplayRoles", userDisplayRoles);
+        model.addAttribute("isGuide", isGuide);
+        model.addAttribute("isAuth0User", isAuth0User);
+        model.addAttribute("currentUserId", userId);
+
+        logger.info("Loading profile for user: {} - up_page: {}, pa_page: {}", userId, upcomingPageParam, pastPageParam);
         String errorMessage = null;
 
         try {
@@ -65,94 +144,59 @@ public class ProfileController {
             List<Trip> allUpcomingTrips = splitTrips.getOrDefault("upcomingTrips", Collections.emptyList());
             List<Trip> allPastTrips = splitTrips.getOrDefault("pastTrips", Collections.emptyList());
 
-            // logger.debug("Total upcoming trips found: {}", allUpcomingTrips.size());
-            // logger.debug("Total past trips found: {}", allPastTrips.size());
-
-            // Optimizare: Ia toti ghizii o data
             Map<String, String> guideEmailMap = auth0Service.getAllGuides().stream()
                     .filter(g -> g != null && g.get("id") != null && g.get("email") != null)
-                    .collect(Collectors.toMap(g -> g.get("id"), g -> g.get("email"), (e1, e2) -> e1));
+                    .collect(Collectors.toMap(g -> (String)g.get("id"), g -> (String)g.get("email"), (e1, e2) -> e1));
 
+            int upcomingPage = upcomingPageParam;
+            int pastPage = pastPageParam;
 
-            int pageSize = 3; // Seteaza dimensiunea paginii la 3
-
-            // --- Paginare Upcoming Trips ---
             int totalUpcomingTrips = allUpcomingTrips.size();
-            int totalUpcomingPages = (int) Math.ceil((double) totalUpcomingTrips / pageSize);
-            if (totalUpcomingPages == 0) totalUpcomingPages = 1; // Minim o pagina
-
-            // Valideaza pagina ceruta
+            int totalUpcomingPages = (int) Math.ceil((double) totalUpcomingTrips / PAGE_SIZE);
+            if (totalUpcomingPages == 0) totalUpcomingPages = 1;
             if (upcomingPage < 0) upcomingPage = 0;
-            else if (upcomingPage >= totalUpcomingPages) upcomingPage = totalUpcomingPages - 1;
-
-            int upcomingFromIndex = upcomingPage * pageSize;
-            int upcomingToIndex = Math.min(upcomingFromIndex + pageSize, totalUpcomingTrips);
-
-            // Extrage sublista doar daca indexul de start e valid
-            List<Trip> pageUpcomingTrips = (upcomingFromIndex < totalUpcomingTrips && upcomingFromIndex >= 0) ?
+            else if (upcomingPage >= totalUpcomingPages) upcomingPage = Math.max(0, totalUpcomingPages - 1);
+            int upcomingFromIndex = upcomingPage * PAGE_SIZE;
+            int upcomingToIndex = Math.min(upcomingFromIndex + PAGE_SIZE, totalUpcomingTrips);
+            List<Trip> pageUpcomingTrips = (upcomingFromIndex < totalUpcomingTrips && upcomingFromIndex >=0) ?
                     allUpcomingTrips.subList(upcomingFromIndex, upcomingToIndex) : Collections.emptyList();
-
-            // logger.debug("Upcoming Trips Pagination: total={}, totalPages={}, requestedPage={}, from={}, to={}, resultingSize={}",
-            //        totalUpcomingTrips, totalUpcomingPages, upcomingPage, upcomingFromIndex, upcomingToIndex, pageUpcomingTrips.size());
-
-            List<String> upcomingTripGuideEmailsOnPage = new ArrayList<>();
-            for (Trip trip : pageUpcomingTrips) {
-                String guideId = trip.getGuideId();
-                upcomingTripGuideEmailsOnPage.add(guideId != null ? guideEmailMap.get(guideId.toString()) : null);
-            }
-
+            List<String> upcomingTripGuideEmailsOnPage = pageUpcomingTrips.stream()
+                    .map(trip -> guideEmailMap.get(trip.getGuideId()))
+                    .collect(Collectors.toList());
             model.addAttribute("pageUpcomingTrips", pageUpcomingTrips);
             model.addAttribute("upcomingPage", upcomingPage);
             model.addAttribute("totalUpcomingPages", totalUpcomingPages);
             model.addAttribute("upcomingTripGuideEmailsOnPage", upcomingTripGuideEmailsOnPage);
-            // --- Sfarsit Paginare Upcoming Trips ---
 
-
-            // --- Paginare Past Trips ---
             int totalPastTrips = allPastTrips.size();
-            int totalPastPages = (int) Math.ceil((double) totalPastTrips / pageSize);
-            if (totalPastPages == 0) totalPastPages = 1; // Minim o pagina
-
-            // Valideaza pagina ceruta
+            int totalPastPages = (int) Math.ceil((double) totalPastTrips / PAGE_SIZE);
+            if (totalPastPages == 0) totalPastPages = 1;
             if (pastPage < 0) pastPage = 0;
-            else if (pastPage >= totalPastPages) pastPage = totalPastPages - 1;
-
-            int pastFromIndex = pastPage * pageSize;
-            int pastToIndex = Math.min(pastFromIndex + pageSize, totalPastTrips);
-
-            // Extrage sublista doar daca indexul de start e valid
+            else if (pastPage >= totalPastPages) pastPage = Math.max(0, totalPastPages - 1);
+            int pastFromIndex = pastPage * PAGE_SIZE;
+            int pastToIndex = Math.min(pastFromIndex + PAGE_SIZE, totalPastTrips);
             List<Trip> pagePastTrips = (pastFromIndex < totalPastTrips && pastFromIndex >= 0) ?
                     allPastTrips.subList(pastFromIndex, pastToIndex) : Collections.emptyList();
-
-            // logger.debug("Past Trips Pagination: total={}, totalPages={}, requestedPage={}, from={}, to={}, resultingSize={}",
-            //         totalPastTrips, totalPastPages, pastPage, pastFromIndex, pastToIndex, pagePastTrips.size());
-
-
-            List<String> pastTripGuideEmailsOnPage = new ArrayList<>();
-            for (Trip trip : pagePastTrips) {
-                String guideId = trip.getGuideId();
-                pastTripGuideEmailsOnPage.add(guideId != null ? guideEmailMap.get(guideId.toString()) : null);
-            }
-
+            List<String> pastTripGuideEmailsOnPage = pagePastTrips.stream()
+                    .map(trip -> guideEmailMap.get(trip.getGuideId()))
+                    .collect(Collectors.toList());
             model.addAttribute("pagePastTrips", pagePastTrips);
             model.addAttribute("pastPage", pastPage);
             model.addAttribute("totalPastPages", totalPastPages);
             model.addAttribute("pastTripGuideEmailsOnPage", pastTripGuideEmailsOnPage);
-            // --- Sfarsit Paginare Past Trips ---
-
 
         } catch (Exception e) {
             logger.error("Error loading profile data for user {}", userId, e);
             errorMessage = "Could not load profile data. Please try again later.";
             model.addAttribute("description", "");
+            model.addAttribute("pageUpcomingTrips", Collections.emptyList());
+            model.addAttribute("upcomingPage", 0);
+            model.addAttribute("totalUpcomingPages", 1);
+            model.addAttribute("upcomingTripGuideEmailsOnPage", Collections.emptyList());
             model.addAttribute("pagePastTrips", Collections.emptyList());
             model.addAttribute("pastPage", 0);
-            model.addAttribute("totalPastPages", 0);
+            model.addAttribute("totalPastPages", 1);
             model.addAttribute("pastTripGuideEmailsOnPage", Collections.emptyList());
-            model.addAttribute("pageUpcomingTrips", Collections.emptyList()); // Foloseste pageUpcomingTrips aici
-            model.addAttribute("upcomingPage", 0);
-            model.addAttribute("totalUpcomingPages", 0);
-            model.addAttribute("upcomingTripGuideEmailsOnPage", Collections.emptyList());
         }
 
         if (errorMessage != null) {
@@ -177,7 +221,6 @@ public class ProfileController {
             logger.error("Error updating description for user {}", userId, e);
             redirectAttributes.addFlashAttribute("errorMessage", "Failed to update description. Reason: " + e.getMessage());
         }
-
         return "redirect:/profile";
     }
 
@@ -201,10 +244,6 @@ public class ProfileController {
             logger.error("Error updating picture for user {}", userId, e);
             redirectAttributes.addFlashAttribute("errorMessage", "Failed to update profile picture. Reason: " + e.getMessage());
         }
-
         return "redirect:/profile";
     }
-
-    // Metoda /enroll - presupunem ca exista din controllerul UpcomingTripsController
-    // Daca vrei si logica de enroll de pe pagina de profil, trebuie adaugata/adaptata aici
 }
