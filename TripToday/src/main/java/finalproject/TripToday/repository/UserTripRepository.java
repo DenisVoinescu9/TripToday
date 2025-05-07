@@ -12,4 +12,6 @@ import java.util.Optional;
 public interface UserTripRepository extends JpaRepository<UserTrip, Integer> {
     Optional<List<UserTrip>> findAllByUserId(@Size(max = 255) @NotNull String userId);
     Optional<List<UserTrip>> findAllByTripId(@Size(max = 255) @NotNull Integer tripId);
+    boolean existsByUserIdAndTripId(String userId, Integer tripId);
+
 }

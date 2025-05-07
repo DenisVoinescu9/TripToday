@@ -232,21 +232,43 @@ function openViewTravelersModal(buttonElement) {
                     img.alt = 'Traveler picture';
                     img.width = 65;
                     img.height = 65;
-                    img.className = 'rounded-circle mr-2';
+                    img.className = 'rounded-circle mr-2'; // Pastram margin-right pentru imagine
 
+                    travelerItem.appendChild(img); // Adaugam imaginea
+
+                    // --- START MODIFICARE ---
+                    // Cream un div nou pentru a tine textul (ID + Nume/Email)
+                    const textWrapper = document.createElement('div');
+                    // Optional: stiluri pentru wrapper-ul de text, ex. flex column daca vrei aliniere specifica
+                    // textWrapper.style.display = 'flex';
+                    // textWrapper.style.flexDirection = 'column';
+                    // textWrapper.style.justifyContent = 'center';
+
+                    // Cream span pentru ID user
                     const spanId = document.createElement('span');
                     spanId.textContent = traveler.user_id || 'Unknown User ID';
-                    spanId.className = 'mr-2';
+                    spanId.style.display = 'block'; // Facem span-ul block ca sa stea pe randul lui
+                    spanId.style.fontWeight = '500'; // Optional: putin bold
+                    spanId.style.wordBreak = 'break-all'; // Permite spargerea ID-urilor lungi
 
+                    // Cream span pentru Nume/Email
                     const spanName = document.createElement('span');
-                    spanName.textContent = `(${traveler.name || traveler.email || ''})`;
+                    let nameOrEmail = traveler.name || traveler.email || '';
+                    if (!nameOrEmail) { nameOrEmail = '(No name/email available)'; }
+                    spanName.textContent = nameOrEmail;
+                    spanName.style.display = 'block'; // Facem span-ul block ca sa stea pe randul lui
                     spanName.style.fontSize = '0.9em';
                     spanName.style.color = '#6c757d';
+                    spanName.style.wordBreak = 'break-word'; // Permite spargerea
 
+                    // Adaugam span-urile in textWrapper
+                    textWrapper.appendChild(spanId);
+                    textWrapper.appendChild(spanName);
 
-                    travelerItem.appendChild(img);
-                    travelerItem.appendChild(spanId);
-                    travelerItem.appendChild(spanName);
+                    // Adaugam textWrapper la item-ul principal
+                    travelerItem.appendChild(textWrapper);
+                    // --- FINAL MODIFICARE ---
+
                     listGroup.appendChild(travelerItem);
                 });
                 listElement.appendChild(listGroup);
@@ -259,6 +281,13 @@ function openViewTravelersModal(buttonElement) {
             listElement.innerHTML = `<p class="text-danger">Could not load traveler list. Please try again later. (${error.message})</p>`;
         });
 }
+
+
+$(document).ready(function () {
+    $('.navbar-toggler').on('click', function () {
+        $('.navbar-container-items').toggleClass('active');
+    });
+});
 
 $(document).ready(function() {
 
@@ -411,6 +440,53 @@ $(document).ready(function() {
             $(form).find('.is-invalid').first().focus();
         }
         $(form).addClass('was-validated');
+    });
+
+});
+
+$(document).ready(function() {
+    // Contor caractere descriere
+    const descriptionTextarea = $('#description');
+    const charCountDisplay = $('#description-char-count');
+    if (descriptionTextarea.length > 0) {
+        const maxLength = parseInt(descriptionTextarea.attr('maxlength'), 10);
+        function updateCounter() {
+            if (charCountDisplay.length > 0 && !isNaN(maxLength)) {
+                const currentLength = descriptionTextarea.val().length;
+                charCountDisplay.text(currentLength + '/' + maxLength);
+                if (currentLength > maxLength * 0.95) {
+                    charCountDisplay.removeClass('text-danger').addClass('text-warning');
+                } else {
+                    charCountDisplay.removeClass('text-danger text-warning');
+                }
+            }
+        }
+        updateCounter();
+        descriptionTextarea.on('input', updateCounter);
+    }
+
+    // Logica pentru butoanele de toggle excursii
+    const upcomingBtn = $('#show-upcoming-btn');
+    const pastBtn = $('#show-past-btn');
+    const upcomingContent = $('#upcoming-trips-content');
+    const pastContent = $('#past-trips-content');
+
+    upcomingBtn.on('click', function() {
+        if (!$(this).hasClass('active')) {
+            pastContent.hide();
+            upcomingContent.show();
+            $(this).addClass('active');
+            pastBtn.removeClass('active');
+        }
+    });
+
+    pastBtn.on('click', function() {
+        if (!$(this).hasClass('active')) {
+            upcomingContent.hide();
+            pastContent.show();
+            $(this).addClass('active');
+            upcomingBtn.removeClass('active');
+        }
     });
 
 });

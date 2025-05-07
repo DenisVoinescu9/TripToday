@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+</head>
 <body>
 
 <div th:fragment="addTripModal">
@@ -35,11 +38,11 @@
                         </div>
                         <div class="form-group">
                             <label for="addDepartureDate">Departure Date</label>
-                            <input type="date" class="form-control" name="departureDate" id="addDepartureDate" required>
+                            <input type="date" class="form-control" name="departureDate" id="addDepartureDate" required max="9999-12-31">
                         </div>
                         <div class="form-group">
                             <label for="addReturnDate">Return Date</label>
-                            <input type="date" class="form-control" name="returnDate" id="addReturnDate" required>
+                            <input type="date" class="form-control" name="returnDate" id="addReturnDate" required max="9999-12-31">
                         </div>
                         <div class="form-group">
                             <label for="addDepartureHour">Departure Hour</label>
