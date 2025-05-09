@@ -45,10 +45,12 @@
     font-weight: 500;
     padding: 0.5rem 0;
     position: relative;
+    font-size: 0.95rem;
 }
 
 .navbar-container-items a:hover {
     color: #007bff;
+    text-decoration: none;
 }
 
 .navbar-container-items a::after {
@@ -102,5 +104,3 @@
         text-align: left;
     }
 }
-
-

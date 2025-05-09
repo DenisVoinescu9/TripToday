@@ -36,12 +36,12 @@
     box-sizing: border-box;
 }
 .trips-intro-section h1 {
-    font-size: 2rem;
+    font-size: 2.25rem;
     margin-bottom: 1rem;
     color: #333;
 }
 .trips-intro-section p {
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: #555;
     line-height: 1.6;
     overflow-wrap: break-word;
@@ -166,6 +166,7 @@
 .trip-manager-buttons .btn {
     width: 8rem;
     max-width: 100%;
+    font-size: 0.9rem;
 }
 .btn {
     width: auto; border-radius: 8px; font-size: 0.9rem;
@@ -177,6 +178,7 @@
     margin-top: auto;
     margin-bottom: 0.5rem;
     flex-shrink: 0;
+    font-size: 0.9rem;
 }
 .enroll-button:disabled {
     background-color: #cccccc;
@@ -217,6 +219,7 @@
 textarea.form-control {
     resize: vertical;
     min-height: 80px;
+    font-size: 0.95rem;
 }
 
 .no-trips-container {
@@ -281,6 +284,7 @@ textarea.form-control {
         max-width: 200px;
         align-self: center;
         margin-top: 0.5rem;
+        font-size: 0.95rem;
     }
     .trip-info-grid {
         grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -332,6 +336,7 @@ textarea.form-control {
     .trip-column-image p { font-size: 1.1rem; }
     .enroll-button {
         width: 70%;
+        font-size: 0.9rem;
     }
     .trip-info-grid {
         grid-template-columns: 1fr 1fr;
@@ -374,6 +379,7 @@ textarea.form-control {
     }
     .trip-wrapper-details-item h1 {
         margin-bottom: 0.1rem;
+        font-size: 0.8rem;
     }
     .trip-guide-item {
         grid-column: 1 / -1;
@@ -385,6 +391,7 @@ textarea.form-control {
     .trip-manager-buttons .btn {
         width: 100%;
         margin-bottom: 0.5rem;
+        font-size: 0.85rem;
     }
     .trip-manager-buttons .btn:last-child {
         margin-bottom: 0;
@@ -399,12 +406,11 @@ textarea.form-control {
         gap: 0.3rem;
         margin-top: 1.5rem;
     }
-    .pagination > *,
     .pagination a button,
     .pagination span.current-page {
         width: auto;
         padding: 0.3rem 0.6rem;
         font-size: 0.85rem;
-        margin: 0.1rem;
+        margin: 0;
     }
 }

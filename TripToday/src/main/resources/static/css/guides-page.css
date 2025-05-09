@@ -17,19 +17,16 @@
     box-sizing: border-box;
 }
 
-.guides-page-wrapper h2 {
+.guides-page-wrapper h1 {
     text-align: center;
-    font-size: 2rem;
+    margin-top: 0;
     margin-bottom: 1rem;
-    color: #333;
-    font-weight: 600;
     opacity: 0;
     animation: slideInFromBottom 0.6s ease-out forwards;
     animation-delay: 0s;
 }
 
 .guides-page-wrapper > p {
-    font-size: 1.1rem;
     color: #555;
     line-height: 1.6;
     text-align: center;
@@ -164,7 +161,11 @@
 }
 
 @media (max-width: 768px) {
-    .guides-page-wrapper h2 {
+    .guides-page-wrapper {
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+    }
+    .guides-page-wrapper h1 {
         font-size: 1.8rem;
     }
     .guides-page-wrapper > p {

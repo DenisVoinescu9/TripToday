@@ -138,7 +138,6 @@ public class TripService {
             trip.setDescription(tripDetails.getDescription());
             trip.setPicture(tripDetails.getPicture());
             trip.setHotelName(tripDetails.getHotelName());
-            // Set new departure hour
             trip.setDepartureHour(tripDetails.getDepartureHour());
 
             // Save updated trip

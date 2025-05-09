@@ -87,6 +87,37 @@ public class UpcomingTripsController {
         // Add guides to model
         model.addAttribute("guides", guides);
 
+        // Add UI text to model
+        model.addAttribute("pageTitle", "Upcoming trips | TripToday");
+        model.addAttribute("introHeading", "Your next adventure awaits!");
+        model.addAttribute("introParagraph", "Browse our currently available trips below. Find the perfect destination, check the details, and secure your spot for an unforgettable journey. Let's explore together!");
+        model.addAttribute("labelDestination", "Destination");
+        model.addAttribute("labelDescription", "Description");
+        model.addAttribute("labelDepartureLocation", "Departure location");
+        model.addAttribute("labelDepartureDate", "Departure date");
+        model.addAttribute("labelDepartureHour", "Departure hour");
+        model.addAttribute("labelReturnDate", "Return date");
+        model.addAttribute("labelDuration", "Duration (days):");
+        model.addAttribute("labelRemainingSpots", "Remaining spots");
+        model.addAttribute("labelEnrollmentFee", "Enrollment fee");
+        model.addAttribute("labelGuide", "Guide");
+        model.addAttribute("labelHotel", "Hotel");
+        model.addAttribute("textNoGuideAssigned", "No guide assigned");
+        model.addAttribute("buttonEnroll", "Enroll");
+        model.addAttribute("buttonFull", "Full");
+        model.addAttribute("buttonViewTravelers", "View travelers");
+        model.addAttribute("buttonEdit", "Edit trip");
+        model.addAttribute("buttonCancelTrip", "Cancel trip");
+        model.addAttribute("buttonCreateTrip", "Create trip");
+        model.addAttribute("messageNoTrips", "No trips available at the moment.");
+        model.addAttribute("unitDays", "days"); // Although labelDuration includes (days): this can be for other uses
+        model.addAttribute("unitSpots", "spots");
+        model.addAttribute("unitCurrency", "RON");
+        model.addAttribute("unitTimezone", "UTC");
+        model.addAttribute("paginationPreviousSymbol", "\u2190"); // Left arrow
+        model.addAttribute("paginationNextSymbol", "\u2192");     // Right arrow
+
+
         // Return view template name
         return "upcoming-trips-page";
     }

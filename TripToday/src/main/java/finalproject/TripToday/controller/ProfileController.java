@@ -49,6 +49,9 @@ public class ProfileController {
         Map<String, String> pageText = new HashMap<>();
         // Add page title
         pageText.put("title", "My profile | TripToday");
+
+        pageText.put("profilePageMainTitle", "My profile");
+
         // Add default picture URL in case user has no picture
         pageText.put("defaultPictureUrl", "/images/default_avatar.png");
 
