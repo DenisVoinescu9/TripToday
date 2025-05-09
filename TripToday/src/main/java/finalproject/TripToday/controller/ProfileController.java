@@ -39,7 +39,7 @@ public class ProfileController {
 
     private void addPageTextToModel(Model model) {
         Map<String, String> pageText = new HashMap<>();
-        pageText.put("title", "My profile | TripToday"); // Titlul paginii HTML, de obicei Title Case e OK
+        pageText.put("title", "My profile | TripToday");
         pageText.put("defaultPictureUrl", "/images/default_avatar.png");
 
         pageText.put("emailLabel", "Email:");
@@ -49,16 +49,16 @@ public class ProfileController {
         pageText.put("guideDescriptionLabel", "Your description (as a guide):");
         pageText.put("guideDescriptionPlaceholder", "Enter your description...");
         pageText.put("guideDescriptionCharCounterSuffix", "/200");
-        pageText.put("guideDescriptionSaveButton", "Save description"); // Ajustat la Sentence case
+        pageText.put("guideDescriptionSaveButton", "Save description");
 
         pageText.put("pictureUpdateLabel", "Update profile picture:");
         pageText.put("pictureUpdatePlaceholder", "Enter URL of picture here (e.g., https://...)");
-        pageText.put("pictureUpdateButton", "Update picture"); // Deja Sentence case
+        pageText.put("pictureUpdateButton", "Update picture");
 
-        pageText.put("upcomingTripsButton", "Upcoming trips"); // Ajustat la Sentence case
-        pageText.put("pastTripsButton", "Past trips");       // Ajustat la Sentence case
-        pageText.put("upcomingTripsTitle", "Upcoming trips");  // Ajustat la Sentence case
-        pageText.put("pastTripsTitle", "Past trips");        // Ajustat la Sentence case
+        pageText.put("upcomingTripsButton", "Upcoming trips");
+        pageText.put("pastTripsButton", "Past trips");
+        pageText.put("upcomingTripsTitle", "Upcoming trips");
+        pageText.put("pastTripsTitle", "Past trips");
         pageText.put("noUpcomingTrips", "No upcoming trips found.");
         pageText.put("noPastTrips", "No past trips found.");
 
@@ -98,8 +98,8 @@ public class ProfileController {
                           @RequestParam(name="pa_page", defaultValue = "0") int pastPageParam,
                           @AuthenticationPrincipal OidcUser principal) {
 
-        addPageTextToModel(model); // Adaugam textele prima data
-        Map<String, String> pageText = (Map<String, String>) model.getAttribute("pageText"); // Recuperam pentru uz intern
+        addPageTextToModel(model);
+        Map<String, String> pageText = (Map<String, String>) model.getAttribute("pageText");
 
 
         if (principal == null) {

@@ -22,10 +22,13 @@ public class GuidesController {
 
     private final Auth0Service auth0Service;
 
-    // Declare logger object
+    // Define logger object
 
     private static final Logger logger = LoggerFactory.getLogger(GuidesController.class);
 
+    // Define page size for pagination
+
+    private static final int pageSize = 4;
 
     @Autowired
     public GuidesController(Auth0Service auth0Service) {
@@ -73,9 +76,8 @@ public class GuidesController {
                 }
             }
 
-            // Define number of guides that will be displayed per page
 
-            int pageSize = 4;
+
 
             // Get size of the list of displayed guides
 
