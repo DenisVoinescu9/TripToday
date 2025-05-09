@@ -1,3 +1,14 @@
+@keyframes slideInFromBottom {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .guides-page-wrapper {
     width: 100%;
     max-width: 60rem;
@@ -28,7 +39,6 @@
     animation-delay: 0.1s;
 }
 
-/* Folosim flexbox pentru aliniere și control perfect pe spații */
 .guides-list {
     display: flex;
     flex-wrap: wrap;
@@ -37,22 +47,21 @@
     padding: 0 2rem;
 }
 
-/* Cardurile au dimensiuni fixe și înălțime echilibrată */
 .guide-card {
-    width: 300px;
+    width: 340px;
+    height: 380px;
     background-color: #fff;
     border: 1px solid #e0e0e0;
     border-radius: 12px;
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     opacity: 0;
     animation: slideInFromBottom 0.6s ease-out forwards;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    min-height: 400px;
 }
 
 .guide-card:hover {
@@ -60,7 +69,6 @@
     box-shadow: 0 6px 12px rgba(0,0,0,0.1);
 }
 
-/* Animare la afișare */
 .guides-list .guide-card:nth-child(1) { animation-delay: 0.3s; }
 .guides-list .guide-card:nth-child(2) { animation-delay: 0.4s; }
 .guides-list .guide-card:nth-child(3) { animation-delay: 0.5s; }
@@ -85,6 +93,7 @@
     align-items: center;
     width: 100%;
     flex-grow: 1;
+    justify-content: space-between;
 }
 
 .guide-email {
@@ -104,10 +113,8 @@
     overflow-wrap: break-word;
     white-space: pre-wrap;
     max-width: 100%;
-    flex-grow: 0;
+    word-break: break-all;
 }
-
-
 .pagination {
     margin-top: 2rem;
     display: flex;
@@ -131,15 +138,4 @@
     background-color: #ddd;
     font-weight: bold;
     cursor: default;
-}
-
-@keyframes slideInFromBottom {
-    from {
-        opacity: 0;
-        transform: translateY(50px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
