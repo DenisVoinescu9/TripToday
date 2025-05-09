@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
 </head>
 <body>
 
@@ -30,11 +29,11 @@
                         </div>
                         <div class="form-group">
                             <label for="addDestination">Destination</label>
-                            <input type="text" class="form-control" name="destination" id="addDestination" required>
+                            <input type="text" class="form-control" name="destination" id="addDestination" required maxlength="30">
                         </div>
                         <div class="form-group">
                             <label for="addDepartureLocation">Departure location</label>
-                            <input type="text" class="form-control" name="departureLocation" id="addDepartureLocation" required>
+                            <input type="text" class="form-control" name="departureLocation" id="addDepartureLocation" required maxlength="40">
                         </div>
                         <div class="form-group">
                             <label for="addDepartureDate">Departure date</label>
@@ -50,27 +49,27 @@
                         </div>
                         <div class="form-group">
                             <label for="addDurationDays">Duration (days)</label>
-                            <input type="number" class="form-control" name="durationDays" id="addDurationDays" required min="1" readonly>
+                            <input type="number" class="form-control" name="durationDays" id="addDurationDays" required min="1" max="365" readonly>
                         </div>
                         <div class="form-group">
                             <label for="addAvailableSpots">Available spots</label>
-                            <input type="number" class="form-control" name="availableSpots" id="addAvailableSpots" required min="0">
+                            <input type="number" class="form-control" name="availableSpots" id="addAvailableSpots" required min="0" max="999">
                         </div>
                         <div class="form-group">
                             <label for="addRegistrationFee">Enrollment fee</label>
-                            <input type="number" step="0.01" class="form-control" name="registrationFee" id="addRegistrationFee" required min="0">
+                            <input type="number" step="0.01" class="form-control" name="registrationFee" id="addRegistrationFee" required min="0" max="99999.99">
                         </div>
                         <div class="form-group">
                             <label for="addHotelName">Hotel</label>
-                            <input type="text" class="form-control" name="hotelName" id="addHotelName" required>
+                            <input type="text" class="form-control" name="hotelName" id="addHotelName" required maxlength="25">
                         </div>
                         <div class="form-group">
                             <label for="addDescription">Description</label>
-                            <textarea class="form-control" name="description" id="addDescription" required></textarea>
+                            <textarea class="form-control" name="description" id="addDescription" required maxlength="200" rows="4"></textarea>
                         </div>
                         <div class="form-group">
                             <label for="addPicture">Picture URL</label>
-                            <input type="url" class="form-control" name="picture" id="addPicture" required>
+                            <input type="url" class="form-control" name="picture" id="addPicture" required maxlength="500">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -146,19 +145,19 @@
                         </div>
                         <div class="form-group">
                             <label for="editDestination">Destination</label>
-                            <input type="text" class="form-control" name="destination" id="editDestination" required>
+                            <input type="text" class="form-control" name="destination" id="editDestination" required maxlength="30">
                         </div>
                         <div class="form-group">
                             <label for="editDepartureLocation">Departure location</label>
-                            <input type="text" class="form-control" name="departureLocation" id="editDepartureLocation" required>
+                            <input type="text" class="form-control" name="departureLocation" id="editDepartureLocation" required maxlength="40">
                         </div>
                         <div class="form-group">
                             <label for="editDepartureDate">Departure date</label>
-                            <input type="date" class="form-control" name="departureDate" id="editDepartureDate" required>
+                            <input type="date" class="form-control" name="departureDate" id="editDepartureDate" required max="9999-12-31">
                         </div>
                         <div class="form-group">
                             <label for="editReturnDate">Return Date</label>
-                            <input type="date" class="form-control" name="returnDate" id="editReturnDate" required>
+                            <input type="date" class="form-control" name="returnDate" id="editReturnDate" required max="9999-12-31">
                         </div>
                         <div class="form-group">
                             <label for="editDepartureHour">Departure hour</label>
@@ -166,27 +165,27 @@
                         </div>
                         <div class="form-group">
                             <label for="editDurationDays">Duration (days)</label>
-                            <input type="number" class="form-control" name="durationDays" id="editDurationDays" required min="1" readonly>
+                            <input type="number" class="form-control" name="durationDays" id="editDurationDays" required min="1" max="365" readonly>
                         </div>
                         <div class="form-group">
                             <label for="editAvailableSpots">Available spots</label>
-                            <input type="number" class="form-control" name="availableSpots" id="editAvailableSpots" required min="0">
+                            <input type="number" class="form-control" name="availableSpots" id="editAvailableSpots" required min="0" max="999">
                         </div>
                         <div class="form-group">
                             <label for="editRegistrationFee">Enrollment fee</label>
-                            <input type="number" step="0.01" class="form-control" name="registrationFee" id="editRegistrationFee" required min="0">
+                            <input type="number" step="0.01" class="form-control" name="registrationFee" id="editRegistrationFee" required min="0" max="99999.99">
                         </div>
                         <div class="form-group">
                             <label for="editHotelName">Hotel</label>
-                            <input type="text" class="form-control" name="hotelName" id="editHotelName" required>
+                            <input type="text" class="form-control" name="hotelName" id="editHotelName" required maxlength="25">
                         </div>
                         <div class="form-group">
                             <label for="editDescription">Description</label>
-                            <textarea class="form-control" name="description" id="editDescription" required></textarea>
+                            <textarea class="form-control" name="description" id="editDescription" required maxlength="200" rows="4"></textarea>
                         </div>
                         <div class="form-group">
                             <label for="editPicture">Picture URL</label>
-                            <input type="url" class="form-control" name="picture" id="editPicture" required>
+                            <input type="url" class="form-control" name="picture" id="editPicture" required maxlength="500">
                         </div>
                     </div>
                     <div class="modal-footer">

@@ -125,24 +125,34 @@ function openEditTripModal(button) {
     const card = $(button).closest('.trip-card');
 
     const destination = card.find('.trip-column-image p').text().trim();
-    // Gasirea detaliilor - ATENTIE: Aceasta metoda este fragila si depinde de ordinea/textul exact!
-    // Ar fi mai robust daca elementele P ar avea ID-uri sau atribute data-* unice.
     const detailsItems = card.find('.trip-wrapper-details-item');
     const departureLocation = detailsItems.eq(0).find('p').text().trim();
     const departureDate = detailsItems.eq(1).find('p').text().trim();
+
+    // --- START MODIFICARE PENTRU EXTRAGEREA OREI ---
     const departureHourRaw = detailsItems.eq(2).find('p').text().trim();
-    const departureHour = departureHourRaw.includes(':') ? departureHourRaw.replace(' UTC', '').trim() : '00:00';
+    let departureHour = '00:00'; // Valoare default
+
+    if (departureHourRaw) { // Verificam daca exista text
+        const timeMatch = departureHourRaw.match(/^(\d{1,2}:\d{2})/); // Extrage HH:MM sau H:MM de la inceputul string-ului
+        if (timeMatch && timeMatch[1]) {
+            departureHour = timeMatch[1]; // timeMatch[1] este grupul capturat (ex: "9:30" sau "14:30")
+        }
+    }
+    // --- FINAL MODIFICARE PENTRU EXTRAGEREA OREI ---
+
     const returnDate = detailsItems.eq(3).find('p').text().trim();
-    const availableSpots = detailsItems.eq(4).find('p').text().replace(/\D/g,'').trim();
+    const availableSpotsRaw = detailsItems.eq(4).find('p').text().trim(); // Modificat pentru a lua textul raw
+    const availableSpots = availableSpotsRaw.replace(/\D/g,''); // Pastram doar cifrele
+
     const registrationFeeRaw = detailsItems.eq(5).find('p').text().trim();
     const registrationFee = registrationFeeRaw.replace(/[^\d.-]/g, '');
     const hotelName = detailsItems.eq(6).find('p').text().trim();
-    let guideElement = detailsItems.eq(7).find('p span'); // Cauta span-ul specific
+    let guideElement = detailsItems.eq(7).find('p span');
     let guideEmail = guideElement.length > 0 && guideElement.text().trim() !== 'No guide assigned' ? guideElement.text().trim() : '';
 
     const description = card.find('.trip-wrapper-description p').text().trim();
     const pictureUrl = card.find('.trip-column-image img').attr('src');
-
 
     let initialGuideId = '';
     $('#editGuideSelect option').each(function() {
@@ -155,14 +165,14 @@ function openEditTripModal(button) {
     $('#editDestination').val(destination);
     $('#editDepartureLocation').val(departureLocation);
     $('#editDepartureDate').val(departureDate);
-    $('#editDepartureHour').val(departureHour);
+    $('#editDepartureHour').val(departureHour); // Aici se seteaza ora extrasa corect
     $('#editReturnDate').val(returnDate);
-    $('#editAvailableSpots').val(availableSpots);
+    $('#editAvailableSpots').val(availableSpots); // Se seteaza valoarea procesata
     $('#editRegistrationFee').val(registrationFee);
     $('#editDescription').val(description);
     $('#editHotelName').val(hotelName);
     $('#editPicture').val(pictureUrl);
-    $('#editGuideSelect').val(initialGuideId || ''); // Seteaza ghidul selectat
+    $('#editGuideSelect').val(initialGuideId || '');
 
     const today = new Date();
     const tomorrow = new Date(today);
@@ -282,12 +292,6 @@ function openViewTravelersModal(buttonElement) {
         });
 }
 
-
-$(document).ready(function () {
-    $('.navbar-toggler').on('click', function () {
-        $('.navbar-container-items').toggleClass('active');
-    });
-});
 
 $(document).ready(function() {
 
@@ -444,49 +448,3 @@ $(document).ready(function() {
 
 });
 
-$(document).ready(function() {
-    // Contor caractere descriere
-    const descriptionTextarea = $('#description');
-    const charCountDisplay = $('#description-char-count');
-    if (descriptionTextarea.length > 0) {
-        const maxLength = parseInt(descriptionTextarea.attr('maxlength'), 10);
-        function updateCounter() {
-            if (charCountDisplay.length > 0 && !isNaN(maxLength)) {
-                const currentLength = descriptionTextarea.val().length;
-                charCountDisplay.text(currentLength + '/' + maxLength);
-                if (currentLength > maxLength * 0.95) {
-                    charCountDisplay.removeClass('text-danger').addClass('text-warning');
-                } else {
-                    charCountDisplay.removeClass('text-danger text-warning');
-                }
-            }
-        }
-        updateCounter();
-        descriptionTextarea.on('input', updateCounter);
-    }
-
-    // Logica pentru butoanele de toggle excursii
-    const upcomingBtn = $('#show-upcoming-btn');
-    const pastBtn = $('#show-past-btn');
-    const upcomingContent = $('#upcoming-trips-content');
-    const pastContent = $('#past-trips-content');
-
-    upcomingBtn.on('click', function() {
-        if (!$(this).hasClass('active')) {
-            pastContent.hide();
-            upcomingContent.show();
-            $(this).addClass('active');
-            pastBtn.removeClass('active');
-        }
-    });
-
-    pastBtn.on('click', function() {
-        if (!$(this).hasClass('active')) {
-            upcomingContent.hide();
-            pastContent.show();
-            $(this).addClass('active');
-            upcomingBtn.removeClass('active');
-        }
-    });
-
-});

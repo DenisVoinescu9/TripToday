@@ -1,4 +1,3 @@
-/* Definim animația o singură dată */
 @keyframes slideInFromBottom {
     from {
         opacity: 0;
@@ -13,7 +12,7 @@
 .profile-container {
     max-width: 60rem;
     margin: 2rem auto;
-    padding: 0; /* Am eliminat padding-ul aici dacă e specificat la elementele copil */
+    padding: 0;
     box-sizing: border-box;
 }
 
@@ -24,7 +23,6 @@
     box-shadow: 0 4px 8px rgba(0,0,0,0.05);
     background-color: #fff;
     margin-bottom: 2rem;
-    /* Efect de intrare */
     opacity: 0;
     animation: slideInFromBottom 0.6s ease-out forwards;
     animation-delay: 0.1s;
@@ -38,7 +36,7 @@
     width: 150px;
     height: 150px;
     object-fit: cover;
-    transition: transform 0.3s ease; /* Efect subtil la hover */
+    transition: transform 0.3s ease;
 }
 .profile-avatar:hover {
     transform: scale(1.05);
@@ -84,10 +82,9 @@ textarea#description:focus {
 .trip-toggle-buttons {
     text-align: center;
     margin-bottom: 2rem;
-    /* Efect de intrare */
     opacity: 0;
     animation: slideInFromBottom 0.6s ease-out forwards;
-    animation-delay: 0.3s; /* După cardul de profil */
+    animation-delay: 0.3s;
 }
 
 .trip-toggle-buttons .btn {
@@ -97,7 +94,7 @@ textarea#description:focus {
 }
 .trip-toggle-buttons .btn:hover:not(.active) {
     transform: translateY(-2px);
-    background-color: #e9ecef; /* Un gri mai deschis pentru hover */
+    background-color: #e9ecef;
 }
 .trip-toggle-buttons .btn.active {
     background-color: #007bff;
@@ -109,8 +106,6 @@ textarea#description:focus {
     color: #007bff;
 }
 
-
-/* Titlurile secțiunilor de excursii (Upcoming/Past) */
 #upcoming-trips-content > h4,
 #past-trips-content > h4 {
     margin-top: 1.5rem;
@@ -118,12 +113,10 @@ textarea#description:focus {
     padding-bottom: 0.5rem;
     border-bottom: 1px solid #eee;
     font-size: 1.5rem;
-    /* Efect de intrare */
     opacity: 0;
     animation: slideInFromBottom 0.6s ease-out forwards;
-    animation-delay: 0.4s; /* După butoanele de toggle */
+    animation-delay: 0.4s;
 }
-
 
 .trip-card {
     display: grid;
@@ -136,20 +129,17 @@ textarea#description:focus {
     background-color: #fff;
     margin-bottom: 2rem;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    /* Efect de intrare pentru carduri - adăugat opacity și animation */
     opacity: 0;
     animation: slideInFromBottom 0.5s ease-out forwards;
-    /* animation-delay va fi setat per card mai jos */
 }
 .trip-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 6px 12px rgba(0,0,0,0.1);
 }
 
-/* Staggering pentru cardurile de excursii (max 3 pe pagină, conform paginării) */
 #upcoming-trips-content .trip-card:nth-of-type(1),
 #past-trips-content .trip-card:nth-of-type(1) {
-    animation-delay: 0.5s; /* După titlul secțiunii */
+    animation-delay: 0.5s;
 }
 #upcoming-trips-content .trip-card:nth-of-type(2),
 #past-trips-content .trip-card:nth-of-type(2) {
@@ -159,7 +149,6 @@ textarea#description:focus {
 #past-trips-content .trip-card:nth-of-type(3) {
     animation-delay: 0.7s;
 }
-
 
 .trip-column-image {
     display: flex;
@@ -173,6 +162,9 @@ textarea#description:focus {
     font-size: 1.1rem;
     color: #333;
     margin: 1rem 0 0 0;
+    width: 100%;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 .trip-column-image img {
     width: 160px;
@@ -186,6 +178,7 @@ textarea#description:focus {
 .trip-details-wrapper {
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 .trip-info-grid {
     display: grid;
@@ -209,6 +202,8 @@ textarea#description:focus {
     margin-bottom: 0.1rem;
     font-size: 0.85rem;
     line-height: 1.3;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 .trip-wrapper-details-item p {
     margin: 0;
@@ -224,6 +219,8 @@ textarea#description:focus {
     font-size: 0.9rem;
     font-weight: normal;
     line-height: 1.4;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 .trip-guide-item p .font-weight-bold {
     font-weight: bold !important;
@@ -238,6 +235,8 @@ textarea#description:focus {
     font-size: 0.9rem;
     color: #444;
     line-height: 1.5;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 
 .pagination {
@@ -247,10 +246,9 @@ textarea#description:focus {
     align-items: center;
     gap: 0.5rem;
     flex-wrap: wrap;
-    /* Efect de intrare pentru paginare */
     opacity: 0;
     animation: slideInFromBottom 0.6s ease-out forwards;
-    animation-delay: 0.8s; /* După ce cardurile ar trebui să fi intrat */
+    animation-delay: 0.8s;
 }
 .pagination button,
 .pagination .current-page {
@@ -274,14 +272,11 @@ textarea#description:focus {
 .alert {
     margin-top: 1.5rem;
     margin-bottom: 1.5rem;
-    /* Efect de intrare pentru alerte */
     opacity: 0;
     animation: slideInFromBottom 0.6s ease-out forwards;
-    animation-delay: 0s; /* Alertele să apară imediat dacă există */
+    animation-delay: 0s;
 }
 
-/* Stiluri pentru butoanele generale din formularele de profil (Save, Update) */
-/* Asigură-te că butoanele din HTML au clasa .btn și eventual .btn-primary sau .btn-secondary */
 .profile-info-card .btn {
     transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, transform 0.2s ease;
 }
@@ -298,8 +293,6 @@ textarea#description:focus {
     border-color: #4e555b;
 }
 
-
-/* Responsive Adjustments - acestea rămân neschimbate din CSS-ul tău */
 @media (max-width: 992px) {
     .profile-container {
         width: 100%; max-width: 100%; padding-left: 1.5rem; padding-right: 1.5rem; box-sizing: border-box;
@@ -334,6 +327,27 @@ textarea#description:focus {
     .trip-wrapper-details-item h1 { font-size: 0.85rem; }
     .trip-wrapper-details-item p, .trip-guide-item p, .trip-guide-item p span, .trip-wrapper-description p { font-size: 0.95rem; line-height: 1.5; }
 }
+
+@media (max-width: 576px) {
+    .pagination {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 0.3rem;
+        margin-top: 1.5rem;
+    }
+    .pagination > *,
+    .pagination a button,
+    .pagination span.current-page {
+        width: auto;
+        padding: 0.3rem 0.6rem;
+        font-size: 0.85rem;
+        margin: 0.1rem;
+    }
+}
+
 @media (max-width: 480px) {
     .profile-info-card p, .profile-info-card strong, .profile-info-card span,
     .description-container label, .description-container textarea,

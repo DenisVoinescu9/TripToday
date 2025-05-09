@@ -1,7 +1,18 @@
+@keyframes slideInFromBottom {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .alert-container {
     width: 60rem;
     margin: 1.5rem auto 0 auto;
-    max-width: 95%; /* Adaugat pentru consistenta si ecrane < 60rem */
+    max-width: 95%;
     box-sizing: border-box;
 }
 .alert-container .alert {
@@ -11,7 +22,7 @@
 .trip-wrapper {
     width: 60rem;
     margin: 2rem auto;
-    max-width: 95%; /* Adaugat */
+    max-width: 95%;
     box-sizing: border-box;
 }
 .trips-intro-section {
@@ -21,7 +32,7 @@
     opacity: 0;
     animation: slideInFromBottom 0.6s ease-out forwards;
     animation-delay: 0s;
-    max-width: 95%; /* Adaugat */
+    max-width: 95%;
     box-sizing: border-box;
 }
 .trips-intro-section h1 {
@@ -33,6 +44,8 @@
     font-size: 1.1rem;
     color: #555;
     line-height: 1.6;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 .trip-card {
     display: grid;
@@ -43,7 +56,7 @@
     gap: 1rem;
     align-items: start;
     background-color: #fff;
-    margin-bottom: 2rem; /* Marit putin pentru delimitare mai buna */
+    margin-bottom: 2rem;
     opacity: 0;
     animation: slideInFromBottom 0.6s ease-out forwards;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -59,6 +72,8 @@
     opacity: 0;
     animation: slideInFromBottom 0.6s ease-out forwards;
     animation-delay: 0.1s;
+    margin-bottom: 1rem;
+    text-align: left;
 }
 .trip-wrapper .trip-card:nth-of-type(1) { animation-delay: 0.2s; }
 .trip-wrapper .trip-card:nth-of-type(2) { animation-delay: 0.3s; }
@@ -70,12 +85,19 @@
     align-items: center;
     text-align: center;
     align-self: start;
+    min-width: 0;
 }
 .trip-column-image p {
     font-weight: bold;
     font-size: 1.1rem;
     color: #333;
-    margin: 1rem 0 1rem 0;
+    margin: 1rem 0;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    white-space: normal;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 .trip-column-image img {
     width: 160px;
@@ -85,133 +107,304 @@
     border: 2px solid #eee;
     flex-shrink: 0;
     box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    margin-bottom: 0.5rem;
 }
-.trip-details-wrapper { display: flex; flex-direction: column; }
+.trip-details-wrapper { display: flex; flex-direction: column; min-width: 0;}
 .trip-info-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr) 2fr; /* Desktop: Guide column is wider */
+    grid-template-columns: repeat(3, 1fr) 2fr;
     gap: 1rem;
     margin-bottom: 1rem;
 }
-.trip-wrapper-details-item { display: flex; flex-direction: column; min-width: 0; }
+.trip-wrapper-details-item {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
 .trip-wrapper-details-item h1 {
     margin: 0; padding: 0.1rem 0; font-weight: bold; color: #555;
     margin-bottom: 0.2rem; font-size: 0.9rem;
     line-height: 1.4;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 .trip-wrapper-details-item p {
-    margin: 0; padding: 0.1rem 0; color: #333; overflow-wrap: break-word;
-    word-wrap: break-word; font-size: 0.9rem;
+    margin: 0; padding: 0.1rem 0; color: #333;
+    font-size: 0.9rem;
     line-height: 1.4; font-weight: normal;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    white-space: normal;
 }
 .trip-guide-item p, .trip-guide-item p span {
     font-size: 0.85rem;
     font-weight: normal; line-height: 1.4;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
-.trip-wrapper-description { border-top: 1px solid #eee; padding-top: 1rem; margin-top: 1rem; }
-.trip-wrapper-description p { margin: 0; font-size: 0.9rem; color: #444; line-height: 1.5; }
-.trip-manager-buttons { display: flex; flex-direction: column; justify-content: flex-start; align-items: center; gap: 0.75rem; }
-.trip-manager-buttons .btn { width: 8rem; max-width: 100%; } /* Stilul tau original */
+.trip-wrapper-description {
+    border-top: 1px solid #eee;
+    padding-top: 1rem;
+    margin-top: 1rem;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+.trip-wrapper-description p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #444;
+    line-height: 1.5;
+    white-space: normal;
+}
+.trip-manager-buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.75rem;
+}
+.trip-manager-buttons .btn {
+    width: 8rem;
+    max-width: 100%;
+}
 .btn {
     width: auto; border-radius: 8px; font-size: 0.9rem;
     padding: 0.5rem 1rem; white-space: nowrap;
 }
-.enroll-button { width: auto; align-self: center; margin-top: auto; margin-bottom: 0.5rem; flex-shrink: 0; }
-/* Stilul original pentru butonul disabled (gri) */
+.enroll-button {
+    width: auto;
+    align-self: center;
+    margin-top: auto;
+    margin-bottom: 0.5rem;
+    flex-shrink: 0;
+}
 .enroll-button:disabled {
     background-color: #cccccc;
     border-color: #cccccc;
-    color: #666666; /* Text putin mai inchis pe gri */
-    opacity: 0.7; /* Putin transparent */
+    color: #666666;
+    opacity: 0.7;
     cursor: not-allowed;
 }
-h1 { font-weight: bold; font-size: 0.9rem; color: #333; } /* Regula generala H1 din CSS-ul tau */
-.pagination { margin-top: 2rem; display: flex; justify-content: center; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
-.pagination button, .pagination .current-page {
-    background-color: #f5f5f5; border: 1px solid #ccc; padding: 0.4rem 0.8rem;
-    border-radius: 6px; font-size: 0.9rem; cursor: pointer;
+
+.pagination {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
 }
-.pagination .current-page { background-color: #ddd; font-weight: bold; cursor: default; }
+.pagination button,
+.pagination .current-page {
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+.pagination button:hover {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+}
+.pagination .current-page {
+    background-color: #ddd;
+    font-weight: bold;
+    cursor: default;
+}
 
-@keyframes slideInFromLeft { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
-@keyframes slideInFromRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
-@keyframes slideInFromBottom { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+textarea.form-control {
+    resize: vertical;
+    min-height: 80px;
+}
 
-/* Responsive Adjustments */
-@media (max-width: 992px) { /* Tablete */
+.no-trips-container {
+    text-align: center;
+    width: 100%;
+    padding: 2rem 0;
+    margin-top: 2rem;
+}
+
+.no-trips-container p {
+    font-size: 1.2rem;
+    color: #555;
+}
+
+
+@media (max-width: 1200px) {
+    .trip-card--manager {
+        grid-template-columns: 13rem minmax(0, 1fr) 9rem;
+    }
+    .trip-manager-buttons .btn {
+        width: 7rem;
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+    }
+}
+
+@media (max-width: 992px) {
     .alert-container, .trips-intro-section, .trip-wrapper {
-        width: 90%; /* Nu full width, dar mai lat decat 60rem pe ecrane > 60rem */
-        /* max-width: 60rem; Scoatem asta ca sa fie 90% din ecran */
-        padding-left: 0;
-        padding-right: 0;
-        margin-top: 2.5rem;
-        margin-bottom: 2.5rem;
+        width: 90%;
+        padding-left: 15px;
+        padding-right: 15px;
+        margin-left: auto;
+        margin-right: auto;
     }
     .trips-intro-section h1 { font-size: 1.8rem; }
-    .trips-intro-section p { font-size: 1.05rem; line-height: 1.55; }
-
-    .trip-card, .trip-card--manager {
-        grid-template-columns: 1fr; /* Stivuire coloane */
-        gap: 1rem;
-        padding: 1.25rem; /* Padding intern card marit putin */
+    .trips-intro-section p { font-size: 1rem; }
+    .create-trip-button-container {
+        text-align: center;
     }
-    .trip-column-image { margin-bottom: 1rem; }
-    .trip-column-image p { font-size: 1.3rem; margin: 0.75rem 0; }
+    .trip-card, .trip-card--manager {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        padding: 1.25rem;
+    }
+    .trip-column-image {
+        margin-bottom: 0.5rem;
+        align-self: center;
+    }
     .trip-column-image img {
-        width: 70%;
-        max-width: 280px; /* Imagine mai mare */
-        height: auto;
-        aspect-ratio: 16/10;
+        width: 200px;
+        height: 150px;
+        margin-bottom: 0.75rem;
+    }
+    .trip-column-image p {
+        font-size: 1.2rem;
+        margin-top: 0;
+        margin-bottom: 0.75rem;
+        padding: 0 5px;
+    }
+    .enroll-button {
+        width: 60%;
+        max-width: 200px;
+        align-self: center;
+        margin-top: 0.5rem;
     }
     .trip-info-grid {
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); /* Itemii din grid sa aiba mai mult spatiu */
-        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 0.75rem 1rem;
     }
-    .trip-wrapper-details-item h1 { font-size: 0.9rem; } /* Font label */
-    .trip-wrapper-details-item p, .trip-guide-item p, .trip-guide-item p span, .trip-wrapper-description p {
-        font-size: 1rem; line-height: 1.5; /* Font valoare */
-    }
-    .btn, .enroll-button { font-size: 0.95rem; padding: 0.6rem 1.2rem; }
-    .trip-manager-buttons .btn { width: 100%; } /* Butoane manager full width cand sunt stivuite */
-    .enroll-button { width: 100%; margin-top: 1rem; }
-    .pagination button, .pagination .current-page { font-size: 0.95rem; }
-}
-
-@media (max-width: 768px) { /* Telefoane mari / Tablete mici portret */
-    .alert-container, .trips-intro-section, .trip-wrapper {
-        width: 100%; /* Full width */
-        padding-left: 1rem; /* Padding lateral */
-        padding-right: 1rem;
-        margin-top: 2rem;
-        margin-bottom: 2rem;
-    }
-    .trips-intro-section h1 { font-size: 1.7rem; }
-    .trips-intro-section p { font-size: 1rem; line-height: 1.5; }
-
-    .trip-card { padding: 1rem; }
-    .trip-column-image p { font-size: 1.2rem; margin: 0.5rem 0; }
-    .trip-column-image img { width: 60%; max-width: 240px; }
-
-    .trip-info-grid { grid-template-columns: 1fr; } /* Detaliile stivuite pe 1 coloana */
     .trip-wrapper-details-item h1 { font-size: 0.85rem; }
-    .trip-wrapper-details-item p, .trip-guide-item p, .trip-guide-item p span, .trip-wrapper-description p {
-        font-size: 0.95rem; line-height: 1.45;
+    .trip-wrapper-details-item p, .trip-guide-item p, .trip-guide-item p span { font-size: 0.9rem; }
+    .trip-wrapper-description { margin-top: 0.5rem; padding-top: 0.75rem; }
+    .trip-wrapper-description p { font-size: 0.9rem; }
+
+    .trip-manager-buttons {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
     }
-    .btn, .enroll-button, .trip-manager-buttons .btn { font-size: 0.9rem; padding: 0.5rem 1rem; }
+    .trip-manager-buttons .btn {
+        width: auto;
+        min-width: 120px;
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+    }
+    .pagination {
+        margin-top: 1.5rem;
+        gap: 0.3rem;
+    }
+    .pagination button, .pagination .current-page {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.85rem;
+    }
 }
 
-@media (max-width: 480px) { /* Telefoane mici */
+@media (max-width: 768px) {
     .alert-container, .trips-intro-section, .trip-wrapper {
-        padding-left: 0.75rem;
-        padding-right: 0.75rem;
+        width: 100%;
+        max-width: 100%;
+        padding-left: 10px;
+        padding-right: 10px;
     }
+    .trips-intro-section { margin-top: 2rem; margin-bottom: 1.5rem;}
     .trips-intro-section h1 { font-size: 1.6rem; }
-    .trips-intro-section p { font-size: 0.9rem; }
-    .trip-column-image p { font-size: 1.1rem; }
-    .trip-column-image img { width: 55%; max-width: 200px; }
-    .trip-wrapper-details-item h1 { font-size: 0.8rem; }
-    .trip-wrapper-details-item p, .trip-guide-item p, .trip-guide-item p span, .trip-wrapper-description p {
-        font-size: 0.9rem; line-height: 1.4;
+    .trips-intro-section p { font-size: 0.95rem; }
+    .trip-card { padding: 1rem; margin-bottom: 1.5rem; }
+    .trip-column-image img {
+        width: 180px;
+        height: 135px;
     }
-    .btn, .enroll-button, .trip-manager-buttons .btn { font-size: 0.85rem; padding: 0.4rem 0.8rem;}
+    .trip-column-image p { font-size: 1.1rem; }
+    .enroll-button {
+        width: 70%;
+    }
+    .trip-info-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem 0.75rem;
+    }
+    .trip-wrapper-details-item h1 { font-size: 0.8rem; }
+    .trip-wrapper-details-item p, .trip-guide-item p, .trip-guide-item p span { font-size: 0.85rem; }
+    .trip-wrapper-description p { font-size: 0.85rem; }
+    .trip-manager-buttons .btn {
+        min-width: 100px;
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .trips-intro-section h1 { font-size: 1.4rem; }
+    .trips-intro-section p { font-size: 0.9rem; }
+    .create-trip-button-container .btn {
+        width: 100%;
+        font-size: 0.9rem;
+    }
+    .trip-card {
+        grid-template-columns: 1fr;
+    }
+    .trip-column-image img {
+        width: 150px;
+        height: 112px;
+    }
+    .trip-column-image p { font-size: 1rem; }
+    .enroll-button {
+        width: 100%;
+        font-size: 0.9rem;
+    }
+    .trip-info-grid {
+        grid-template-columns: 1fr;
+    }
+    .trip-wrapper-details-item {
+        text-align: center;
+    }
+    .trip-wrapper-details-item h1 {
+        margin-bottom: 0.1rem;
+    }
+    .trip-guide-item {
+        grid-column: 1 / -1;
+    }
+    .trip-manager-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .trip-manager-buttons .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    .trip-manager-buttons .btn:last-child {
+        margin-bottom: 0;
+    }
+
+    .pagination {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 0.3rem;
+        margin-top: 1.5rem;
+    }
+    .pagination > *,
+    .pagination a button,
+    .pagination span.current-page {
+        width: auto;
+        padding: 0.3rem 0.6rem;
+        font-size: 0.85rem;
+        margin: 0.1rem;
+    }
 }
