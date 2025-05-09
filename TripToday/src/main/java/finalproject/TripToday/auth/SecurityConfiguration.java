@@ -26,6 +26,9 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
+
+        // Configure paths based on authentication status
+
         http    .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/css/**", "/js/**","/images/**", "/favicon.ico").permitAll()
@@ -35,11 +38,15 @@ public class SecurityConfiguration {
                 .oauth2Login(login -> login
                  .defaultSuccessUrl("/", true)
         )
+
+                // Set logout handler
+
                 .logout(logout -> logout
                         .addLogoutHandler(logoutHandler()));
         return http.build();
     }
 
+    // Configure logout handler
 
     private LogoutHandler logoutHandler() {
         return (request, response, authentication) -> {
