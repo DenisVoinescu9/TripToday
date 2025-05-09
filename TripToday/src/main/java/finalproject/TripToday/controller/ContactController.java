@@ -9,52 +9,45 @@ import java.util.Map;
 @Controller
 public class ContactController {
 
-    // Define contact page
-
     @GetMapping("/contact")
-    public String about(Model model) {
+    public String contact(Model model) { // Renamed from 'about' to 'contact' for clarity
 
-        // General page labels
+        // Page structure texts
+        String pageTitle = "Contact us | TripToday"; // For <title> tag
+        String pageMainHeader = "Contact us";       // For the main H1
 
-        String pageTitle = "Contact us | TripToday";
-        String mainHeading = "We value your feedback";
-        String mainParagraph = "At TripToday, your satisfaction is paramount. To ensure the best possible experience, we encourage you to contact us with any inquiries or requests. We're dedicated to making your adventure seamless and enjoyable.";
-        String imageAltText = "Guides group photo";
-        String imageUrl = "/images/your-experience-text.png";
+        // Section: "We value your feedback" (previously mainHeading)
+        String feedbackSectionHeading = "We value your feedback";
+        String feedbackSectionParagraph = "At TripToday, your satisfaction is paramount. To ensure the best possible experience, we encourage you to contact us with any inquiries or requests. We're dedicated to making your adventure seamless and enjoyable.";
+        String feedbackImageAltText = "Feedback concept image"; // More generic alt
+        String feedbackImageUrl = "/images/your-experience-text.png"; // Assuming you have this image
 
-        // Contact data labels
-
+        // Contact details data
         String contactEmail = "support@triptoday.com";
         String contactPhone = "+40 770 123 987";
         String contactAddress = "Nicolae Balcescu Street, No. 114, Brasov, 500019, Romania";
-        String contactHours = "06:00 - 14:00 UTC";
+        String contactHours = "09:00 - 17:00 (Monday - Friday)"; // Adjusted format slightly
 
-        // FAQ labels
-
+        // FAQ section texts
         String faqSectionTitle = "Frequently Asked Questions";
         String noFaqsText = "No FAQs available at the moment.";
 
-        // Adding general labels to the model
-
+        // Add to model
         model.addAttribute("pageTitle", pageTitle);
-        model.addAttribute("heading", mainHeading);
-        model.addAttribute("paragraph", mainParagraph);
-        model.addAttribute("imageAlt", imageAltText);
-        model.addAttribute("imageUrl", imageUrl);
+        model.addAttribute("pageMainHeader", pageMainHeader); // New attribute for H1
 
-        // Adding contact labels to the model
+        model.addAttribute("heading", feedbackSectionHeading); // Kept 'heading' for existing section
+        model.addAttribute("paragraph", feedbackSectionParagraph);
+        model.addAttribute("imageAlt", feedbackImageAltText);
+        model.addAttribute("imageUrl", feedbackImageUrl);
 
         model.addAttribute("contactEmail", contactEmail);
         model.addAttribute("contactPhone", contactPhone);
         model.addAttribute("contactAddress", contactAddress);
         model.addAttribute("contactHours", contactHours);
 
-        // Adding FAQ labels to the model
-
         model.addAttribute("faqHeading", faqSectionTitle);
         model.addAttribute("noFaqsMessage", noFaqsText);
-
-        // Initialize FAQ map ( Question - Answer)
 
         Map<String, String> faqMap = new LinkedHashMap<>();
         faqMap.put("What is TripToday about?", "TripToday connects you with experienced, world-traveled guides for unique travel experiences and tours.");
@@ -63,11 +56,7 @@ public class ContactController {
         faqMap.put("Who are the guides for the trips?", "Our guides are generally well-traveled individuals, eager to share their broad knowledge and passion for global exploration during your trip.");
         faqMap.put("I'm an experienced traveler and want to become a guide. How can I join?", "If you have extensive travel experience and want to become a guide with us, please email your details to contact@triptoday.com");
 
-        // Adding FAQ map to the model
-
         model.addAttribute("faqs", faqMap);
-
-        // Return thymeleaf template
 
         return "contact-page";
     }
