@@ -195,11 +195,10 @@ textarea#description:focus {
     min-width: 0;
 }
 .trip-wrapper-details-item h1 {
-    margin: 0;
     padding: 0.1rem 0;
     font-weight: bold;
     color: #555;
-    margin-bottom: 0.1rem;
+    margin: 0 0 0.1rem;
     font-size: 0.85rem;
     line-height: 1.3;
     overflow-wrap: break-word;

@@ -88,15 +88,15 @@ h2.faq-heading {
         margin-top: 2.5rem; margin-bottom: 2.5rem;
     }
     .our-contacts-body {
-        /* Scoatem flex-direction: column; lasam flex-wrap: wrap */
-        justify-content: center; /* Centreaza randurile */
-        gap: 2rem; /* Ajustat gap */
+
+        justify-content: center;
+        gap: 2rem;
     }
     .our-contacts-item {
-        flex: 1 1 calc(50% - 1rem); /* Tintim 2 coloane (50% minus jumatate din gap) */
+        flex: 1 1 calc(50% - 1rem);
         max-width: calc(50% - 1rem);
         padding: 1rem;
-        margin-bottom: 2rem; /* Margin intre randuri */
+        margin-bottom: 2rem;
     }
     .contact-us-container-text__heading, h2.faq-heading {
         font-size: 1.8rem;
@@ -143,16 +143,15 @@ h2.faq-heading {
 }
 
 @media (max-width: 768px) {
-    /* Aici fortam un singur item pe rand */
     .our-contacts-body {
         flex-direction: column;
         align-items: center;
         gap: 2rem;
     }
     .our-contacts-item {
-        max-width: 25rem; /* Max width pt un singur item */
-        width: 90%; /* Latimea itemului */
-        flex-basis: auto; /* Resetam flex-basis */
+        max-width: 25rem;
+        width: 90%;
+        flex-basis: auto;
     }
     .our-contacts-wrapper, .value-feedback-wrapper, .faq-wrapper {
         padding-left: 1rem;
