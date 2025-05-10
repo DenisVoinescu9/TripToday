@@ -363,7 +363,7 @@ textarea#description:focus {
         grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     }
     .trip-wrapper-details-item h1 {
-        font-size: 1.1rem;
+        font-size: 1.15rem;
         font-weight: bold !important;
     }
     .trip-wrapper-details-item p,
@@ -417,7 +417,7 @@ textarea#description:focus {
         gap: 1rem;
     }
     .trip-wrapper-details-item h1 {
-        font-size: 1.0rem;
+        font-size: 1.05rem;
         font-weight: bold !important;
     }
     .trip-wrapper-details-item p,
@@ -452,7 +452,7 @@ textarea#description:focus {
         margin: 0;
     }
     .trip-wrapper-details-item h1 {
-        font-size: 0.9rem;
+        font-size: 0.95rem;
         font-weight: bold !important;
     }
     .trip-wrapper-details-item p,
@@ -488,7 +488,7 @@ textarea#description:focus {
         font-size: 1.1rem;
     }
     .trip-wrapper-details-item h1 {
-        font-size: 0.85rem;
+        font-size: 0.9rem;
         font-weight: bold !important;
     }
     .trip-wrapper-details-item p,

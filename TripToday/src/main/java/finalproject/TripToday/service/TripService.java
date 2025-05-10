@@ -146,6 +146,10 @@ public class TripService {
         return null; // Trip not found
     }
 
+    public List<Trip> getPastTrips() {
+        return tripRepository.findPastTrips(LocalDate.now());
+    }
+
     // Marks a trip as canceled
     @Transactional // DB transaction
     public boolean deleteTrip(Integer id) { // Note: "delete" means cancel

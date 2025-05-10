@@ -126,53 +126,44 @@ function openEditTripModal(button) {
 
     const destination = card.find('.trip-column-image p').text().trim();
     const detailsItems = card.find('.trip-wrapper-details-item');
+
     const departureLocation = detailsItems.eq(0).find('p').text().trim();
-    const departureDate = detailsItems.eq(1).find('p').text().trim();
-
-    // --- START MODIFICARE PENTRU EXTRAGEREA OREI ---
+    const departureDateISO = card.data('departure-date-iso');
     const departureHourRaw = detailsItems.eq(2).find('p').text().trim();
-    let departureHour = '00:00'; // Valoare default
+    const returnDateISO = card.data('return-date-iso');
 
-    if (departureHourRaw) { // Verificam daca exista text
-        const timeMatch = departureHourRaw.match(/^(\d{1,2}:\d{2})/); // Extrage HH:MM sau H:MM de la inceputul string-ului
+    const availableSpotsRaw = detailsItems.eq(5).find('p').text().trim();
+    const registrationFeeRaw = detailsItems.eq(6).find('p').text().trim();
+    const hotelNameText = detailsItems.eq(7).find('p').text().trim();
+    const guideIdFromCard = card.data('guide-id');
+
+    let departureHour = '00:00';
+    if (departureHourRaw) {
+        const timeMatch = departureHourRaw.match(/^(\d{1,2}:\d{2})/);
         if (timeMatch && timeMatch[1]) {
-            departureHour = timeMatch[1]; // timeMatch[1] este grupul capturat (ex: "9:30" sau "14:30")
+            departureHour = timeMatch[1];
         }
     }
-    // --- FINAL MODIFICARE PENTRU EXTRAGEREA OREI ---
 
-    const returnDate = detailsItems.eq(3).find('p').text().trim();
-    const availableSpotsRaw = detailsItems.eq(4).find('p').text().trim(); // Modificat pentru a lua textul raw
-    const availableSpots = availableSpotsRaw.replace(/\D/g,''); // Pastram doar cifrele
-
-    const registrationFeeRaw = detailsItems.eq(5).find('p').text().trim();
+    const availableSpots = availableSpotsRaw.replace(/\D/g,'');
     const registrationFee = registrationFeeRaw.replace(/[^\d.-]/g, '');
-    const hotelName = detailsItems.eq(6).find('p').text().trim();
-    let guideElement = detailsItems.eq(7).find('p span');
-    let guideEmail = guideElement.length > 0 && guideElement.text().trim() !== 'No guide assigned' ? guideElement.text().trim() : '';
+    const hotelName = (hotelNameText === 'No guide assigned' || hotelNameText === 'Not specified') ? '' : hotelNameText;
 
     const description = card.find('.trip-wrapper-description p').text().trim();
     const pictureUrl = card.find('.trip-column-image img').attr('src');
 
-    let initialGuideId = '';
-    $('#editGuideSelect option').each(function() {
-        if ($(this).text().trim() === guideEmail && guideEmail) {
-            initialGuideId = $(this).val();
-        }
-    });
-
     $('#editTripId').val(tripId);
     $('#editDestination').val(destination);
     $('#editDepartureLocation').val(departureLocation);
-    $('#editDepartureDate').val(departureDate);
-    $('#editDepartureHour').val(departureHour); // Aici se seteaza ora extrasa corect
-    $('#editReturnDate').val(returnDate);
-    $('#editAvailableSpots').val(availableSpots); // Se seteaza valoarea procesata
+    $('#editDepartureDate').val(departureDateISO);
+    $('#editDepartureHour').val(departureHour);
+    $('#editReturnDate').val(returnDateISO);
+    $('#editAvailableSpots').val(availableSpots);
     $('#editRegistrationFee').val(registrationFee);
     $('#editDescription').val(description);
     $('#editHotelName').val(hotelName);
     $('#editPicture').val(pictureUrl);
-    $('#editGuideSelect').val(initialGuideId || '');
+    $('#editGuideSelect').val(guideIdFromCard || '');
 
     const today = new Date();
     const tomorrow = new Date(today);
@@ -181,13 +172,13 @@ function openEditTripModal(button) {
 
     $('#editDepartureDate').attr('min', tomorrowString);
 
-    if (departureDate && departureDate >= tomorrowString) {
-        $('#editReturnDate').attr('min', departureDate);
+    if (departureDateISO && departureDateISO >= tomorrowString) {
+        $('#editReturnDate').attr('min', departureDateISO);
     } else {
         $('#editReturnDate').attr('min', tomorrowString);
     }
 
-    if (departureDate && returnDate) {
+    if (departureDateISO && returnDateISO) {
         calculateAndUpdateDuration('#editDepartureDate', '#editReturnDate', '#editDurationDays');
     } else {
         $('#editDurationDays').val('').removeClass('is-valid is-invalid');
@@ -242,43 +233,31 @@ function openViewTravelersModal(buttonElement) {
                     img.alt = 'Traveler picture';
                     img.width = 65;
                     img.height = 65;
-                    img.className = 'rounded-circle mr-2'; // Pastram margin-right pentru imagine
+                    img.className = 'rounded-circle mr-2';
 
-                    travelerItem.appendChild(img); // Adaugam imaginea
+                    travelerItem.appendChild(img);
 
-                    // --- START MODIFICARE ---
-                    // Cream un div nou pentru a tine textul (ID + Nume/Email)
                     const textWrapper = document.createElement('div');
-                    // Optional: stiluri pentru wrapper-ul de text, ex. flex column daca vrei aliniere specifica
-                    // textWrapper.style.display = 'flex';
-                    // textWrapper.style.flexDirection = 'column';
-                    // textWrapper.style.justifyContent = 'center';
 
-                    // Cream span pentru ID user
                     const spanId = document.createElement('span');
                     spanId.textContent = traveler.user_id || 'Unknown User ID';
-                    spanId.style.display = 'block'; // Facem span-ul block ca sa stea pe randul lui
-                    spanId.style.fontWeight = '500'; // Optional: putin bold
-                    spanId.style.wordBreak = 'break-all'; // Permite spargerea ID-urilor lungi
+                    spanId.style.display = 'block';
+                    spanId.style.fontWeight = '500';
+                    spanId.style.wordBreak = 'break-all';
 
-                    // Cream span pentru Nume/Email
                     const spanName = document.createElement('span');
                     let nameOrEmail = traveler.name || traveler.email || '';
                     if (!nameOrEmail) { nameOrEmail = '(No name/email available)'; }
                     spanName.textContent = nameOrEmail;
-                    spanName.style.display = 'block'; // Facem span-ul block ca sa stea pe randul lui
+                    spanName.style.display = 'block';
                     spanName.style.fontSize = '0.9em';
                     spanName.style.color = '#6c757d';
-                    spanName.style.wordBreak = 'break-word'; // Permite spargerea
+                    spanName.style.wordBreak = 'break-word';
 
-                    // Adaugam span-urile in textWrapper
                     textWrapper.appendChild(spanId);
                     textWrapper.appendChild(spanName);
 
-                    // Adaugam textWrapper la item-ul principal
                     travelerItem.appendChild(textWrapper);
-                    // --- FINAL MODIFICARE ---
-
                     listGroup.appendChild(travelerItem);
                 });
                 listElement.appendChild(listGroup);
@@ -337,8 +316,7 @@ $(document).ready(function() {
 
         if (popoverMessage) {
             if (!button.data('bs.popover') || button.data('bs.popover').config.trigger !== 'manual') {
-                // Initialize or re-initialize with manual trigger if needed
-                if (button.data('bs.popover')) button.popover('dispose'); // Dispose old one first
+                if (button.data('bs.popover')) button.popover('dispose');
                 button.popover({
                     content: popoverMessage,
                     trigger: 'manual',
@@ -346,16 +324,14 @@ $(document).ready(function() {
                     container: 'body'
                 });
             } else {
-                // Update content if popover already exists with manual trigger
                 button.data('bs.popover').config.content = popoverMessage;
             }
             button.popover('show');
             setTimeout(function() { button.popover('hide'); }, 2500);
-            return; // Stop execution
+            return;
         }
 
-        // Daca sunt locuri SI user-ul NU e ghid, deschide modalul
-        if (button.data('bs.popover')) { // Distruge popover-ul daca exista (cel de hover/focus)
+        if (button.data('bs.popover')) {
             button.popover('dispose');
         }
         const enrollModal = $('#enrollModal');
@@ -446,5 +422,69 @@ $(document).ready(function() {
         $(form).addClass('was-validated');
     });
 
-});
+    const showUpcomingBtn = document.getElementById('show-upcoming-trips-btn');
+    const showPastBtn = document.getElementById('show-past-trips-btn');
+    const upcomingTripsContent = document.getElementById('upcoming-trips-section');
+    const pastTripsContent = document.getElementById('past-trips-section');
 
+    function updateView(showPast) {
+        if (!showUpcomingBtn || !showPastBtn || !upcomingTripsContent || !pastTripsContent) {
+            return;
+        }
+        if (showPast) {
+            pastTripsContent.style.display = 'block';
+            upcomingTripsContent.style.display = 'none';
+            showPastBtn.classList.add('active');
+            showUpcomingBtn.classList.remove('active');
+        } else {
+            upcomingTripsContent.style.display = 'block';
+            pastTripsContent.style.display = 'none';
+            showUpcomingBtn.classList.add('active');
+            showPastBtn.classList.remove('active');
+        }
+    }
+
+    function checkInitialView() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const pastPageParam = urlParams.get('pa_page');
+        const upcomingPageParam = urlParams.get('page');
+
+        let shouldShowPast = false;
+
+        if (pastPageParam !== null) {
+            shouldShowPast = true;
+            if (upcomingPageParam !== null && upcomingPageParam !== '0') {
+                if(urlParams.has('page') && !urlParams.has('pa_page_navigated_explicitly')){
+                    shouldShowPast = false;
+                }
+            }
+        } else {
+            shouldShowPast = false;
+        }
+        updateView(shouldShowPast);
+    }
+
+    if (showUpcomingBtn && showPastBtn && upcomingTripsContent && pastTripsContent) {
+        checkInitialView();
+
+        showUpcomingBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            updateView(false);
+            const url = new URL(window.location);
+            const currentPage = url.searchParams.get('page') || '0';
+            let preservedParams = new URLSearchParams();
+            preservedParams.set('page', currentPage);
+            history.pushState({}, '', url.pathname + '?' + preservedParams.toString());
+        });
+
+        showPastBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            updateView(true);
+            const url = new URL(window.location);
+            const currentPastPage = url.searchParams.get('pa_page') || '0';
+            let preservedParams = new URLSearchParams();
+            preservedParams.set('pa_page', currentPastPage);
+            history.pushState({}, '', url.pathname + '?' + preservedParams.toString());
+        });
+    }
+});
