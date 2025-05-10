@@ -13,4 +13,7 @@ import java.util.List;
 public interface TripRepository extends JpaRepository<Trip, Integer> {
     @Query("SELECT t FROM Trip t WHERE t.departureDate >= :currentDate ORDER BY t.departureDate ASC")
     List<Trip> findUpcomingTrips(@Param("currentDate") LocalDate currentDate);
+
+    @Query("SELECT t FROM Trip t WHERE t.departureDate < :currentDate ORDER BY t.departureDate DESC")
+    List<Trip> findPastTrips(@Param("currentDate") LocalDate currentDate);
 }

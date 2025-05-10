@@ -9,6 +9,10 @@
     }
 }
 
+html {
+    overflow-y: scroll;
+}
+
 .alert-container {
     width: 60rem;
     margin: 1.5rem auto 0 auto;
@@ -21,7 +25,7 @@
 }
 .trip-wrapper {
     width: 60rem;
-    margin: 2rem auto;
+    margin: 0 auto 2rem auto;
     max-width: 95%;
     box-sizing: border-box;
 }
@@ -39,6 +43,8 @@
     font-size: 2.25rem;
     margin-bottom: 1rem;
     color: #333;
+    font-weight: 700; /* Am presupus că vrei font-weight similar cu .page-main-title */
+    line-height: 1.2; /* Am presupus că vrei line-height similar cu .page-main-title */
 }
 .trips-intro-section p {
     font-size: 1rem;
@@ -68,16 +74,53 @@
 .trip-card--manager {
     grid-template-columns: 13rem minmax(0, 1fr) 10rem;
 }
+
+.manager-controls-wrapper {
+    width: 60rem;
+    margin: 0 auto 1.5rem auto;
+    max-width: 95%;
+    box-sizing: border-box;
+}
+
 .create-trip-button-container {
     opacity: 0;
     animation: slideInFromBottom 0.6s ease-out forwards;
     animation-delay: 0.1s;
-    margin-bottom: 1rem;
     text-align: left;
 }
-.trip-wrapper .trip-card:nth-of-type(1) { animation-delay: 0.2s; }
-.trip-wrapper .trip-card:nth-of-type(2) { animation-delay: 0.3s; }
-.trip-wrapper .trip-card:nth-of-type(3) { animation-delay: 0.4s; }
+
+.trip-toggle-buttons {
+    text-align: center;
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+}
+.trip-toggle-buttons .btn {
+    margin: 0 0.5rem;
+}
+.trip-toggle-buttons .btn.active {
+    background-color: #007bff;
+    color: white;
+}
+.trip-toggle-buttons .btn:not(.active) {
+    background-color: #f8f9fa;
+    color: #007bff;
+}
+
+.trip-section-title {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    font-size: 1.75rem;
+    color: #333;
+    text-align: center;
+}
+
+#upcoming-trips-section .trip-wrapper .trip-card:nth-of-type(1),
+#past-trips-section .trip-wrapper .trip-card:nth-of-type(1) { animation-delay: 0.2s; }
+#upcoming-trips-section .trip-wrapper .trip-card:nth-of-type(2),
+#past-trips-section .trip-wrapper .trip-card:nth-of-type(2) { animation-delay: 0.3s; }
+#upcoming-trips-section .trip-wrapper .trip-card:nth-of-type(3),
+#past-trips-section .trip-wrapper .trip-card:nth-of-type(3) { animation-delay: 0.4s; }
+
 
 .trip-column-image {
     display: flex;
@@ -135,6 +178,9 @@
     overflow-wrap: break-word;
     word-wrap: break-word;
     white-space: normal;
+}
+.trip-guide-item {
+    grid-column: 1 / -1;
 }
 .trip-guide-item p, .trip-guide-item p span {
     font-size: 0.85rem;
@@ -226,7 +272,6 @@ textarea.form-control {
     text-align: center;
     width: 100%;
     padding: 2rem 0;
-    margin-top: 2rem;
 }
 
 .no-trips-container p {
@@ -247,14 +292,17 @@ textarea.form-control {
 }
 
 @media (max-width: 992px) {
-    .alert-container, .trips-intro-section, .trip-wrapper {
+    .alert-container, .trips-intro-section, .trip-wrapper, .manager-controls-wrapper {
         width: 90%;
         padding-left: 15px;
         padding-right: 15px;
         margin-left: auto;
         margin-right: auto;
     }
-    .trips-intro-section h1 { font-size: 1.8rem; }
+    .trips-intro-section h1 {
+        font-size: 2rem; /* Ajustat */
+        margin-bottom: 1.25rem; /* Ajustat */
+    }
     .trips-intro-section p { font-size: 1rem; }
     .create-trip-button-container {
         text-align: center;
@@ -290,7 +338,14 @@ textarea.form-control {
         grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
         gap: 0.75rem 1rem;
     }
-    .trip-wrapper-details-item h1 { font-size: 0.85rem; }
+    .trip-guide-item {
+        grid-column: 1 / -1;
+    }
+    .trip-wrapper-details-item h1 {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #484848;
+    }
     .trip-wrapper-details-item p, .trip-guide-item p, .trip-guide-item p span { font-size: 0.9rem; }
     .trip-wrapper-description { margin-top: 0.5rem; padding-top: 0.75rem; }
     .trip-wrapper-description p { font-size: 0.9rem; }
@@ -319,14 +374,17 @@ textarea.form-control {
 }
 
 @media (max-width: 768px) {
-    .alert-container, .trips-intro-section, .trip-wrapper {
+    .alert-container, .trips-intro-section, .trip-wrapper, .manager-controls-wrapper {
         width: 100%;
         max-width: 100%;
         padding-left: 10px;
         padding-right: 10px;
     }
     .trips-intro-section { margin-top: 2rem; margin-bottom: 1.5rem;}
-    .trips-intro-section h1 { font-size: 1.6rem; }
+    .trips-intro-section h1 {
+        font-size: 1.8rem; /* Ajustat */
+        margin-bottom: 1rem; /* Ajustat */
+    }
     .trips-intro-section p { font-size: 0.95rem; }
     .trip-card { padding: 1rem; margin-bottom: 1.5rem; }
     .trip-column-image img {
@@ -342,7 +400,11 @@ textarea.form-control {
         grid-template-columns: 1fr 1fr;
         gap: 0.5rem 0.75rem;
     }
-    .trip-wrapper-details-item h1 { font-size: 0.8rem; }
+    .trip-wrapper-details-item h1 {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #484848;
+    }
     .trip-wrapper-details-item p, .trip-guide-item p, .trip-guide-item p span { font-size: 0.85rem; }
     .trip-wrapper-description p { font-size: 0.85rem; }
     .trip-manager-buttons .btn {
@@ -353,7 +415,10 @@ textarea.form-control {
 }
 
 @media (max-width: 576px) {
-    .trips-intro-section h1 { font-size: 1.4rem; }
+    .trips-intro-section h1 {
+        font-size: 1.7rem; /* Ajustat */
+        margin-bottom: 1rem; /* Ajustat */
+    }
     .trips-intro-section p { font-size: 0.9rem; }
     .create-trip-button-container .btn {
         width: 100%;
@@ -379,6 +444,14 @@ textarea.form-control {
     }
     .trip-wrapper-details-item h1 {
         margin-bottom: 0.1rem;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #484848;
+    }
+    .trip-wrapper-details-item p {
+        font-size: 0.8rem;
+    }
+    .trip-guide-item p, .trip-guide-item p span {
         font-size: 0.8rem;
     }
     .trip-guide-item {
@@ -413,4 +486,12 @@ textarea.form-control {
         font-size: 0.85rem;
         margin: 0;
     }
+}
+
+@media (max-width: 480px) {
+    .trips-intro-section h1 {
+        font-size: 1.6rem;
+        margin-bottom: 0.75rem;
+    }
+    /* Poți adăuga aici și alte stiluri specifice pentru 480px dacă este necesar */
 }
