@@ -41,10 +41,10 @@ html {
 }
 .trips-intro-section h1 {
     font-size: 2.25rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem; /* Ajustat pentru consistență */
     color: #333;
-    font-weight: 700; /* Am presupus că vrei font-weight similar cu .page-main-title */
-    line-height: 1.2; /* Am presupus că vrei line-height similar cu .page-main-title */
+    font-weight: 700;
+    line-height: 1.2;
 }
 .trips-intro-section p {
     font-size: 1rem;
@@ -300,8 +300,8 @@ textarea.form-control {
         margin-right: auto;
     }
     .trips-intro-section h1 {
-        font-size: 2rem; /* Ajustat */
-        margin-bottom: 1.25rem; /* Ajustat */
+        font-size: 2rem;
+        margin-bottom: 1.25rem;
     }
     .trips-intro-section p { font-size: 1rem; }
     .create-trip-button-container {
@@ -382,8 +382,8 @@ textarea.form-control {
     }
     .trips-intro-section { margin-top: 2rem; margin-bottom: 1.5rem;}
     .trips-intro-section h1 {
-        font-size: 1.8rem; /* Ajustat */
-        margin-bottom: 1rem; /* Ajustat */
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
     }
     .trips-intro-section p { font-size: 0.95rem; }
     .trip-card { padding: 1rem; margin-bottom: 1.5rem; }
@@ -416,8 +416,8 @@ textarea.form-control {
 
 @media (max-width: 576px) {
     .trips-intro-section h1 {
-        font-size: 1.7rem; /* Ajustat */
-        margin-bottom: 1rem; /* Ajustat */
+        font-size: 1.7rem;
+        margin-bottom: 1rem;
     }
     .trips-intro-section p { font-size: 0.9rem; }
     .create-trip-button-container .btn {
@@ -487,11 +487,18 @@ textarea.form-control {
         margin: 0;
     }
 }
-
 @media (max-width: 480px) {
     .trips-intro-section h1 {
         font-size: 1.6rem;
         margin-bottom: 0.75rem;
     }
-    /* Poți adăuga aici și alte stiluri specifice pentru 480px dacă este necesar */
+}
+
+.trip-manager-buttons .btn-warning {
+    color: #fff !important; /* Adăugat !important pentru a suprascrie stilul Bootstrap implicit */
+}
+.trip-manager-buttons .btn-warning:hover,
+.trip-manager-buttons .btn-warning:focus,
+.trip-manager-buttons .btn-warning:active {
+    color: #fff !important; /* Asigurăm și pentru stările de hover/focus/active */
 }
