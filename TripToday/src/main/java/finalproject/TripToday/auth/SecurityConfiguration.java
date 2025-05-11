@@ -32,7 +32,8 @@ public class SecurityConfiguration {
         http    .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/css/**", "/js/**","/images/**", "/favicon.ico").permitAll()
-                        .requestMatchers("/","/home","/contact", "/guides", "/api/v2/**").permitAll()
+                        .requestMatchers("/","/home","/contact", "/guides").permitAll()
+                        // "/api/v2/**"
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(login -> login
