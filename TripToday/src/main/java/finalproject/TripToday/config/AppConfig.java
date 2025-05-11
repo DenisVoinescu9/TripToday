@@ -1,4 +1,4 @@
-package finalproject.TripToday.config; // Sau pachetul tău de configurare
+package finalproject.TripToday.config;
 
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
@@ -13,16 +13,13 @@ public class AppConfig {
     @Bean
     public RestTemplate restTemplate() {
 
-        // Create Apache HttpClient
 
         CloseableHttpClient httpClient = HttpClients.createDefault();
 
-        // Create Request Factory based on Apache HTTP Client
 
         HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
         requestFactory.setHttpClient(httpClient);
 
-        // Create the bean using the Request Factory
 
         return new RestTemplate(requestFactory);
     }

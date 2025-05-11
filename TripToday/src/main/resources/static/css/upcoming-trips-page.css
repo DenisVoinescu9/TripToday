@@ -19,16 +19,19 @@ html {
     max-width: 95%;
     box-sizing: border-box;
 }
+
 .alert-container .alert {
     margin-top: 0;
     margin-bottom: 1rem;
 }
+
 .trip-wrapper {
     width: 60rem;
     margin: 0 auto 2rem auto;
     max-width: 95%;
     box-sizing: border-box;
 }
+
 .trips-intro-section {
     width: 60rem;
     margin: 3rem auto 2rem auto;
@@ -39,13 +42,15 @@ html {
     max-width: 95%;
     box-sizing: border-box;
 }
+
 .trips-intro-section h1 {
     font-size: 2.25rem;
-    margin-bottom: 1.25rem; /* Ajustat pentru consistență */
+    margin-bottom: 1.25rem;
     color: #333;
     font-weight: 700;
     line-height: 1.2;
 }
+
 .trips-intro-section p {
     font-size: 1rem;
     color: #555;
@@ -53,6 +58,7 @@ html {
     overflow-wrap: break-word;
     word-wrap: break-word;
 }
+
 .trip-card {
     display: grid;
     grid-template-columns: 13rem 1fr;
@@ -67,10 +73,12 @@ html {
     animation: slideInFromBottom 0.6s ease-out forwards;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
 .trip-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
+
 .trip-card--manager {
     grid-template-columns: 13rem minmax(0, 1fr) 10rem;
 }
@@ -94,13 +102,16 @@ html {
     margin-top: 1rem;
     margin-bottom: 1.5rem;
 }
+
 .trip-toggle-buttons .btn {
     margin: 0 0.5rem;
 }
+
 .trip-toggle-buttons .btn.active {
     background-color: #007bff;
     color: white;
 }
+
 .trip-toggle-buttons .btn:not(.active) {
     background-color: #f8f9fa;
     color: #007bff;
@@ -115,11 +126,19 @@ html {
 }
 
 #upcoming-trips-section .trip-wrapper .trip-card:nth-of-type(1),
-#past-trips-section .trip-wrapper .trip-card:nth-of-type(1) { animation-delay: 0.2s; }
+#past-trips-section .trip-wrapper .trip-card:nth-of-type(1) {
+    animation-delay: 0.2s;
+}
+
 #upcoming-trips-section .trip-wrapper .trip-card:nth-of-type(2),
-#past-trips-section .trip-wrapper .trip-card:nth-of-type(2) { animation-delay: 0.3s; }
+#past-trips-section .trip-wrapper .trip-card:nth-of-type(2) {
+    animation-delay: 0.3s;
+}
+
 #upcoming-trips-section .trip-wrapper .trip-card:nth-of-type(3),
-#past-trips-section .trip-wrapper .trip-card:nth-of-type(3) { animation-delay: 0.4s; }
+#past-trips-section .trip-wrapper .trip-card:nth-of-type(3) {
+    animation-delay: 0.4s;
+}
 
 
 .trip-column-image {
@@ -130,6 +149,7 @@ html {
     align-self: start;
     min-width: 0;
 }
+
 .trip-column-image p {
     font-weight: bold;
     font-size: 1.1rem;
@@ -142,6 +162,7 @@ html {
     max-width: 100%;
     box-sizing: border-box;
 }
+
 .trip-column-image img {
     width: 160px;
     height: 120px;
@@ -149,45 +170,65 @@ html {
     border-radius: 12px;
     border: 2px solid #eee;
     flex-shrink: 0;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
     margin-bottom: 0.5rem;
 }
-.trip-details-wrapper { display: flex; flex-direction: column; min-width: 0;}
+
+.trip-details-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
 .trip-info-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr) 2fr;
     gap: 1rem;
     margin-bottom: 1rem;
 }
+
 .trip-wrapper-details-item {
     display: flex;
     flex-direction: column;
     min-width: 0;
 }
+
 .trip-wrapper-details-item h1 {
-    margin: 0; padding: 0.1rem 0; font-weight: bold; color: #555;
-    margin-bottom: 0.2rem; font-size: 0.9rem;
+    margin: 0;
+    padding: 0.1rem 0;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 0.2rem;
+    font-size: 0.9rem;
     line-height: 1.4;
     overflow-wrap: break-word;
     word-wrap: break-word;
 }
+
 .trip-wrapper-details-item p {
-    margin: 0; padding: 0.1rem 0; color: #333;
+    margin: 0;
+    padding: 0.1rem 0;
+    color: #333;
     font-size: 0.9rem;
-    line-height: 1.4; font-weight: normal;
+    line-height: 1.4;
+    font-weight: normal;
     overflow-wrap: break-word;
     word-wrap: break-word;
     white-space: normal;
 }
+
 .trip-guide-item {
     grid-column: 1 / -1;
 }
+
 .trip-guide-item p, .trip-guide-item p span {
     font-size: 0.85rem;
-    font-weight: normal; line-height: 1.4;
+    font-weight: normal;
+    line-height: 1.4;
     overflow-wrap: break-word;
     word-wrap: break-word;
 }
+
 .trip-wrapper-description {
     border-top: 1px solid #eee;
     padding-top: 1rem;
@@ -195,6 +236,7 @@ html {
     overflow-wrap: break-word;
     word-wrap: break-word;
 }
+
 .trip-wrapper-description p {
     margin: 0;
     font-size: 0.9rem;
@@ -202,6 +244,7 @@ html {
     line-height: 1.5;
     white-space: normal;
 }
+
 .trip-manager-buttons {
     display: flex;
     flex-direction: column;
@@ -209,15 +252,21 @@ html {
     align-items: center;
     gap: 0.75rem;
 }
+
 .trip-manager-buttons .btn {
     width: 8rem;
     max-width: 100%;
     font-size: 0.9rem;
 }
+
 .btn {
-    width: auto; border-radius: 8px; font-size: 0.9rem;
-    padding: 0.5rem 1rem; white-space: nowrap;
+    width: auto;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    white-space: nowrap;
 }
+
 .enroll-button {
     width: auto;
     align-self: center;
@@ -226,6 +275,7 @@ html {
     flex-shrink: 0;
     font-size: 0.9rem;
 }
+
 .enroll-button:disabled {
     background-color: #cccccc;
     border-color: #cccccc;
@@ -242,6 +292,7 @@ html {
     gap: 0.5rem;
     flex-wrap: wrap;
 }
+
 .pagination button,
 .pagination .current-page {
     background-color: #f5f5f5;
@@ -252,10 +303,12 @@ html {
     cursor: pointer;
     transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
 }
+
 .pagination button:hover {
     background-color: #e9ecef;
     border-color: #adb5bd;
 }
+
 .pagination .current-page {
     background-color: #ddd;
     font-weight: bold;
@@ -284,6 +337,7 @@ textarea.form-control {
     .trip-card--manager {
         grid-template-columns: 13rem minmax(0, 1fr) 9rem;
     }
+
     .trip-manager-buttons .btn {
         width: 7rem;
         font-size: 0.85rem;
@@ -299,34 +353,44 @@ textarea.form-control {
         margin-left: auto;
         margin-right: auto;
     }
+
     .trips-intro-section h1 {
         font-size: 2rem;
         margin-bottom: 1.25rem;
     }
-    .trips-intro-section p { font-size: 1rem; }
+
+    .trips-intro-section p {
+        font-size: 1rem;
+    }
+
     .create-trip-button-container {
         text-align: center;
     }
+
     .trip-card, .trip-card--manager {
         grid-template-columns: 1fr;
         gap: 1.5rem;
         padding: 1.25rem;
     }
+
     .trip-column-image {
         margin-bottom: 0.5rem;
         align-self: center;
     }
+
     .trip-column-image img {
         width: 200px;
         height: 150px;
         margin-bottom: 0.75rem;
     }
+
     .trip-column-image p {
         font-size: 1.2rem;
         margin-top: 0;
         margin-bottom: 0.75rem;
         padding: 0 5px;
     }
+
     .enroll-button {
         width: 60%;
         max-width: 200px;
@@ -334,21 +398,34 @@ textarea.form-control {
         margin-top: 0.5rem;
         font-size: 0.95rem;
     }
+
     .trip-info-grid {
         grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
         gap: 0.75rem 1rem;
     }
+
     .trip-guide-item {
         grid-column: 1 / -1;
     }
+
     .trip-wrapper-details-item h1 {
         font-size: 0.9rem;
         font-weight: 700;
         color: #484848;
     }
-    .trip-wrapper-details-item p, .trip-guide-item p, .trip-guide-item p span { font-size: 0.9rem; }
-    .trip-wrapper-description { margin-top: 0.5rem; padding-top: 0.75rem; }
-    .trip-wrapper-description p { font-size: 0.9rem; }
+
+    .trip-wrapper-details-item p, .trip-guide-item p, .trip-guide-item p span {
+        font-size: 0.9rem;
+    }
+
+    .trip-wrapper-description {
+        margin-top: 0.5rem;
+        padding-top: 0.75rem;
+    }
+
+    .trip-wrapper-description p {
+        font-size: 0.9rem;
+    }
 
     .trip-manager-buttons {
         flex-direction: row;
@@ -357,16 +434,19 @@ textarea.form-control {
         gap: 0.5rem;
         margin-top: 1rem;
     }
+
     .trip-manager-buttons .btn {
         width: auto;
         min-width: 120px;
         font-size: 0.9rem;
         padding: 0.5rem 1rem;
     }
+
     .pagination {
         margin-top: 1.5rem;
         gap: 0.3rem;
     }
+
     .pagination button, .pagination .current-page {
         padding: 0.3rem 0.6rem;
         font-size: 0.85rem;
@@ -380,33 +460,59 @@ textarea.form-control {
         padding-left: 10px;
         padding-right: 10px;
     }
-    .trips-intro-section { margin-top: 2rem; margin-bottom: 1.5rem;}
+
+    .trips-intro-section {
+        margin-top: 2rem;
+        margin-bottom: 1.5rem;
+    }
+
     .trips-intro-section h1 {
         font-size: 1.8rem;
         margin-bottom: 1rem;
     }
-    .trips-intro-section p { font-size: 0.95rem; }
-    .trip-card { padding: 1rem; margin-bottom: 1.5rem; }
+
+    .trips-intro-section p {
+        font-size: 0.95rem;
+    }
+
+    .trip-card {
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
     .trip-column-image img {
         width: 180px;
         height: 135px;
     }
-    .trip-column-image p { font-size: 1.1rem; }
+
+    .trip-column-image p {
+        font-size: 1.1rem;
+    }
+
     .enroll-button {
         width: 70%;
         font-size: 0.9rem;
     }
+
     .trip-info-grid {
         grid-template-columns: 1fr 1fr;
         gap: 0.5rem 0.75rem;
     }
+
     .trip-wrapper-details-item h1 {
         font-size: 0.85rem;
         font-weight: 700;
         color: #484848;
     }
-    .trip-wrapper-details-item p, .trip-guide-item p, .trip-guide-item p span { font-size: 0.85rem; }
-    .trip-wrapper-description p { font-size: 0.85rem; }
+
+    .trip-wrapper-details-item p, .trip-guide-item p, .trip-guide-item p span {
+        font-size: 0.85rem;
+    }
+
+    .trip-wrapper-description p {
+        font-size: 0.85rem;
+    }
+
     .trip-manager-buttons .btn {
         min-width: 100px;
         font-size: 0.8rem;
@@ -419,53 +525,72 @@ textarea.form-control {
         font-size: 1.7rem;
         margin-bottom: 1rem;
     }
-    .trips-intro-section p { font-size: 0.9rem; }
+
+    .trips-intro-section p {
+        font-size: 0.9rem;
+    }
+
     .create-trip-button-container .btn {
         width: 100%;
         font-size: 0.9rem;
     }
+
     .trip-card {
         grid-template-columns: 1fr;
     }
+
     .trip-column-image img {
         width: 150px;
         height: 112px;
     }
-    .trip-column-image p { font-size: 1rem; }
+
+    .trip-column-image p {
+        font-size: 1rem;
+    }
+
     .enroll-button {
         width: 100%;
         font-size: 0.9rem;
     }
+
     .trip-info-grid {
         grid-template-columns: 1fr;
     }
+
     .trip-wrapper-details-item {
         text-align: center;
     }
+
     .trip-wrapper-details-item h1 {
         margin-bottom: 0.1rem;
         font-size: 0.85rem;
         font-weight: 700;
         color: #484848;
     }
+
     .trip-wrapper-details-item p {
         font-size: 0.8rem;
     }
+
     .trip-guide-item p, .trip-guide-item p span {
         font-size: 0.8rem;
     }
+
     .trip-guide-item {
         grid-column: 1 / -1;
     }
+
     .trip-manager-buttons {
         flex-direction: column;
         align-items: stretch;
     }
+
     .trip-manager-buttons .btn {
         width: 100%;
         margin-bottom: 0.5rem;
         font-size: 0.85rem;
     }
+
     .trip-manager-buttons .btn:last-child {
         margin-bottom: 0;
     }
@@ -479,6 +604,7 @@ textarea.form-control {
         gap: 0.3rem;
         margin-top: 1.5rem;
     }
+
     .pagination a button,
     .pagination span.current-page {
         width: auto;
@@ -487,6 +613,7 @@ textarea.form-control {
         margin: 0;
     }
 }
+
 @media (max-width: 480px) {
     .trips-intro-section h1 {
         font-size: 1.6rem;
@@ -495,10 +622,11 @@ textarea.form-control {
 }
 
 .trip-manager-buttons .btn-warning {
-    color: #fff !important; /* Adăugat !important pentru a suprascrie stilul Bootstrap implicit */
+    color: #fff !important;
 }
+
 .trip-manager-buttons .btn-warning:hover,
 .trip-manager-buttons .btn-warning:focus,
 .trip-manager-buttons .btn-warning:active {
-    color: #fff !important; /* Asigurăm și pentru stările de hover/focus/active */
+    color: #fff !important;
 }

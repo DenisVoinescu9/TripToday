@@ -17,7 +17,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -52,7 +51,7 @@ public class UpcomingTripsController {
                         @RequestParam(name = "pa_page", defaultValue = "0") int pastPageParam,
                         Model model, @AuthenticationPrincipal OidcUser principal) {
 
-        Map<String, Object> userClaims = null;
+        Map<String, Object> userClaims;
         boolean isUserManager = false;
 
         if (principal != null) {
@@ -128,12 +127,11 @@ public class UpcomingTripsController {
         model.addAttribute("labelHotel", "Hotel");
         model.addAttribute("textNoGuideAssigned", "No guide assigned");
         model.addAttribute("buttonEnroll", "Enroll");
-        model.addAttribute("buttonFull", "Full");
+        model.addAttribute("buttonFull", "No available spots");
         model.addAttribute("buttonViewTravelers", "View travelers");
         model.addAttribute("buttonEdit", "Edit trip");
         model.addAttribute("buttonCancelTrip", "Cancel trip");
         model.addAttribute("buttonCreateTrip", "Create trip");
-        model.addAttribute("messageNoTrips", "No trips available at the moment.");
         model.addAttribute("unitDays", "days");
         model.addAttribute("unitSpots", "spots");
         model.addAttribute("unitCurrency", "RON");
@@ -141,18 +139,18 @@ public class UpcomingTripsController {
         model.addAttribute("paginationPreviousSymbol", "\u2190");
         model.addAttribute("paginationNextSymbol", "\u2192");
         model.addAttribute("tripCanceledMessageGeneric", "This trip was canceled.");
-        model.addAttribute("buttonUpcomingTrips", "Upcoming Trips");
-        model.addAttribute("buttonPastTrips", "Past Trips");
-        model.addAttribute("titleUpcomingTrips", "Upcoming Trips");
-        model.addAttribute("titlePastTrips", "Past Trips");
-        model.addAttribute("messageNoUpcomingTrips", "No upcoming trips available at the moment.");
+        model.addAttribute("buttonUpcomingTrips", "Upcoming trips");
+        model.addAttribute("buttonPastTrips", "Past trips");
+        model.addAttribute("titleUpcomingTrips", "Upcoming trips");
+        model.addAttribute("titlePastTrips", "Past trips");
+        model.addAttribute("messageNoUpcomingTrips", "There are no upcoming trips at the moment.");
         model.addAttribute("messageNoPastTrips", "No past trips found.");
 
         return "upcoming-trips-page";
     }
 
     @PostMapping("/create-trip")
-    public String createTrip(@ModelAttribute Trip trip, Model model, RedirectAttributes redirectAttributes) {
+    public String createTrip(@ModelAttribute Trip trip, RedirectAttributes redirectAttributes) {
         try {
             tripService.createTrip(trip);
             redirectAttributes.addFlashAttribute("successMessage", "Trip successfully created!");

@@ -39,20 +39,18 @@ public class SecurityConfiguration {
                  .defaultSuccessUrl("/", true)
         )
 
-                // Set logout handler
 
                 .logout(logout -> logout
                         .addLogoutHandler(logoutHandler()));
         return http.build();
     }
 
-    // Configure logout handler
 
     private LogoutHandler logoutHandler() {
         return (request, response, authentication) -> {
             try {
                 String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
-                response.sendRedirect(AUTH0_ISSUER + "v2/logout?client_id=" + AUTH0_CLIENT_ID + "&returnTo=" + baseUrl);
+                response.sendRedirect(AUTH0_ISSUER + "v2/logout?client_id=" + AUTH0_CLIENT_ID);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

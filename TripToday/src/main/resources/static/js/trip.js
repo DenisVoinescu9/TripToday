@@ -71,7 +71,7 @@ function validateFormField(fieldElement) {
 function validateForm(formElement) {
     const form = $(formElement);
     let isFormValid = true;
-    form.find('input, select, textarea').filter('[required]').each(function() {
+    form.find('input, select, textarea').filter('[required]').each(function () {
         if (this.id !== 'addDurationDays' && this.id !== 'editDurationDays') {
             validateFormField(this);
             if ($(this).hasClass('is-invalid')) isFormValid = false;
@@ -145,7 +145,7 @@ function openEditTripModal(button) {
         }
     }
 
-    const availableSpots = availableSpotsRaw.replace(/\D/g,'');
+    const availableSpots = availableSpotsRaw.replace(/\D/g, '');
     const registrationFee = registrationFeeRaw.replace(/[^\d.-]/g, '');
     const hotelName = (hotelNameText === 'No guide assigned' || hotelNameText === 'Not specified') ? '' : hotelNameText;
 
@@ -247,7 +247,9 @@ function openViewTravelersModal(buttonElement) {
 
                     const spanName = document.createElement('span');
                     let nameOrEmail = traveler.name || traveler.email || '';
-                    if (!nameOrEmail) { nameOrEmail = '(No name/email available)'; }
+                    if (!nameOrEmail) {
+                        nameOrEmail = '(No name/email available)';
+                    }
                     spanName.textContent = nameOrEmail;
                     spanName.style.display = 'block';
                     spanName.style.fontSize = '0.9em';
@@ -272,9 +274,9 @@ function openViewTravelersModal(buttonElement) {
 }
 
 
-$(document).ready(function() {
+$(document).ready(function () {
 
-    $('.enroll-button').each(function() {
+    $('.enroll-button').each(function () {
         const button = $(this);
         const spots = parseInt(button.data('spots'), 10);
         const isGuide = button.data('is-guide') === true || button.data('is-guide') === 'true';
@@ -288,10 +290,7 @@ $(document).ready(function() {
 
         if (popoverContent) {
             button.popover({
-                content: popoverContent,
-                trigger: 'hover focus',
-                placement: 'top',
-                container: 'body'
+                content: popoverContent, trigger: 'hover focus', placement: 'top', container: 'body'
             });
         } else {
             if (button.data('bs.popover')) {
@@ -300,7 +299,7 @@ $(document).ready(function() {
         }
     });
 
-    $('.enroll-button').on('click', function(event) {
+    $('.enroll-button').on('click', function (event) {
         const button = $(this);
         const spots = parseInt(button.data('spots'), 10);
         const isGuide = button.data('is-guide') === true || button.data('is-guide') === 'true';
@@ -318,16 +317,15 @@ $(document).ready(function() {
             if (!button.data('bs.popover') || button.data('bs.popover').config.trigger !== 'manual') {
                 if (button.data('bs.popover')) button.popover('dispose');
                 button.popover({
-                    content: popoverMessage,
-                    trigger: 'manual',
-                    placement: 'top',
-                    container: 'body'
+                    content: popoverMessage, trigger: 'manual', placement: 'top', container: 'body'
                 });
             } else {
                 button.data('bs.popover').config.content = popoverMessage;
             }
             button.popover('show');
-            setTimeout(function() { button.popover('hide'); }, 2500);
+            setTimeout(function () {
+                button.popover('hide');
+            }, 2500);
             return;
         }
 
@@ -353,7 +351,7 @@ $(document).ready(function() {
         });
     });
 
-    $('#addTripForm').find('input[required], select[required], textarea[required]').on('blur', function() {
+    $('#addTripForm').find('input[required], select[required], textarea[required]').on('blur', function () {
         if (this.id !== 'addDurationDays') {
             validateFormField(this);
         }
@@ -367,7 +365,7 @@ $(document).ready(function() {
         }
     });
 
-    $('#editTripForm').find('input[required], select[required], textarea[required]').on('blur', function() {
+    $('#editTripForm').find('input[required], select[required], textarea[required]').on('blur', function () {
         if (this.id !== 'editDurationDays') {
             validateFormField(this);
         }
@@ -381,9 +379,11 @@ $(document).ready(function() {
         }
     });
 
-    $('#enrollForm').find('input[required]').on('blur', function() { validateFormField(this); });
+    $('#enrollForm').find('input[required]').on('blur', function () {
+        validateFormField(this);
+    });
 
-    $('#enrollForm input[name="expirationDate"]').on('input', function(e) {
+    $('#enrollForm input[name="expirationDate"]').on('input', function (e) {
         var input = $(this), value = input.val(), digits = value.replace(/\D/g, ''), formattedValue = digits;
         if (digits.length > 2) {
             formattedValue = digits.substring(0, 2) + '/' + digits.substring(2, 4);
@@ -393,7 +393,7 @@ $(document).ready(function() {
         input.val(formattedValue);
     });
 
-    $('#addDepartureDate, #addReturnDate').on('input change', function() {
+    $('#addDepartureDate, #addReturnDate').on('input change', function () {
         const departureDateVal = $('#addDepartureDate').val();
         if (this.id === 'addDepartureDate' && departureDateVal && this.checkValidity()) {
             $('#addReturnDate').attr('min', departureDateVal);
@@ -402,7 +402,7 @@ $(document).ready(function() {
         calculateAndUpdateDuration('#addDepartureDate', '#addReturnDate', '#addDurationDays');
     });
 
-    $('#editDepartureDate, #editReturnDate').on('input change', function() {
+    $('#editDepartureDate, #editReturnDate').on('input change', function () {
         const departureDateVal = $('#editDepartureDate').val();
         if (this.id === 'editDepartureDate' && departureDateVal && this.checkValidity()) {
             $('#editReturnDate').attr('min', departureDateVal);
@@ -411,7 +411,7 @@ $(document).ready(function() {
         calculateAndUpdateDuration('#editDepartureDate', '#editReturnDate', '#editDurationDays');
     });
 
-    $('.needs-validation').submit(function(event) {
+    $('.needs-validation').submit(function (event) {
         const form = this;
         const isValid = validateForm(form);
         if (!isValid) {
@@ -454,7 +454,7 @@ $(document).ready(function() {
         if (pastPageParam !== null) {
             shouldShowPast = true;
             if (upcomingPageParam !== null && upcomingPageParam !== '0') {
-                if(urlParams.has('page') && !urlParams.has('pa_page_navigated_explicitly')){
+                if (urlParams.has('page') && !urlParams.has('pa_page_navigated_explicitly')) {
                     shouldShowPast = false;
                 }
             }

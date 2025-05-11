@@ -16,10 +16,9 @@ import java.util.stream.Collectors; // Import Collectors
 public class UserTripController {
 
     private final UserTripService userTripService;
-    private final Auth0Service auth0Service; // Inject Auth0Service
+    private final Auth0Service auth0Service;
 
-    // Updated constructor to inject Auth0Service
-    public UserTripController(UserTripService userTripService, Auth0Service auth0Service) {
+     public UserTripController(UserTripService userTripService, Auth0Service auth0Service) {
         this.userTripService = userTripService;
         this.auth0Service = auth0Service;
     }
@@ -32,11 +31,10 @@ public class UserTripController {
 
     @GetMapping
     public List<UserTrip> getAllUserTrips() {
-        // This endpoint remains unchanged, returns basic UserTrip data
-        return userTripService.getAllUserTrips();
+         return userTripService.getAllUserTrips();
     }
 
-    @GetMapping("/trip/{id}/details") // Changed path slightly to avoid conflict and indicate details
+    @GetMapping("/trip/{id}/details")
     public List<Map<String, Object>> getTravelerDetailsByTripId(@PathVariable Integer id) {
         List<UserTrip> userTrips = userTripService.getAllUserTripsByTripId(id);
 

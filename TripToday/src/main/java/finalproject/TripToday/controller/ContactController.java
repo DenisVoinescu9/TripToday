@@ -10,33 +10,28 @@ import java.util.Map;
 public class ContactController {
 
     @GetMapping("/contact")
-    public String contact(Model model) { // Renamed from 'about' to 'contact' for clarity
+    public String contact(Model model) {
 
-        // Page structure texts
-        String pageTitle = "Contact us | TripToday"; // For <title> tag
-        String pageMainHeader = "Contact us";       // For the main H1
+         String pageTitle = "Contact us | TripToday";
+        String pageMainHeader = "Contact us";
 
-        // Section: "We value your feedback" (previously mainHeading)
-        String feedbackSectionHeading = "We value your feedback";
+         String feedbackSectionHeading = "We value your feedback";
         String feedbackSectionParagraph = "At TripToday, your satisfaction is paramount. To ensure the best possible experience, we encourage you to contact us with any inquiries or requests. We're dedicated to making your adventure seamless and enjoyable.";
-        String feedbackImageAltText = "Feedback concept image"; // More generic alt
-        String feedbackImageUrl = "/images/your-experience-text.png"; // Assuming you have this image
+        String feedbackImageAltText = "Feedback concept image";
+        String feedbackImageUrl = "/images/your-experience-text.png";
 
-        // Contact details data
-        String contactEmail = "support@triptoday.com";
+         String contactEmail = "support@triptoday.com";
         String contactPhone = "+40 770 123 987";
         String contactAddress = "Nicolae Balcescu Street, No. 114, Brasov, 500019, Romania";
-        String contactHours = "09:00 - 17:00 (Monday - Friday)"; // Adjusted format slightly
+        String contactHours = "09:00 - 17:00 (Monday - Friday)";
 
-        // FAQ section texts
-        String faqSectionTitle = "Frequently Asked Questions";
+         String faqSectionTitle = "Frequently Asked Questions";
         String noFaqsText = "No FAQs available at the moment.";
 
-        // Add to model
-        model.addAttribute("pageTitle", pageTitle);
-        model.addAttribute("pageMainHeader", pageMainHeader); // New attribute for H1
+         model.addAttribute("pageTitle", pageTitle);
+        model.addAttribute("pageMainHeader", pageMainHeader);
 
-        model.addAttribute("heading", feedbackSectionHeading); // Kept 'heading' for existing section
+        model.addAttribute("heading", feedbackSectionHeading);
         model.addAttribute("paragraph", feedbackSectionParagraph);
         model.addAttribute("imageAlt", feedbackImageAltText);
         model.addAttribute("imageUrl", feedbackImageUrl);

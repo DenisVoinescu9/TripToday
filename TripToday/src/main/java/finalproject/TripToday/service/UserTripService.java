@@ -2,11 +2,9 @@ package finalproject.TripToday.service;
 
 import finalproject.TripToday.entity.UserTrip;
 import finalproject.TripToday.repository.UserTripRepository;
-// import org.apache.catalina.User; // Unused import
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
-import java.util.Collections; // Import needed for emptyList
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +19,6 @@ public class UserTripService {
 
 
     public boolean isUserEnrolled(String userId, Integer tripId) {
-        // Foloseste repository-ul pentru a verifica existenta inregistrarii
         return userTripRepository.existsByUserIdAndTripId(userId, tripId);
     }
 

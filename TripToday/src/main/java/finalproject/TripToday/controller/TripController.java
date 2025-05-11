@@ -11,74 +11,53 @@ import org.springframework.web.bind.annotation.*;   // For request mapping
 import java.util.List;                            // For lists
 import java.util.Optional;                        // For optional results
 
-@Controller                                       // Spring MVC Controller
-@RequestMapping("/api/v2/trips")                // Base API path
+@Controller
+@RequestMapping("/api/v2/trips")
 public class TripController {
 
-    // Declare TripService
-    private final TripService tripService;
+     private final TripService tripService;
 
-    @Autowired                                    // Inject TripService
+    @Autowired
     public TripController(TripService tripService) {
-        // Initialize TripService
-        this.tripService = tripService;
+         this.tripService = tripService;
     }
 
-    // Create a new trip
-    @PostMapping
-    public ResponseEntity<Trip> createTrip(@RequestBody Trip trip) { // Trip from request body
-        // Call service to create
-        Trip createdTrip = tripService.createTrip(trip);
-        // Return created, 201 status
-        return new ResponseEntity<>(createdTrip, HttpStatus.CREATED);
+     @PostMapping
+    public ResponseEntity<Trip> createTrip(@RequestBody Trip trip) {
+         Trip createdTrip = tripService.createTrip(trip);
+         return new ResponseEntity<>(createdTrip, HttpStatus.CREATED);
     }
 
-    // Get all trips
-    @GetMapping
+     @GetMapping
     public ResponseEntity<List<Trip>> getAllTrips() {
-        // Call service for all
-        List<Trip> trips = tripService.getAllTrips();
-        // Return list, 200 status
-        return new ResponseEntity<>(trips, HttpStatus.OK);
+         List<Trip> trips = tripService.getAllTrips();
+         return new ResponseEntity<>(trips, HttpStatus.OK);
     }
 
-    // Get trip by ID
-    @GetMapping("/{id}")
-    public ResponseEntity<Trip> getTripById(@PathVariable Integer id) { // ID from path
-        // Call service by ID
-        Optional<Trip> trip = tripService.getTripById(id);
-        // Map result to response
-        return trip.map(value -> new ResponseEntity<>(value, HttpStatus.OK)) // Found: return trip, 200
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));   // Else: return 404
+     @GetMapping("/{id}")
+    public ResponseEntity<Trip> getTripById(@PathVariable Integer id) {
+         Optional<Trip> trip = tripService.getTripById(id);
+         return trip.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    // Update existing trip
-    @PutMapping("/{id}")
-    public ResponseEntity<Trip> updateTrip(@PathVariable Integer id, @RequestBody Trip tripDetails) { // ID and trip data
-        // Call service to update
-        Trip updatedTrip = tripService.updateTrip(id, tripDetails);
-        // Check update result
-        if (updatedTrip != null) {
-            // Success: return updated, 200
-            return new ResponseEntity<>(updatedTrip, HttpStatus.OK);
+     @PutMapping("/{id}")
+    public ResponseEntity<Trip> updateTrip(@PathVariable Integer id, @RequestBody Trip tripDetails) {
+         Trip updatedTrip = tripService.updateTrip(id, tripDetails);
+         if (updatedTrip != null) {
+             return new ResponseEntity<>(updatedTrip, HttpStatus.OK);
         } else {
-            // Fail: return 404
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-    // Delete trip by ID
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTrip(@PathVariable Integer id) { // ID from path
-        // Call service to delete
-        boolean success = tripService.deleteTrip(id);
-        // Check delete result
-        if (success) {
-            // Success: return 200 (OK)
-            return new ResponseEntity<>(HttpStatus.OK);
+     @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTrip(@PathVariable Integer id) {
+         boolean success = tripService.deleteTrip(id);
+         if (success) {
+             return new ResponseEntity<>(HttpStatus.OK);
         } else {
-            // Fail: return 404
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 }
