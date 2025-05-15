@@ -2,26 +2,27 @@ package finalproject.TripToday.service;
 
 import finalproject.TripToday.entity.UserTrip;
 import finalproject.TripToday.repository.UserTripRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserTripService {
 
     private final UserTripRepository userTripRepository;
+    private final Auth0Service auth0Service;
 
-    public UserTripService(UserTripRepository userTripRepository) {
+    @Autowired
+    public UserTripService(UserTripRepository userTripRepository, Auth0Service auth0Service) {
         this.userTripRepository = userTripRepository;
+        this.auth0Service = auth0Service;
     }
-
 
     public boolean isUserEnrolled(String userId, Integer tripId) {
         return userTripRepository.existsByUserIdAndTripId(userId, tripId);
     }
-
 
     public UserTrip createUserTrip(UserTrip userTrip) {
         return userTripRepository.save(userTrip);
@@ -60,5 +61,15 @@ public class UserTripService {
             return true;
         }
         return false;
+    }
+
+    public List<Map<String, Object>> getTravelerDetailsForTrip(Integer tripId) {
+        List<UserTrip> userTrips = this.getAllUserTripsByTripId(tripId);
+        return userTrips.stream()
+                .map(UserTrip::getUserId)
+                .filter(userId -> userId != null && !userId.trim().isEmpty())
+                .map(auth0Service::getUserDetails)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 }

@@ -1,78 +1,74 @@
 package finalproject.TripToday.controller;
 
 import finalproject.TripToday.entity.UserTrip;
-import finalproject.TripToday.service.Auth0Service; // Import Auth0Service
 import finalproject.TripToday.service.UserTripService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Map; // Import Map
-import java.util.stream.Collectors; // Import Collectors
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v2/user-trips")
 public class UserTripController {
 
     private final UserTripService userTripService;
-    private final Auth0Service auth0Service;
 
-     public UserTripController(UserTripService userTripService, Auth0Service auth0Service) {
+    @Autowired
+    public UserTripController(UserTripService userTripService) {
         this.userTripService = userTripService;
-        this.auth0Service = auth0Service;
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public UserTrip createUserTrip(@RequestBody UserTrip userTrip) {
-        return userTripService.createUserTrip(userTrip);
+    public ResponseEntity<UserTrip> createUserTrip(@RequestBody UserTrip userTrip) {
+        UserTrip createdUserTrip = userTripService.createUserTrip(userTrip);
+        return new ResponseEntity<>(createdUserTrip, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public List<UserTrip> getAllUserTrips() {
-         return userTripService.getAllUserTrips();
+    public ResponseEntity<List<UserTrip>> getAllUserTrips() {
+        List<UserTrip> userTrips = userTripService.getAllUserTrips();
+        return new ResponseEntity<>(userTrips, HttpStatus.OK);
     }
 
     @GetMapping("/trip/{id}/details")
-    public List<Map<String, Object>> getTravelerDetailsByTripId(@PathVariable Integer id) {
-        List<UserTrip> userTrips = userTripService.getAllUserTripsByTripId(id);
-
-
-        return userTrips.stream()
-                .map(UserTrip::getUserId)
-                .filter(userId -> userId != null && !userId.trim().isEmpty())
-                .map(auth0Service::getUserDetails)
-                .collect(Collectors.toList());
+    public ResponseEntity<List<Map<String, Object>>> getTravelerDetailsByTripId(@PathVariable Integer id) {
+        List<Map<String, Object>> travelerDetails = userTripService.getTravelerDetailsForTrip(id);
+        return new ResponseEntity<>(travelerDetails, HttpStatus.OK);
     }
 
     @GetMapping("/trip/{id}")
-    public List<UserTrip> getAllUserTripsByTripId(@PathVariable Integer id) {
-        return userTripService.getAllUserTripsByTripId(id);
+    public ResponseEntity<List<UserTrip>> getAllUserTripsByTripId(@PathVariable Integer id) {
+        List<UserTrip> userTrips = userTripService.getAllUserTripsByTripId(id);
+        return new ResponseEntity<>(userTrips, HttpStatus.OK);
     }
 
-
     @GetMapping("/{id}")
-    public UserTrip getUserTripById(@PathVariable Integer id) {
-        return userTripService.getUserTripById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "UserTrip not found with id: " + id));
+    public ResponseEntity<UserTrip> getUserTripById(@PathVariable Integer id) {
+        Optional<UserTrip> userTrip = userTripService.getUserTripById(id);
+        return userTrip.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PutMapping("/{id}")
-    public UserTrip updateUserTrip(@PathVariable Integer id, @RequestBody UserTrip userTripDetails) {
+    public ResponseEntity<UserTrip> updateUserTrip(@PathVariable Integer id, @RequestBody UserTrip userTripDetails) {
         UserTrip updatedUserTrip = userTripService.updateUserTrip(id, userTripDetails);
-        if (updatedUserTrip == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "UserTrip not found with id: " + id + " for update");
+        if (updatedUserTrip != null) {
+            return new ResponseEntity<>(updatedUserTrip, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return updatedUserTrip;
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUserTrip(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteUserTrip(@PathVariable Integer id) {
         boolean deleted = userTripService.deleteUserTrip(id);
-        if (!deleted) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "UserTrip not found with id: " + id + " for deletion");
+        if (deleted) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 }

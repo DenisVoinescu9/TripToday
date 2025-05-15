@@ -11,8 +11,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
@@ -23,26 +21,23 @@ public class SecurityConfiguration {
     private String AUTH0_CLIENT_ID;
 
 
-
     @Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
 
-        // Configure paths based on authentication status
 
-        http    .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/css/**", "/js/**","/images/**", "/favicon.ico").permitAll()
-                        .requestMatchers("/","/home","/contact", "/guides").permitAll()
-                        // "/api/v2/**"
-                        .anyRequest().authenticated()
-                )
-                .oauth2Login(login -> login
-                 .defaultSuccessUrl("/", true)
-        )
+        http.csrf(csrf -> csrf.disable()).authorizeHttpRequests(
+                        authorize ->
+                                authorize.
+                                        requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico")
+                                        .permitAll()
+                                        .requestMatchers("/", "/home", "/contact", "/guides")
+                                        .permitAll()
+                                        .anyRequest()
+                                        .authenticated())
+                .oauth2Login(login -> login.defaultSuccessUrl("/", true))
 
 
-                .logout(logout -> logout
-                        .addLogoutHandler(logoutHandler()));
+                .logout(logout -> logout.addLogoutHandler(logoutHandler()));
         return http.build();
     }
 

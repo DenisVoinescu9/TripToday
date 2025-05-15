@@ -130,9 +130,10 @@
     line-height: 1.5;
     text-align: center;
     overflow-wrap: break-word;
-    white-space: pre-wrap;
+    word-break: normal;
+    white-space: pre-line;
+    hyphens: auto;
     max-width: 100%;
-    word-break: break-all;
     margin-bottom: 0;
 }
 

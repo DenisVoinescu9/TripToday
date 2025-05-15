@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+>
 <head>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>Home | TripToday</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" th:href="@{css/main.css}"/>
-    <link rel="stylesheet" type="text/css" th:href="@{css/header.css}"/>
-    <link rel="stylesheet" type="text/css" th:href="@{css/home-page.css}"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link rel="stylesheet" th:href="@{css/main.css}" type="text/css"/>
+    <link rel="stylesheet" th:href="@{css/header.css}" type="text/css"/>
+    <link rel="stylesheet" th:href="@{css/home-page.css}" type="text/css"/>
 </head>
 
 <body>
@@ -20,7 +20,7 @@
             <p class="about-us-container-text__paragraph" th:text="${aboutUsParagraph}"></p>
         </div>
         <div class="about-us-container-image slide-in-right">
-            <img class="about-us-container-image__picture" th:src="@{${aboutUsImageSrc}}" th:alt="${aboutUsImageAlt}">
+            <img class="about-us-container-image__picture" th:alt="${aboutUsImageAlt}" th:src="@{${aboutUsImageSrc}}">
         </div>
     </div>
     <div class="our-travelers-wrapper">
@@ -30,8 +30,8 @@
         <div class="our-travelers-body">
             <div class="our-travelers-body__card slide-in-bottom" th:each="testimonial, iterStat : ${testimonials}"
                  th:style="${'animation-delay: ' + (0.4 + iterStat.index * 0.2) + 's'}">
-                <img class="our-travelers-body__card__image" th:src="@{${testimonial.imageSrc}}"
-                     th:alt="${testimonial.imageAlt}">
+                <img class="our-travelers-body__card__image" th:alt="${testimonial.imageAlt}"
+                     th:src="@{${testimonial.imageSrc}}">
                 <p class="our-travelers-body__card__body" th:text="${testimonial.body}"></p>
             </div>
         </div>

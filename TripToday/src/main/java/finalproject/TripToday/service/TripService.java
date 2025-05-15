@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TripService {
@@ -90,7 +91,7 @@ public class TripService {
         return tripRepository.findPastTrips(LocalDate.now());
     }
 
-    @Transactional // DB transaction
+    @Transactional
     public boolean deleteTrip(Integer id) {
         Optional<Trip> optionalTrip = tripRepository.findById(id);
         if (optionalTrip.isPresent()) {
@@ -100,5 +101,70 @@ public class TripService {
             return true;
         }
         return false;
+    }
+
+    public Map<String, Object> getPaginatedFilteredUpcomingTrips(int pageParam, int pageSize) {
+        List<Trip> allUpcomingTripsFiltered = getUpcomingTrips().stream()
+                .filter(trip -> trip.getCanceled() != null && !trip.getCanceled())
+                .collect(Collectors.toList());
+        return getPaginatedTrips(allUpcomingTripsFiltered, pageParam, pageSize);
+    }
+
+    public Map<String, Object> getPaginatedFilteredPastTrips(int pageParam, int pageSize) {
+        List<Trip> allPastTripsFiltered = getPastTrips().stream()
+                .filter(trip -> trip.getCanceled() != null && !trip.getCanceled())
+                .collect(Collectors.toList());
+        return getPaginatedTrips(allPastTripsFiltered, pageParam, pageSize);
+    }
+
+    private Map<String, Object> getPaginatedTrips(List<Trip> trips, int pageParam, int pageSize) {
+        Map<String, Object> result = new HashMap<>();
+        int totalPages = (int) Math.ceil((double) trips.size() / pageSize);
+        int currentPage = pageParam;
+        if (currentPage < 0) currentPage = 0;
+        if (currentPage >= totalPages) {
+            currentPage = totalPages > 0 ? totalPages - 1 : 0;
+        }
+
+        int fromIndex = currentPage * pageSize;
+        int toIndex = Math.min(fromIndex + pageSize, trips.size());
+        List<Trip> pageTrips = trips.isEmpty() ? Collections.emptyList() : trips.subList(fromIndex, toIndex);
+
+        result.put("trips", pageTrips);
+        result.put("currentPage", currentPage);
+        result.put("totalPages", totalPages);
+        return result;
+    }
+
+    @Transactional
+    public String enrollUserInTrip(String userId, Integer tripId) {
+        Optional<Trip> optionalTrip = getTripById(tripId);
+        if (optionalTrip.isEmpty()) {
+            return "Trip not found.";
+        }
+        Trip trip = optionalTrip.get();
+        if (trip.getCanceled() != null && trip.getCanceled()) {
+            return "This trip has been canceled.";
+        }
+        if (trip.getAvailableSpots() <= 0) {
+            return "Sorry, this trip is full.";
+        }
+        String guideIdAsString = (trip.getGuideId() != null) ? String.valueOf(trip.getGuideId()) : null;
+        if (userId.equals(guideIdAsString)) {
+            return "You cannot enroll in a trip you are guiding.";
+        }
+        if (userTripService.isUserEnrolled(userId, tripId)) {
+            return "You are already enrolled in this trip.";
+        }
+
+        UserTrip userTrip = new UserTrip();
+        userTrip.setUserId(userId);
+        userTrip.setTripId(tripId);
+        userTripService.createUserTrip(userTrip);
+
+        trip.setAvailableSpots(trip.getAvailableSpots() - 1);
+        tripRepository.save(trip);
+
+        return "SUCCESS";
     }
 }

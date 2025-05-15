@@ -5,11 +5,11 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException; // Import needed
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -28,10 +28,9 @@ public class Auth0Service {
     private final String rolesApiBaseUrl;
 
     private final RestTemplate restTemplate;
-
+    private final Object apiTokenLock = new Object();
     private volatile String cachedApiToken = null;
     private volatile Instant apiTokenExpiryTime = Instant.MIN;
-    private final Object apiTokenLock = new Object();
 
     public Auth0Service(RestTemplateBuilder builder, @Value("${AUTH0_CLIENT_ID}") String clientId, @Value("${AUTH0_CLIENT_SECRET}") String clientSecret, @Value("${AUTH0_AUDIENCE}") String audience, @Value("${AUTH0_ISSUER}") String issuerUrl, @Value("${AUTH0_ROLE_GUIDE_ID}") String guideRoleId) {
         this.restTemplate = builder.build();
@@ -160,6 +159,47 @@ public class Auth0Service {
         return defaultResult;
     }
 
+    public Map<String, Object> getPagedGuidesWithDescriptions(int page) {
+        final int pageSize = 4;
+        List<Map<String, String>> guidesForView = new ArrayList<>();
+        List<Map<String, String>> initialGuides = getAllGuides();
+
+        for (Map<String, String> guide : initialGuides) {
+            String guideId = guide.get("id");
+            if (guideId != null && !guideId.isEmpty()) {
+                String description = getGuideDescription(guideId);
+                guide.put("description", description == null || description.isEmpty() ? "The guide has no description yet." : description);
+                guidesForView.add(guide);
+            }
+        }
+
+        int totalGuides = guidesForView.size();
+        int totalPages = (int) Math.ceil((double) totalGuides / pageSize);
+
+        if (page < 0) {
+            page = 0;
+        } else if (page >= totalPages && totalPages > 0) {
+            page = totalPages - 1;
+        }
+
+        int fromIndex = page * pageSize;
+        int toIndex = Math.min(fromIndex + pageSize, totalGuides);
+        List<Map<String, String>> pageGuides = new ArrayList<>();
+
+        if (fromIndex >= 0 && fromIndex < totalGuides) {
+            pageGuides = guidesForView.subList(fromIndex, toIndex);
+        } else if (totalGuides > 0) {
+            page = 0;
+            toIndex = Math.min(pageSize, totalGuides);
+            pageGuides = guidesForView.subList(0, toIndex);
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("guides", pageGuides);
+        result.put("page", page);
+        result.put("totalPages", totalPages);
+        return result;
+    }
 
     public List<Map<String, String>> getAllGuides() {
         List<Map<String, String>> guides = new ArrayList<>();
@@ -186,7 +226,7 @@ public class Auth0Service {
 
                     if (userIdOpt.isPresent() && emailOpt.isPresent()) {
                         Map<String, String> guide = new HashMap<>();
-                         guide.put("id", userIdOpt.get());
+                        guide.put("id", userIdOpt.get());
                         guide.put("email", emailOpt.get());
                         guide.put("name", Optional.ofNullable(user.get("name")).map(Object::toString).orElse("N/A"));
                         guide.put("picture", Optional.ofNullable(user.get("picture")).map(Object::toString).orElse(""));
@@ -195,16 +235,16 @@ public class Auth0Service {
                 }
             }
         } catch (Exception e) {
-             System.out.println(e.getMessage());
+            System.out.println(e.getMessage());
         }
         return guides;
     }
 
     public void updatePicture(String userId, String imageUrl) {
-         if (this.usersApiBaseUrl == null || this.usersApiBaseUrl.isEmpty()) {
+        if (this.usersApiBaseUrl == null || this.usersApiBaseUrl.isEmpty()) {
             throw new IllegalStateException("User API endpoint not configured.");
         }
-         if (userId == null || userId.trim().isEmpty() || imageUrl == null || imageUrl.trim().isEmpty()) {
+        if (userId == null || userId.trim().isEmpty() || imageUrl == null || imageUrl.trim().isEmpty()) {
             throw new IllegalArgumentException("User ID and Image URL cannot be empty.");
         }
         String url = this.usersApiBaseUrl + userId.trim();
@@ -213,29 +253,29 @@ public class Auth0Service {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
         headers.setContentType(MediaType.APPLICATION_JSON);
-         Map<String, String> requestBody = Map.of("picture", imageUrl.trim());
+        Map<String, String> requestBody = Map.of("picture", imageUrl.trim());
         HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
 
         try {
-             ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.PATCH, requestEntity, Void.class);
-             if (!response.getStatusCode().is2xxSuccessful()) {
+            ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.PATCH, requestEntity, Void.class);
+            if (!response.getStatusCode().is2xxSuccessful()) {
                 throw new RuntimeException("Picture update failed, status code: " + response.getStatusCode());
             }
         } catch (RestClientException e) {
-             throw new RuntimeException("Picture update failed: " + e.getMessage(), e);
+            throw new RuntimeException("Picture update failed: " + e.getMessage(), e);
         } catch (Exception e) {
-             throw new RuntimeException("Picture update failed: Unexpected error - " + e.getMessage(), e);
+            throw new RuntimeException("Picture update failed: Unexpected error - " + e.getMessage(), e);
         }
     }
 
     public void updateGuideDescription(String userId, String description) {
-         if (this.usersApiBaseUrl == null || this.usersApiBaseUrl.isEmpty()) {
+        if (this.usersApiBaseUrl == null || this.usersApiBaseUrl.isEmpty()) {
             throw new IllegalStateException("User API endpoint not configured.");
         }
-         if (userId == null || userId.trim().isEmpty()) {
+        if (userId == null || userId.trim().isEmpty()) {
             throw new IllegalArgumentException("User ID cannot be empty.");
         }
-         String descriptionToSave = (description != null) ? description : "";
+        String descriptionToSave = (description != null) ? description : "";
         String url = this.usersApiBaseUrl + userId.trim();
         String accessToken = getApiToken();
 
@@ -250,14 +290,14 @@ public class Auth0Service {
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
 
         try {
-             ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.PATCH, requestEntity, Void.class);
-             if (!response.getStatusCode().is2xxSuccessful()) {
+            ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.PATCH, requestEntity, Void.class);
+            if (!response.getStatusCode().is2xxSuccessful()) {
                 throw new RuntimeException("Description update failed, status code: " + response.getStatusCode());
             }
         } catch (RestClientException e) {
-             throw new RuntimeException("Description update failed: " + e.getMessage(), e);
+            throw new RuntimeException("Description update failed: " + e.getMessage(), e);
         } catch (Exception e) {
-             throw new RuntimeException("Description update failed: Unexpected error - " + e.getMessage(), e);
+            throw new RuntimeException("Description update failed: Unexpected error - " + e.getMessage(), e);
         }
     }
 }
