@@ -60,7 +60,7 @@
     height: 2px;
     bottom: 0;
     left: 0;
-    color: #ff6200;
+    background-color: #ff6200;
     transition: width 0.1s ease;
 }
 
@@ -68,7 +68,7 @@
     width: 100%;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1300px) {
     .navbar-toggler {
         color: #ff6200;
         display: block;

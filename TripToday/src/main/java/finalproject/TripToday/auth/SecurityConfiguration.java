@@ -24,7 +24,6 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
 
-
         http.csrf(csrf -> csrf.disable()).authorizeHttpRequests(
                         authorize ->
                                 authorize.
@@ -40,7 +39,6 @@ public class SecurityConfiguration {
                 .logout(logout -> logout.addLogoutHandler(logoutHandler()));
         return http.build();
     }
-
 
     private LogoutHandler logoutHandler() {
         return (request, response, authentication) -> {
